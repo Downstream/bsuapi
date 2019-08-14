@@ -26,27 +26,27 @@ public class RelatedResource
 
     private static final int TIMEOUT = 1000;
 
-    @Path("/{label: [a-zA-Z][a-zA-Z_0-9]*}/{value: [a-zA-Z][a-zA-Z_0-9]*}")
+    @Path("/{topic: [a-zA-Z][a-zA-Z_0-9]*}/{value: [a-zA-Z][a-zA-Z_0-9]*}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response apiRelated(
-            @PathParam("label") String label,
+            @PathParam("topic") String topic,
             @PathParam("value") String value
     ){
         JSONObject res = new JSONObject();
         res.put("success", "false");
         res.put("message", "could not find a matching topic");
 
-        if (value == null || label == null)
+        if (value == null || topic == null)
         {
             res.put("data", new JSONObject());
             return Response.status( Response.Status.NOT_ACCEPTABLE ).entity( UTF8.encode(res.toString()) ).build();
         }
 
         try ( Transaction tx = db.beginTx() ) {
-            JSONObject data = this.findByLabelIndex(label, value);
+            JSONObject data = this.findByLabelIndex(topic, value);
             res.put("success", "true");
-            res.put("message", "Found "+ data.get("count") +" "+ label +" matches for "+ value );
+            res.put("message", "Found "+ data.get("count") +" "+ topic +" matches for "+ value );
             res.put("data", data);
             tx.success();
             return Response.status( Response.Status.OK ).entity( UTF8.encode(res.toString()) ).build();
@@ -62,19 +62,19 @@ public class RelatedResource
     }
 
     private JSONObject findByLabelIndex(
-            String label,
+            String topic,
             String value
     ){
         JSONObject data = new JSONObject();
         JSONArray matches = new JSONArray();
 
-        Topic l = new Topic(db, label);
+        Topic l = new Topic(db, topic);
 
         for (Node node : l.findRelated(value)) {
             matches.put(NodeUtil.toJsonObject(node));
         }
 
-        data.put("label", label);
+        data.put("topic", topic);
         data.put("count", matches.length());
         data.put("matches", matches);
         return data;

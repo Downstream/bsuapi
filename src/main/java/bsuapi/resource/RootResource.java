@@ -22,6 +22,7 @@ public class RootResource
         JSONObject res = new JSONObject();
         res.put("title","Boise State World Museum Neo4j JSON API");
         res.put("summary","Multiple RESTful URI methods to retrieve preset JSON representations of the graph of curated artworks.");
+        res.put("note","Project goal: >90% test coverage, and every API method has an equivalent function registered.");
         res.put("methods", this.buildMethodList());
 
         return Response.status( Status.OK ).entity( UTF8.encode( res.toString(4) ) ).build();
@@ -39,7 +40,7 @@ public class RootResource
                 "/related/{TOPIC}/{VALUE}",
                 "Find all (TOPIC)s with an indexed value matching (VALUE), along with a" +
                 "collection of closely related Topics, and a collection of Artwork which references that Topic.",
-                "(THIS)")
+                "TBD")
         );
         return methods;
     }
