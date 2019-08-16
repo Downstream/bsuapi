@@ -59,7 +59,7 @@ dbms.connectors.default_advertised_address=yourdomain.com
 
 ### Configure nginx
 `/etc/nginx/conf.d/yourdomain.conf`
-```
+```nginx
 server { 
     
     server_name yourdomain.com
