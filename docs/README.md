@@ -1,6 +1,10 @@
 # Experimental Neo4j JSON API Plugin
 Intended to be included as a Neo4j plugin, on Ubuntu 18, with Nginx control of access. 
 
+### Latest [bsuapi-0.0.1.jar](releases/bsuapi-0.0.1.jar)
+* Access the API [bsuapi/](bsuapi)
+* All Releases [releases/](releases)
+
 ### Requirements
 * Neo4j 3.5.8
 
