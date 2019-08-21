@@ -49,9 +49,12 @@ msg "  - - - - - STARTING STACKSCRIPT - - - - - "
 set_hostname
 apt_setup_update
 
+APOCVERSION="3.5.0.4"
+
 msg "hostname $HOSTNAME"
 msg "fqdn $FQDN"
 msg "neoplugin $NEOPLUGIN"
+msg "apoc $APOCVERSION"
 msg "apipath $APIPATH"
 
 # INITIALIZE
@@ -72,8 +75,8 @@ msg "neo4j and nginx installed"
 
 # NEO4J PLUGINS
 wget -O /var/lib/neo4j/plugins/$NEOPLUGIN https://downstream.github.io/bsuapi/releases/$NEOPLUGIN
-chown neo4j:adm /var/lib/neo4j/plugins/$NEOPLUGIN
-# todo: apoc
+wget -O /var/lib/neo4j/plugins/apoc-$APOCVERSION-all.jar https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/$APOCVERSION/apoc-$APOCVERSION-all.jar
+chown neo4j:adm /var/lib/neo4j/plugins/*
 
 cp /lib/systemd/system/neo4j.service /root/neo4j.service.orig
 sed -E 's|^(Environment=".*)$|# \1|g' /root/neo4j.service.orig > /lib/systemd/system/neo4j.service.tmp # NEO4j SERVICE DEF - comment out the bad Env line
