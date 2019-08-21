@@ -1,6 +1,5 @@
 // copy-pasta into browser, or pipe into cypher-shell:
-// cat metimportDepartments.cypher | cypher-shell -u [user] -p [password] --format plain > cypherscript.log 2>&1 &
-// tail -f cypherscript.log
+// cat metimport-1-Departments.cypher | cypher-shell -u [user] -p [password] --format plain > cypherscript.log 2>&1 &; tail -f cypherscript.log
 
 CREATE INDEX ON :Source(name);
 CREATE INDEX ON :Department(id);
