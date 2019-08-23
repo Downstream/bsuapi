@@ -1,6 +1,7 @@
 // copy-pasta into browser, or pipe into cypher-shell:
 // cat metimport-2-Artwork.cypher | cypher-shell -u [user] -p [password] --format plain > cypherscript.log 2>&1 &; tail -f cypherscript.log
 // RUN metimport-1-Departments.cypher first, including CREATE EMPTY ARTWORKS
+// You'll get about 100 to 200 per min, => 1.5 - 4 days
 
 :param urlbase => 'https://collectionapi.metmuseum.org/public/collection/v1';
 :param cleanFields => ["isPublicDomain","primaryImage","objectURL","additionalImages","isHighlight","medium","metadataDate","department","objectEndDate","objectBeginDate","repository","accessionNumber","creditLine","constituents"];

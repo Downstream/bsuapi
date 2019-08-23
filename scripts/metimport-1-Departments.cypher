@@ -29,18 +29,19 @@ RETURN s.name, d.id, d.name;
 
 // CREATE EMPTY ARTWORKS (with id) FROM EACH DEPARTMENT'S LIST
 // Due to API throttling, and one request per each of ~ VERY
+// Takes 5 to 10 hrs
 
-// CALL apoc.periodic.iterate(
-// "
-//   MATCH (d:Department)
-// 	WITH d, $urlbase + '/objects?departmentIds=' + d.id AS url
-// 	CALL apoc.load.json(url) YIELD value
-// 	UNWIND value.objectIDs as s
-// 	RETURN s, d
-// ","
-//   CREATE (a:Artwork {id: s})
-//   CREATE (d)<-[:DEPARTMENT]-(a)
-// ",
-//   {batchSize:500, iterateList:true, parallel:true, params: {urlbase: $urlbase}}
-// )
-// ;
+ CALL apoc.periodic.iterate(
+ "
+   MATCH (d:Department)
+ 	 WITH d, $urlbase + '/objects?departmentIds=' + d.id AS url
+ 	 CALL apoc.load.json(url) YIELD value
+ 	 UNWIND value.objectIDs as s
+ 	 RETURN s, d
+ ","
+   CREATE (a:Artwork {id: s})
+   CREATE (d)<-[:DEPARTMENT]-(a)
+ ",
+   {batchSize:500, iterateList:true, parallel:true, params: {urlbase: $urlbase}}
+ )
+ ;
