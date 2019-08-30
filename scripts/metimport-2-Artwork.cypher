@@ -8,14 +8,14 @@
 :param cleanValues => ['',null];
 
 MATCH (a:Artwork)
-WHERE NOT a.import = 1 AND NOT a.import = 2
+WHERE NOT a.import = 1 AND a.import > 0
 SET a.import = 0;
 
 call apoc.periodic.commit(
   "
     MATCH (a:Artwork {import: 0})
     WITH $urlbase + '/objects/' + a.id AS url, a LIMIT 10
-    CALL apoc.load.json(url) YIELD value
+    CALL apoc.load.json(url, '', failOnError:false) YIELD value
     WITH a, apoc.map.clean(value, $cleanFields, $cleanValues) as artdata
       SET a += artdata
       SET a.import = 1
@@ -28,3 +28,20 @@ call apoc.periodic.commit(
     cleanValues: $cleanValues
   }
 );
+
+// anything not set, had a bad uri - we can retry them later, but best to avoid them for now
+MATCH (a:Artwork {import: 0})
+SET a.import = -1;
+
+// find only artwork with images, and give the artwork a graph-name, for interacting via Browser
+MATCH (a:Artwork {import: 1})
+WHERE EXISTS(a.name)
+SET a.origName = a.name;
+
+MATCH (a:Artwork {import: 1})
+WHERE EXISTS(a.primaryImageSmall)
+WITH a, COALESCE (a.objectName, COALESCE(COALESCE(a.period, a.culture)+' '+a.title, a.title)) as n
+SET a.name = n
+SET a.import = 2;
+// these will be the artworks we operate on.
+// todo: script downloading and resizing images (can, should, this be done in this plugin!?)

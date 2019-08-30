@@ -8,6 +8,7 @@ CREATE INDEX ON :Artist(name);
 CREATE INDEX ON :Classification(name);
 CREATE INDEX ON :Tag(name);
 CREATE INDEX ON :Nation(name);
+CREATE INDEX ON :Culture(name);
 
 :param urlbase => 'https://collectionapi.metmuseum.org/public/collection/v1';
 :param cleanFields => ["isPublicDomain","primaryImage","objectURL","additionalImages","isHighlight","medium","metadataDate","department","objectEndDate","objectBeginDate","repository","accessionNumber","creditLine","constituents"];
