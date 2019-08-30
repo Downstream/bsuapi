@@ -40,7 +40,7 @@ SET a.origName = a.name;
 
 MATCH (a:Artwork {import: 1})
 WHERE EXISTS(a.primaryImageSmall)
-WITH a, COALESCE (a.objectName, COALESCE(COALESCE(a.period, a.culture)+' '+a.title, a.title)) as n
+WITH a, COALESCE (a.title, COALESCE(COALESCE(a.period, a.culture)+' '+a.objectName, a.objectName)) as n
 SET a.name = n
 SET a.import = 2;
 // these will be the artworks we operate on.

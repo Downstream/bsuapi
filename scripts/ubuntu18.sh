@@ -96,6 +96,13 @@ dbms.connectors.default_advertised_address=$FQDN
 # APOC
 dbms.security.procedures.unrestricted=apoc.*
 
+# APOC IMPORT AND EXPORT
+# CALL apoc.export.graphml.all('exportfile.gml',{})
+# exported file may have invalid unicode (see: https://github.com/neo4j-contrib/neo4j-apoc-procedures/issues/438) FIX: regex replace [\x{07}\x{1e}\x{1f}]
+# CALL apoc.import.graphml('exportfile.gml',{batchSize: 10000, readLabels: true, storeNodeIds: false, defaultRelationshipType:'RELATED'})
+apoc.import.file.enabled=true
+apoc.export.file.enabled=true
+
 # ORIGINAL
 " > /etc/neo4j/neo4j.conf
 sed -e '/^\s*#.*$/d' -e '/^\s*$/d' /etc/neo4j/neo4j.conf.default >> /etc/neo4j/neo4j.conf # remove empty line and comments
@@ -129,6 +136,13 @@ echo "server {
         proxy_set_header Host downstream.github.io;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_pass https://downstream.github.io/bsuapi/releases;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    }
+
+    location /bsuapi/data {
+        proxy_set_header Host downstream.github.io;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_pass https://downstream.github.io/bsuapi/data;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
