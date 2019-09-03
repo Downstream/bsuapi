@@ -132,6 +132,10 @@ echo "server {
     error_log /var/log/error.log;
     access_log /var/log/access.log;
 
+    location /bsuapi/data {
+        alias /var/www/data;
+    }
+
     location /bsuapi/releases {
         proxy_set_header Host downstream.github.io;
         proxy_set_header X-Real-IP \$remote_addr;
@@ -139,8 +143,11 @@ echo "server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
-    location /bsuapi/data {
-        root /var/www/data;
+    location /bsuapi/pages {
+        proxy_set_header Host downstream.github.io;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_pass https://downstream.github.io/bsuapi/pages;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
     location /bsuapi/assets {
