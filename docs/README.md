@@ -6,7 +6,7 @@ Intended to be included as a Neo4j plugin, on Ubuntu 18, with Nginx control of a
 * All Releases [releases/](releases)
 
 ### Sample GraphDB
-* [Graph The MET](Graph-The-MET.md)
+* [Graph The MET](./Graph-The-MET.md)
 
 ### Requirements
 * Neo4j 3.5.8
