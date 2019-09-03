@@ -14,7 +14,7 @@ To learn more, visit:
 1. Verify Requirements
     * [APOC](https://github.com/neo4j-contrib/neo4j-apoc-procedures) installed
     * neo4j.conf `apoc.import.file.enabled=true`
-2. Download [graphTheMet.gml](data/graphTheMet.gml) to `$NEO4J_HOME/import/graphTheMet.gml`
+2. Download [graphTheMet.gml](./data/graphTheMet.gml) to `$NEO4J_HOME/import/graphTheMet.gml`
 3. Run the following command via a Neo4j Browser, or cypher-shell. 
 
 ```
