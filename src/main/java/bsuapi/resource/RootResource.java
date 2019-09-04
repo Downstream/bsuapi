@@ -36,12 +36,9 @@ public class RootResource
             "API HOME - you are here - a place to help you get where you're going.",
             "(THIS)")
         );
-        methods.put(this.buildMethod(
-                "/related/{TOPIC}/{VALUE}",
-                "Find all (TOPIC)s with an indexed value matching (VALUE), along with a" +
-                "collection of closely related Topics, and a collection of Artwork which references that Topic.",
-                "TBD")
-        );
+
+        methods.put(this.related());
+
         return methods;
     }
 
@@ -52,5 +49,22 @@ public class RootResource
         res.put("description", description);
         res.put("representation", representation);
         return res;
+    }
+
+    private JSONObject related()
+    {
+        JSONObject method = this.buildMethod(
+            "/related/{TOPIC}/{VALUE}",
+            "Find all (TOPIC)s with an indexed value matching (VALUE), along with a" +
+                    "collection of closely related Topics, and a collection of Artwork which references that Topic. ",
+            "TBD"
+        );
+
+        JSONObject args = new JSONObject();
+        args.put("topic", "All lowercase, a-z. Can be specific (artist, classification, culture, tag, etc.), or general (topic).");
+        args.put("value", "Must start with a letter, a-zA-Z_0-9. Use underscores for spaces (Union_Porcelain_Works).");
+        method.put("arguments", args);
+
+        return method;
     }
 }

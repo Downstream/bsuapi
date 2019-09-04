@@ -26,7 +26,7 @@ public class RelatedResource
 
     private static final int TIMEOUT = 1000;
 
-    @Path("/{topic: [a-zA-Z][a-zA-Z_0-9]*}/{value: [a-zA-Z][a-zA-Z_0-9]*}")
+    @Path("/{topic: [a-z]*}/{value: [a-zA-Z][a-zA-Z_0-9]*}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response apiRelated(
@@ -43,10 +43,13 @@ public class RelatedResource
             return Response.status( Response.Status.NOT_ACCEPTABLE ).entity( UTF8.encode(res.toString()) ).build();
         }
 
+        String searchVal = value.replace('_',' '); // underscores to spaces
+        String searchTopic = topic.substring(0, 1).toUpperCase() + topic.substring(1); // upper first
+
         try ( Transaction tx = db.beginTx() ) {
-            JSONObject data = this.findByLabelIndex(topic, value);
+            JSONObject data = this.findByLabelIndex(searchTopic, searchVal);
             res.put("success", "true");
-            res.put("message", "Found "+ data.get("count") +" "+ topic +" matches for "+ value );
+            res.put("message", "Found "+ data.get("count") +" "+ topic +" matches for "+ searchVal );
             res.put("data", data);
             tx.success();
             return Response.status( Response.Status.OK ).entity( UTF8.encode(res.toString()) ).build();
