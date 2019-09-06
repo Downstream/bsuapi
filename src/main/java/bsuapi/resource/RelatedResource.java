@@ -1,5 +1,6 @@
 package bsuapi.resource;
 
+import bsuapi.behavior.Related;
 import bsuapi.dbal.JsonResponse;
 import bsuapi.dbal.Topic;
 import org.json.JSONArray;
@@ -48,12 +49,8 @@ public class RelatedResource
             {
                 return JsonResponse.notFound();
             } else {
-                JSONObject data = new JSONObject();
-                JSONArray nearby = t.altsJson();
-                data.put("topic", t.name());
-                data.put("node", t.toJson());
-                data.put("nearby", nearby);
-                return JsonResponse.data(data, "Found :"+ t.name() +" "+ t.getNodeName() +" and "+ nearby.length() +" similar matches.");
+                Related rel = new Related(t);
+                return JsonResponse.data(rel.toJson(), rel.message);
             }
         }
         catch (Exception e)

@@ -90,12 +90,17 @@ public class Topic implements org.neo4j.graphdb.Label
 
     public Node getNode()
     {
-        return node;
+        return this.node;
     }
 
     public ArrayList<Node> getAlternates()
     {
         return alternates;
+    }
+
+    public int altsCount()
+    {
+        return alternates.size();
     }
 
     public JSONObject toJson()

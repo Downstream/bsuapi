@@ -1,7 +1,7 @@
 package bsuapi;
 
+import bsuapi.behavior.Related;
 import bsuapi.dbal.Topic;
-import org.json.JSONObject;
 import org.neo4j.graphdb.*;
 import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Description;
@@ -24,12 +24,8 @@ public class RelatedFunction
             Topic t = new Topic(db, labelName, value);
             tx.success();
 
-            JSONObject data = new JSONObject();
-            data.put("topic", t.name());
-            data.put("node", t.toJson());
-            data.put("name", t.getNodeName());
-            data.put("nearby", t.altsJson());
-            return t.getNode();
+            Related rel = new Related(t);
+            return rel.node; // @todo: return a list of properties matching the resource response (Neo4j doesn't handle JSONObject)
         }
     }
 }
