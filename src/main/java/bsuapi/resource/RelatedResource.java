@@ -1,13 +1,11 @@
 package bsuapi.resource;
 
+import bsuapi.dbal.JsonResponse;
 import bsuapi.dbal.Topic;
-import bsuapi.dbal.NodeUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.string.UTF8;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -33,53 +31,34 @@ public class RelatedResource
             @PathParam("topic") String topic,
             @PathParam("value") String value
     ){
-        JSONObject res = new JSONObject();
-        res.put("success", "false");
-        res.put("message", "could not find a matching topic");
-
         if (value == null || topic == null)
         {
-            res.put("data", new JSONObject());
-            return Response.status( Response.Status.NOT_ACCEPTABLE ).entity( UTF8.encode(res.toString()) ).build();
+            return JsonResponse.badRequest("Required method parameters missing: topic label, topic name");
         }
 
         String searchVal = value.replace('_',' '); // underscores to spaces
         String searchTopic = topic.substring(0, 1).toUpperCase() + topic.substring(1); // upper first
 
-        try ( Transaction tx = db.beginTx() ) {
-            JSONObject data = this.findByLabelIndex(searchTopic, searchVal);
-            res.put("success", "true");
-            res.put("message", "Found "+ data.get("count") +" "+ topic +" matches for "+ searchVal );
-            res.put("data", data);
+        try ( Transaction tx = db.beginTx() )
+        {
+            Topic t = new Topic(db, searchTopic, searchVal);
             tx.success();
-            return Response.status( Response.Status.OK ).entity( UTF8.encode(res.toString()) ).build();
+
+            if (!t.hasMatch())
+            {
+                return JsonResponse.notFound();
+            } else {
+                JSONObject data = new JSONObject();
+                JSONArray nearby = t.altsJson();
+                data.put("topic", t.name());
+                data.put("node", t.toJson());
+                data.put("nearby", nearby);
+                return JsonResponse.data(data, "Found :"+ t.name() +" "+ t.getNodeName() +" and "+ nearby.length() +" similar matches.");
+            }
         }
         catch (Exception e)
         {
-            res.put("success", "false");
-            res.put("message", e.getMessage());
-            res.put("data", e.toString());
+            return JsonResponse.exception(e);
         }
-
-        return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( UTF8.encode(res.toString()) ).build();
-    }
-
-    private JSONObject findByLabelIndex(
-            String topic,
-            String value
-    ){
-        JSONObject data = new JSONObject();
-        JSONArray matches = new JSONArray();
-
-        Topic l = new Topic(db, topic);
-
-        for (Node node : l.findRelated(value)) {
-            matches.put(NodeUtil.toJsonObject(node));
-        }
-
-        data.put("topic", topic);
-        data.put("count", matches.length());
-        data.put("matches", matches);
-        return data;
     }
 }

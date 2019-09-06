@@ -1,5 +1,7 @@
 package bsuapi.dbal;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
@@ -8,16 +10,19 @@ import org.neo4j.graphdb.schema.Schema;
 
 import java.util.ArrayList;
 
-public class Topic implements org.neo4j.graphdb.Label {
-
+public class Topic implements org.neo4j.graphdb.Label
+{
     private GraphDatabaseService db;
-
     private org.neo4j.graphdb.Label label;
+    private Node node;
+    private ArrayList<Node> alternates;
 
-    public Topic(GraphDatabaseService db, String labelName)
+    public Topic(GraphDatabaseService db, String labelName, String nodeName)
     {
         this.db = db;
         this.label = org.neo4j.graphdb.Label.label(labelName);
+        this.alternates = new ArrayList<>();
+        this.node = this.findNode(nodeName);
     }
 
     @Override
@@ -25,19 +30,26 @@ public class Topic implements org.neo4j.graphdb.Label {
         return this.label.name();
     }
 
-    public ArrayList<Node> findRelated (
-            String value
-    ){
+    private Node findNode (String nodeName)
+    {
         Schema schema = db.schema();
-        ArrayList<Node> matches = new ArrayList<>();
 
-        for (IndexDefinition index : schema.getIndexes(label)) {
-            for (String keyName : index.getPropertyKeys()) {
-                matches.addAll(this.findThroughIndex(keyName, value));
+        for (IndexDefinition index : schema.getIndexes(label))
+        {
+            for (String keyName : index.getPropertyKeys())
+            {
+                alternates.addAll(this.findThroughIndex(keyName, nodeName));
             }
         }
 
-        return matches;
+        if (alternates.size() > 0)
+        {
+            Node result = alternates.get(0);
+            alternates.remove(0);
+            return result;
+        }
+
+        return null;
     }
 
     private ArrayList<Node> findThroughIndex(
@@ -55,5 +67,50 @@ public class Topic implements org.neo4j.graphdb.Label {
             matches.close();
             return matchNodes;
         }
+    }
+
+    public String getNodeName()
+    {
+        if (this.hasMatch())
+        {
+            Object prop = this.getNode().getProperty("name", null);
+            if (prop != null)
+            {
+                return prop.toString();
+            }
+        }
+
+        return "";
+    }
+
+    public Boolean hasMatch()
+    {
+        return (node != null);
+    }
+
+    public Node getNode()
+    {
+        return node;
+    }
+
+    public ArrayList<Node> getAlternates()
+    {
+        return alternates;
+    }
+
+    public JSONObject toJson()
+    {
+        return NodeUtil.toJsonObject(this.node);
+    }
+
+    public JSONArray altsJson()
+    {
+        JSONArray result = new JSONArray();
+        for (Node node : this.alternates)
+        {
+            result.put(NodeUtil.toJsonObject(node));
+        }
+
+        return result;
     }
 }
