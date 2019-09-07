@@ -1,5 +1,6 @@
 package bsuapi.dbal;
 
+import bsuapi.resource.URLCoder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -12,6 +13,13 @@ import java.util.ArrayList;
 
 public class Topic implements org.neo4j.graphdb.Label
 {
+    public static String ARTWORK = "Artwork";
+    public static String ARTIST = "Artist";
+    public static String CLASS = "Classification";
+    public static String CULTURE = "Culture";
+    public static String NATION = "Nation";
+    public static String TAG = "Tag";
+
     private GraphDatabaseService db;
     private org.neo4j.graphdb.Label label;
     private Node node;
@@ -105,7 +113,9 @@ public class Topic implements org.neo4j.graphdb.Label
 
     public JSONObject toJson()
     {
-        return NodeUtil.toJsonObject(this.node);
+        JSONObject node = NodeUtil.toJsonObject(this.node);
+        node.put("nameEncoded", URLCoder.encode(this.getNodeName()));
+        return node;
     }
 
     public JSONArray altsJson()

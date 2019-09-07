@@ -7,6 +7,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import bsuapi.behavior.Related;
+import bsuapi.dbal.Topic;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.neo4j.string.UTF8;
@@ -31,40 +33,19 @@ public class RootResource
     private JSONArray buildMethodList()
     {
         JSONArray methods = new JSONArray();
-        methods.put(this.buildMethod(
-            "/",
-            "API HOME - you are here - a place to help you get where you're going.",
-            "(THIS)")
-        );
+        methods.put(this.youarehere());
 
-        methods.put(this.related());
+        methods.put(Related.describe());
 
         return methods;
     }
 
-    private JSONObject buildMethod(String uri, String description, String representation)
+    private JSONObject youarehere()
     {
         JSONObject res = new JSONObject();
-        res.put("uri", uri);
-        res.put("description", description);
-        res.put("representation", representation);
+        res.put("uri", "/");
+        res.put("description", "API HOME - you are here - a place to help you get where you're going.");
+        res.put("representation", "(THIS)");
         return res;
-    }
-
-    private JSONObject related()
-    {
-        JSONObject method = this.buildMethod(
-            "/related/{TOPIC}/{VALUE}",
-            "Find all (TOPIC)s with an indexed value matching (VALUE), along with a" +
-                    "collection of closely related Topics, and a collection of Artwork which references that Topic. ",
-            "TBD"
-        );
-
-        JSONObject args = new JSONObject();
-        args.put("topic", "All lowercase, a-z. Can be specific (artist, classification, culture, tag, etc.), or general (topic).");
-        args.put("value", "Must start with a letter, a-zA-Z_0-9. Use underscores for spaces (Union_Porcelain_Works).");
-        method.put("arguments", args);
-
-        return method;
     }
 }
