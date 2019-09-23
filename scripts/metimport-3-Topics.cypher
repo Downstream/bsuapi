@@ -100,3 +100,9 @@ CALL apoc.periodic.iterate(
       MERGE (a)<-[:TAG]-(b)
 ", {batchSize:10000, iterateList:true, parallel:false}
 );
+
+MATCH (a:Classification)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
+MATCH (a:Artist)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
+MATCH (a:Culture)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
+MATCH (a:Nation)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
+MATCH (a:Tag)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
