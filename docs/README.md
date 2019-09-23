@@ -7,6 +7,7 @@ Intended to be included as a Neo4j plugin, on Ubuntu 18, with Nginx control of a
 
 ### Sample GraphDB
 * [Graph The MET](pages/Graph-The-MET.md)
+* [Cypher](cypher.md) useful queries
 
 ### Requirements
 * Neo4j 3.5.8
