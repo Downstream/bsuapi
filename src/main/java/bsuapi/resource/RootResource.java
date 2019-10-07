@@ -23,7 +23,7 @@ public class RootResource
 
         JSONObject res = new JSONObject();
         res.put("title","Boise State World Museum Neo4j JSON API");
-        res.put("summary","Multiple RESTful URI methods to retrieve preset JSON representations of the graph of curated artworks.");
+        res.put("summary","Multiple RESTful URI methods to retrieve preset JSON representations of the graph of curated assets.");
         res.put("note","Project goal: >90% test coverage, and every API method has an equivalent function registered.");
         res.put("methods", this.buildMethodList());
 

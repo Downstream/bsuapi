@@ -1,6 +1,7 @@
 package bsuapi.resource;
 
 import bsuapi.behavior.Related;
+import bsuapi.dbal.Cypher;
 import bsuapi.dbal.JsonResponse;
 import bsuapi.dbal.Topic;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -43,10 +44,11 @@ public class RelatedResource
         String searchVal = URLCoder.decode(value);
         String searchTopic = topic.substring(0, 1).toUpperCase() + topic.substring(1); // upper first
 
-        try ( Transaction tx = db.beginTx() )
-        {
-            Topic t = new Topic(db, searchTopic, searchVal);
-            tx.success();
+        try (
+                Cypher c = new Cypher(db);
+        ) {
+            Topic t = new Topic(searchTopic, searchVal);
+            c.resolveTopic(t);
 
             log.info("Related search: :"+ searchTopic +" \""+ searchVal+"\"");
             if (!t.hasMatch())
@@ -55,6 +57,7 @@ public class RelatedResource
                 return JsonResponse.notFound();
             } else {
                 Related rel = new Related(t);
+                rel.resolveBehavior(c);
                 log.info("Related result: "+ rel.message);
                 //rel.debug(log);
                 return JsonResponse.data(rel.toJson(), rel.message);

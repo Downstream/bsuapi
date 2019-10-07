@@ -1,5 +1,7 @@
 package bsuapi.behavior;
 
+import bsuapi.dbal.Cypher;
+import bsuapi.dbal.CypherException;
 import bsuapi.dbal.Topic;
 import org.json.JSONObject;
 import org.neo4j.graphdb.Node;
@@ -17,10 +19,12 @@ public abstract class Behavior {
         this.message = this.buildMessage(topic);
     }
 
+    abstract public void resolveBehavior(Cypher cypher) throws CypherException;
+
     public String buildMessage(Topic topic)
     {
         if (topic.hasMatch()) {
-            return "Found :"+ topic.name() +" "+ topic.getNodeName() +" and "+ topic.altsCount() +" similar matches.";
+            return "Found :"+ topic.name() +" "+ topic.getNodeKeyField() +":\""+ topic.getNodeKey() +"\"";
         } else {
             return "No Match Found For :"+ topic.name();
         }
@@ -31,7 +35,6 @@ public abstract class Behavior {
         JSONObject data = new JSONObject();
         data.put("topic", this.topic.name());
         data.put("node", this.topic.toJson());
-        data.put("nearby", this.topic.altsJson());
         return data;
     }
 

@@ -1,36 +1,26 @@
 package bsuapi.dbal;
 
 import bsuapi.resource.URLCoder;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.ResourceIterator;
-import org.neo4j.graphdb.schema.IndexDefinition;
-import org.neo4j.graphdb.schema.Schema;
-
-import java.util.ArrayList;
 
 public class Topic implements org.neo4j.graphdb.Label
 {
-    public static String ARTWORK = "Artwork";
-    public static String ARTIST = "Artist";
-    public static String CLASS = "Classification";
-    public static String CULTURE = "Culture";
-    public static String NATION = "Nation";
-    public static String TAG = "Tag";
-
-    private GraphDatabaseService db;
+    private NodeType type;
     private org.neo4j.graphdb.Label label;
+    private String nodeKey;
     private Node node;
-    private ArrayList<Node> alternates;
 
-    public Topic(GraphDatabaseService db, String labelName, String nodeName)
+    public Topic(String labelName, String nodeKey)
     {
-        this.db = db;
+        this.type = NodeType.match(labelName);
         this.label = org.neo4j.graphdb.Label.label(labelName);
-        this.alternates = new ArrayList<>();
-        this.node = this.findNode(nodeName);
+        this.nodeKey = nodeKey;
+    }
+
+    public void setNode(Node node)
+    {
+        this.node = node;
     }
 
     @Override
@@ -38,50 +28,21 @@ public class Topic implements org.neo4j.graphdb.Label
         return this.label.name();
     }
 
-    private Node findNode (String nodeName)
-    {
-        Schema schema = db.schema();
+    public String getNodeKeyField() { return "name"; }
 
-        for (IndexDefinition index : schema.getIndexes(label))
-        {
-            for (String keyName : index.getPropertyKeys())
-            {
-                alternates.addAll(this.findThroughIndex(keyName, nodeName));
-            }
-        }
+    public String getNodeKey() { return this.nodeKey; }
 
-        if (alternates.size() > 0)
-        {
-            Node result = alternates.get(0);
-            alternates.remove(0);
-            return result;
-        }
+    public Boolean hasMatch() { return (node != null); }
 
-        return null;
-    }
+    public Node getNode() { return this.node; }
 
-    private ArrayList<Node> findThroughIndex(
-            String keyName,
-            String keyValue
-    ){
-        try ( ResourceIterator<Node> matches = db.findNodes(label, keyName, keyValue) )
-        {
-            ArrayList<Node> matchNodes = new ArrayList<>();
-            while ( matches.hasNext() )
-            {
-                matchNodes.add( matches.next() );
-            }
+    public NodeType getType() { return this.type; }
 
-            matches.close();
-            return matchNodes;
-        }
-    }
-
-    public String getNodeName()
+    public String getNodeProperty(String field)
     {
         if (this.hasMatch())
         {
-            Object prop = this.getNode().getProperty("name", null);
+            Object prop = this.getNode().getProperty(field, null);
             if (prop != null)
             {
                 return prop.toString();
@@ -91,41 +52,16 @@ public class Topic implements org.neo4j.graphdb.Label
         return "";
     }
 
-    public Boolean hasMatch()
-    {
-        return (node != null);
-    }
-
-    public Node getNode()
-    {
-        return this.node;
-    }
-
-    public ArrayList<Node> getAlternates()
-    {
-        return alternates;
-    }
-
-    public int altsCount()
-    {
-        return alternates.size();
-    }
-
     public JSONObject toJson()
     {
         JSONObject node = NodeUtil.toJsonObject(this.node);
-        node.put("nameEncoded", URLCoder.encode(this.getNodeName()));
+        node.put("keyField", this.getNodeKeyField());
+        node.put("keyEncoded", URLCoder.encode(this.getNodeKey()));
         return node;
     }
 
-    public JSONArray altsJson()
+    public String toCypherMatch()
     {
-        JSONArray result = new JSONArray();
-        for (Node node : this.alternates)
-        {
-            result.put(NodeUtil.toJsonObject(node));
-        }
-
-        return result;
+        return String.format(":%1$s {%2$s:\"%3$s\"}", this.name(), this.getNodeKeyField(), this.getNodeKey());
     }
 }
