@@ -1,5 +1,6 @@
 package bsuapi.dbal;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.neo4j.string.UTF8;
 import javax.ws.rs.core.Response;
@@ -36,6 +37,7 @@ public class JsonResponse {
     {
         JSONObject res = JsonResponse.responseObject(false, e.getMessage());
         res.put("data", e.toString());
+        res.put("stack", JsonResponse.exceptionStack(e));
         return JsonResponse.SERVER_ERROR(res);
     }
 
@@ -67,5 +69,21 @@ public class JsonResponse {
     private static Response build(Response.Status status, JSONObject response)
     {
         return Response.status( status ).entity( UTF8.encode(response.toString()) ).build();
+    }
+
+    private static JSONObject exceptionStack(Exception e)
+    {
+        JSONObject result = new JSONObject();
+        JSONArray stack;
+        Throwable cause = e;
+        do {
+            stack = new JSONArray();
+            for(StackTraceElement trace : cause.getStackTrace()) {
+                stack.put(trace.getFileName() +"["+ trace.getLineNumber() +"] "+ trace.getClass().getSimpleName() +"."+ trace.getMethodName() +"()");
+            }
+            result.put(cause.getClass().getSimpleName(), stack);
+        } while(null != (cause = e.getCause()));
+
+        return result;
     }
 }

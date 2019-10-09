@@ -4,6 +4,8 @@ public class CypherQuery {
     protected String[] args;
     protected String initQuery;
     protected String resultQuery;
+    public int limit = 10;
+    public static String resultColumn = "t"; // target
 
     public CypherQuery (String query)
     {

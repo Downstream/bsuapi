@@ -2,7 +2,6 @@ package bsuapi.dbal;
 
 import bsuapi.resource.URLCoder;
 import org.json.JSONObject;
-import org.neo4j.graphdb.Node;
 
 public class Topic implements org.neo4j.graphdb.Label
 {
@@ -42,11 +41,7 @@ public class Topic implements org.neo4j.graphdb.Label
     {
         if (this.hasMatch())
         {
-            Object prop = this.getNode().getProperty(field, null);
-            if (prop != null)
-            {
-                return prop.toString();
-            }
+            return this.getNode().getProperty(field);
         }
 
         return "";
@@ -54,10 +49,7 @@ public class Topic implements org.neo4j.graphdb.Label
 
     public JSONObject toJson()
     {
-        JSONObject node = NodeUtil.toJsonObject(this.node);
-        node.put("keyField", this.getNodeKeyField());
-        node.put("keyEncoded", URLCoder.encode(this.getNodeKey()));
-        return node;
+        return this.getNode().toJsonObject();
     }
 
     public String toCypherMatch()

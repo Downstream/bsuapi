@@ -3,8 +3,8 @@ package bsuapi.behavior;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
 import bsuapi.dbal.Topic;
+import bsuapi.dbal.Node;
 import org.json.JSONObject;
-import org.neo4j.graphdb.Node;
 import org.neo4j.logging.Log;
 
 public abstract class Behavior {
@@ -21,10 +21,12 @@ public abstract class Behavior {
 
     abstract public void resolveBehavior(Cypher cypher) throws CypherException;
 
+    public org.neo4j.graphdb.Node getNeoNode() { return this.node.getNeoNode(); }
+
     public String buildMessage(Topic topic)
     {
         if (topic.hasMatch()) {
-            return "Found :"+ topic.name() +" "+ topic.getNodeKeyField() +":\""+ topic.getNodeKey() +"\"";
+            return "Found :"+ topic.name() +" {"+ topic.getNodeKeyField() +":\""+ topic.getNodeKey() +"\"}";
         } else {
             return "No Match Found For :"+ topic.name();
         }

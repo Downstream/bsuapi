@@ -4,11 +4,13 @@ import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
 import bsuapi.dbal.NodeType;
 import bsuapi.dbal.Topic;
+import bsuapi.dbal.Node;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.TopicSharedRelations;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Result;
+import java.util.Map;
 
 public class Related extends Behavior
 {
@@ -44,7 +46,7 @@ public class Related extends Behavior
                 result.put(n.labelName(), this.relatedByType(cypher, topic, n));
             }
 
-            result.put(NodeType.ARTWORK.labelName(), this.relatedByType(cypher, topic, NodeType.ARTWORK));
+            //result.put(NodeType.ARTWORK.labelName(), this.relatedByType(cypher, topic, NodeType.ARTWORK));
         }
 
         return result;
@@ -56,10 +58,27 @@ public class Related extends Behavior
         JSONArray result = new JSONArray();
         CypherQuery q = TopicSharedRelations.params(topic, type);
         for (Node node : cypher.query(q)) {
-            result.put(node);
+            result.put( node.toJsonObject() );
         }
         return result;
     }
+
+//    protected JSONObject relatedByTypeShowQ(Cypher cypher, Topic topic, NodeType type)
+//    throws CypherException
+//    {
+//        JSONObject result = new JSONObject();
+//        CypherQuery q = TopicSharedRelations.params(topic, type);
+//        result.put("raw", q.toString());
+//        result.put("query", q.getCommand());
+//
+//        JSONArray resultA = new JSONArray();
+//        for (Node node : cypher.query(q)) {
+//            resultA.put(node);
+//        }
+//        result.put("result", resultA);
+//
+//        return result;
+//    }
 
     public static BehaviorDescribe describe()
     {

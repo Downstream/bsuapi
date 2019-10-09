@@ -30,7 +30,7 @@ public class RelatedFunction
             Related rel = new Related(t);
             rel.resolveBehavior(c);
 
-            return rel.node; // @todo: return a list of properties matching the resource response (Neo4j doesn't handle JSONObject)
+            return rel.getNeoNode(); // @todo: return a list of properties matching the resource response (Neo4j doesn't handle JSONObject)
         }
     }
 }

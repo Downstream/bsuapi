@@ -1,11 +1,17 @@
 package bsuapi.dbal;
 
 import bsuapi.dbal.query.CypherQuery;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.ResourceIterator;
+import org.neo4j.graphdb.Result;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
+import org.neo4j.helpers.collection.Iterators;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Cypher implements AutoCloseable
 {
@@ -30,9 +36,10 @@ public class Cypher implements AutoCloseable
         // @todo pick by (curator/algo) score
         if (matches.size() > 0)
         {
-            Node result = matches.get(0);
-            matches.remove(0);
-            return result;
+            return matches.get(0);
+            // Node result = matches.get(0);
+            // matches.remove(0);
+            // return result;
         }
 
         return null;
@@ -60,12 +67,12 @@ public class Cypher implements AutoCloseable
     {
         try (
                 Transaction tx = db.beginTx();
-                ResourceIterator<Node> matches = db.findNodes(type.label(), keyName, keyValue)
+                ResourceIterator<org.neo4j.graphdb.Node> matches = db.findNodes(type.label(), keyName, keyValue)
         ) {
             ArrayList<Node> matchNodes = new ArrayList<>();
             while ( matches.hasNext() )
             {
-                matchNodes.add( matches.next() );
+                matchNodes.add( new Node(matches.next()) );
             }
 
             tx.success();
@@ -81,30 +88,49 @@ public class Cypher implements AutoCloseable
     {
         try (
                 Transaction tx = db.beginTx();
-                Result nodes = db.execute(query.getCommand())
+                Result result = db.execute(query.getCommand());
         ) {
+
             ArrayList<Node> matchNodes = new ArrayList<>();
-            while ( nodes.hasNext() )
-            {
-                matchNodes.add((Node) nodes.next());
+
+            Iterator<org.neo4j.graphdb.Node> targetResults = result.columnAs(CypherQuery.resultColumn);
+            for (org.neo4j.graphdb.Node neoNode : Iterators.asIterable(targetResults)) {
+                matchNodes.add(new Node(neoNode));
             }
 
             tx.success();
-            nodes.close();
+            result.close();
             return matchNodes;
         } catch (Exception e) {
             throw new CypherException("Cypher.query failed: "+query, e);
         }
     }
 
-//    public ArrayList<Node> topicRelated(Topic topic, NodeType related)
-//    {
-//        // @todo relatedTopics
-//    }
-
+    public Result rawQuery (CypherQuery query)
+    throws CypherException
+    {
+        try (
+                Transaction tx = db.beginTx();
+        ) {
+//            Result r = db.execute(query.getCommand());
+//            StringBuilder rows = new StringBuilder();
+//            while ( r.hasNext()) {
+//                Map<String,Object> row = r.next();
+//                for ( Map.Entry<String,Object> column : row.entrySet() )
+//                {
+//                    rows.append(column.getKey()).append(": ").append(column.getValue()).append("; ");
+//                }
+//                rows.append("\n");
+//            }
+//            result.put("result", rows);
+            return db.execute(query.getCommand());
+        } catch (Exception e) {
+            throw new CypherException("Cypher.query failed: "+query, e);
+        }
+    }
 
     @Override
     public void close() {
-
+        // @todo check4 memory-leak: Topic and Resource close should release memory, but if not, will need to manage Node instances here
     }
 }

@@ -64,7 +64,7 @@ public enum NodeType {
     public static NodeType match(String label)
     {
         try {
-            return NodeType.valueOf(label);
+            return NodeType.valueOf(label.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(label +" is not a valid NodeType.", e);
         }
