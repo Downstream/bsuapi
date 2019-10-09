@@ -2,6 +2,7 @@ package bsuapi.dbal;
 
 import bsuapi.resource.URLCoder;
 import org.json.JSONObject;
+import org.neo4j.graphdb.Label;
 
 import java.util.Map;
 import java.lang.String;
@@ -11,14 +12,13 @@ public class Node
 {
     private org.neo4j.graphdb.Node neoNode;
     private Map<String, Object> properties;
-    private String keyName;
+    private String keyName = "name";
     private String keyVal;
 
     public Node (org.neo4j.graphdb.Node neoNode)
     {
         this.neoNode = neoNode;
         this.properties = neoNode.getAllProperties();
-        this.keyName = "name";
         this.keyVal = this.getProperty(this.keyName);
     }
 
@@ -37,6 +37,15 @@ public class Node
     public String getNodeKey() { return this.keyVal; }
 
     public String getProperty(String key){ return (String) this.properties.get(key); }
+
+    public String getUri(NodeType type)
+    {
+        if (!type.isTopic()) {
+            return null;
+        }
+
+        return "/related/" + type.labelName().toLowerCase() + "/" + URLCoder.encode(this.getNodeKey());
+    }
 
     public JSONObject toJsonObject()
     {

@@ -46,7 +46,15 @@ public class Topic implements org.neo4j.graphdb.Label
 
     public JSONObject toJson()
     {
-        return this.getNode().toJsonObject();
+        Node node = this.getNode();
+        JSONObject n = this.getNode().toJsonObject();
+
+        String uri = node.getUri(this.type);
+        if (null != uri) {
+            n.put("link", uri);
+        }
+
+        return n;
     }
 
     public String toCypherMatch()

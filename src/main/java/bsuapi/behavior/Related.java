@@ -43,7 +43,12 @@ public class Related extends Behavior
 //        result.put(cypher.rawQuery(q));
 
         for (Node node : cypher.query(q)) {
-            result.put( node.toJsonObject() );
+            JSONObject n = node.toJsonObject();
+            String uri = node.getUri(type);
+            if (null != uri) {
+                n.put("link", uri);
+            }
+            result.put(n);
         }
         return result;
     }
