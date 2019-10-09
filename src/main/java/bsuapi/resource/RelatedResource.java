@@ -1,5 +1,8 @@
 package bsuapi.resource;
 
+import bsuapi.behavior.Assets;
+import bsuapi.behavior.Behavior;
+import bsuapi.behavior.BehaviorType;
 import bsuapi.behavior.Related;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.JsonResponse;
@@ -56,11 +59,15 @@ public class RelatedResource
                 log.info("No match "+ t.toString());
                 return JsonResponse.notFound();
             } else {
-                Related rel = new Related(t);
-                rel.resolveBehavior(c);
-                log.info("Related result: "+ rel.message);
-                //rel.debug(log);
-                return JsonResponse.data(rel.toJson(), rel.message);
+                Behavior b = BehaviorType.RELATED.compose(t, c);
+
+                if (null == b) {
+                    return JsonResponse.notFound("Could not resolve related topics.");
+                }
+
+                log.info("Related result: "+ b.getMessage());
+                //b.debug(log);
+                return JsonResponse.data(b.toJson(), b.getMessage());
             }
         }
         catch (Exception e)

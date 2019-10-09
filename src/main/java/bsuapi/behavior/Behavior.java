@@ -7,21 +7,58 @@ import bsuapi.dbal.Node;
 import org.json.JSONObject;
 import org.neo4j.logging.Log;
 
+import java.util.ArrayList;
+
 public abstract class Behavior {
     public Topic topic;
     public Node node;
-    public String message;
+    protected String message;
+    protected ArrayList<Behavior> appendedBehaviors;
 
     public Behavior(Topic topic)
     {
         this.topic = topic;
         this.node = topic.getNode();
-        this.message = this.buildMessage(topic);
     }
 
-    abstract public void resolveBehavior(Cypher cypher) throws CypherException;
+    public void resolveBehavior(Cypher cypher)
+    throws CypherException
+    {
+        this.message = this.buildMessage(this.topic);
+    }
+
+    abstract public String getBehaviorKey();
+    abstract public Object getBehaviorData();
+
+    public void putBehaviorData(JSONObject json)
+    {
+        json.put(this.getBehaviorKey(), this.getBehaviorData());
+    }
+
+    public void putAppendedBehaviors(JSONObject json)
+    {
+        for (Behavior child : this.appendedBehaviors) {
+            child.putBehaviorData(json);
+        }
+    }
+
+    public void appendBehavior(Behavior child)
+    {
+        if (null == this.appendedBehaviors) {
+            this.appendedBehaviors = new ArrayList<>();
+        }
+        this.appendedBehaviors.add(child);
+    }
 
     public org.neo4j.graphdb.Node getNeoNode() { return this.node.getNeoNode(); }
+
+    public String getMessage() {
+        if (null == this.message) {
+            return this.getClass().getSimpleName() + " not Resolved.";
+        } else {
+            return this.message;
+        }
+    }
 
     public String buildMessage(Topic topic)
     {
@@ -37,6 +74,8 @@ public abstract class Behavior {
         JSONObject data = new JSONObject();
         data.put("topic", this.topic.name());
         data.put("node", this.topic.toJson());
+        this.putBehaviorData(data);
+        this.putAppendedBehaviors(data);
         return data;
     }
 

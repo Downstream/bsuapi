@@ -106,24 +106,24 @@ public class Cypher implements AutoCloseable
         }
     }
 
-    public Result rawQuery (CypherQuery query)
+    public String rawQuery (CypherQuery query)
     throws CypherException
     {
         try (
                 Transaction tx = db.beginTx();
         ) {
-//            Result r = db.execute(query.getCommand());
-//            StringBuilder rows = new StringBuilder();
-//            while ( r.hasNext()) {
-//                Map<String,Object> row = r.next();
-//                for ( Map.Entry<String,Object> column : row.entrySet() )
-//                {
-//                    rows.append(column.getKey()).append(": ").append(column.getValue()).append("; ");
-//                }
-//                rows.append("\n");
-//            }
-//            result.put("result", rows);
-            return db.execute(query.getCommand());
+            Result r = db.execute(query.getCommand());
+            StringBuilder rows = new StringBuilder();
+            while ( r.hasNext()) {
+                Map<String,Object> row = r.next();
+                for ( Map.Entry<String,Object> column : row.entrySet() )
+                {
+                    rows.append(column.getKey()).append(": ").append(column.getValue()).append("; ");
+                }
+                rows.append("\n");
+            }
+            return rows.toString();
+            //return db.execute(query.getCommand());
         } catch (Exception e) {
             throw new CypherException("Cypher.query failed: "+query, e);
         }

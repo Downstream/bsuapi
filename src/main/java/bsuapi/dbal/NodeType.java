@@ -16,6 +16,7 @@ public enum NodeType {
     }
 
     public String labelName()
+    throws IllegalStateException
     {
         switch ( this )
         {
@@ -39,6 +40,7 @@ public enum NodeType {
     }
 
     public String relFromTopic()
+    throws IllegalArgumentException, IllegalStateException
     {
         switch ( this )
         {
@@ -55,19 +57,53 @@ public enum NodeType {
             case TOPIC:
                 throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
             case ARTWORK:
-                throw new IllegalArgumentException( "Assets do not have relationships from Topics");
+                throw new IllegalArgumentException( "Assets do not have relationships from Topics. e.g.: (:Topic)-[X]->(:Asset) X does not exist.");
+            default:
+                throw new IllegalStateException( "Unknown Node Type enum: " + this );
+        }
+    }
+
+    public String relFromAsset()
+    throws IllegalArgumentException, IllegalStateException
+    {
+        switch ( this )
+        {
+            case ARTIST:
+                return "BY";
+            case CLASS:
+                return "ART_CLASS";
+            case CULTURE:
+                return "ART_CULTURE";
+            case NATION:
+                return "ART_NATION";
+            case TAG:
+                return "ART_TAG";
+            case TOPIC:
+                throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
+            case ARTWORK:
+                throw new IllegalArgumentException( "Assets do not have direct relationships with eachother. e.g.: (:Asset)<-[X]->(:Asset) X does not exist.");
             default:
                 throw new IllegalStateException( "Unknown Node Type enum: " + this );
         }
     }
 
     public static NodeType match(String label)
+    throws IllegalArgumentException
     {
-        try {
-            return NodeType.valueOf(label.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(label +" is not a valid NodeType.", e);
+        switch (label.toUpperCase()) {
+            case "CLASSIFICATION":
+                label = "class";
+                break;
         }
+
+        // note: Java bug in valueOf? if the entry is not found, valueOf neither completes nor throws an exception
+        for ( NodeType n : NodeType.values() ) {
+            if ( n.toString().equalsIgnoreCase(label) ) {
+                return n;
+            }
+        }
+
+        throw new IllegalArgumentException(label +" is not a valid NodeType.");
     }
 
     public Boolean isTopic()

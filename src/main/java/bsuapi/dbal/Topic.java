@@ -1,19 +1,16 @@
 package bsuapi.dbal;
 
-import bsuapi.resource.URLCoder;
 import org.json.JSONObject;
 
 public class Topic implements org.neo4j.graphdb.Label
 {
     private NodeType type;
-    private org.neo4j.graphdb.Label label;
     private String nodeKey;
     private Node node;
 
     public Topic(String labelName, String nodeKey)
     {
         this.type = NodeType.match(labelName);
-        this.label = org.neo4j.graphdb.Label.label(labelName);
         this.nodeKey = nodeKey;
     }
 
@@ -24,7 +21,7 @@ public class Topic implements org.neo4j.graphdb.Label
 
     @Override
     public String name() {
-        return this.label.name();
+        return this.type.label().name();
     }
 
     public String getNodeKeyField() { return "name"; }
