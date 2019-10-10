@@ -1,15 +1,8 @@
 package bsuapi.resource;
 
-import bsuapi.behavior.Assets;
-import bsuapi.behavior.Behavior;
 import bsuapi.behavior.BehaviorType;
-import bsuapi.behavior.Related;
 import bsuapi.dbal.Cypher;
-import bsuapi.dbal.JsonResponse;
 import bsuapi.dbal.Topic;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.logging.Log;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,31 +10,30 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 
 @Path("/related")
-public class RelatedResource
+public class RelatedResource extends BaseResource
 {
-    @Context
-    public GraphDatabaseService db;
-
-    @Context
-    public Log log;
-
     private static final int TIMEOUT = 1000;
 
     // @todo: refactor to separate request/response handling from behavior
     @Path("/{topic: [a-z]*}/{value}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response apiRelated(
+    public javax.ws.rs.core.Response apiRelated(
             @PathParam("topic") String topic,
-            @PathParam("value") String value
-    ){
+            @PathParam("value") String value,
+            @Context UriInfo uriInfo
+            ){
+
+        //Response response = Response.prepare(new Request(uriInfo));
+        Response response = this.prepareResponse(uriInfo);
+
         if (value == null || topic == null)
         {
-            return JsonResponse.badRequest("Required method parameters missing: topic label, topic name");
+            return response.badRequest("Required method parameters missing: topic label, topic name");
         }
 
         String searchVal = URLCoder.decode(value);
@@ -50,29 +42,20 @@ public class RelatedResource
         try (
                 Cypher c = new Cypher(db);
         ) {
-            Topic t = new Topic(searchTopic, searchVal);
-            c.resolveTopic(t);
+            Topic t = this.prepareTopic(c, searchTopic, searchVal);
 
-            log.info("Related search: :"+ searchTopic +" \""+ searchVal+"\"");
             if (!t.hasMatch())
             {
                 log.info("No match "+ t.toString());
-                return JsonResponse.notFound();
+                return response.notFound();
             } else {
-                Behavior b = BehaviorType.RELATED.compose(t, c);
-
-                if (null == b) {
-                    return JsonResponse.notFound("Could not resolve related topics.");
-                }
-
-                log.info("Related result: "+ b.getMessage());
-                //b.debug(log);
-                return JsonResponse.data(b.toJson(), b.getMessage());
+                return response.behavior(BehaviorType.RELATED.compose(t, c));
             }
         }
         catch (Exception e)
         {
-            return JsonResponse.exception(e);
+            return response.exception(e);
         }
+
     }
 }

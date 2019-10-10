@@ -26,39 +26,7 @@ public class JsonResponse {
         return JsonResponse.build(Response.Status.OK, response);
     }
 
-    public static Response data (JSONObject data, String message)
-    {
-        JSONObject res = JsonResponse.responseObject(true, message);
-        res.put("data", data);
-        return JsonResponse.OK(res);
-    }
-
-    public static Response exception (Exception e)
-    {
-        JSONObject res = JsonResponse.responseObject(false, e.getMessage());
-        res.put("data", e.toString());
-        res.put("stack", JsonResponse.exceptionStack(e));
-        return JsonResponse.SERVER_ERROR(res);
-    }
-
-    public static Response badRequest (String reason)
-    {
-        JSONObject res = JsonResponse.responseObject(false, reason);
-        return JsonResponse.NOT_ACCEPTABLE(res);
-    }
-
-    public static Response notFound (String message)
-    {
-        JSONObject res = JsonResponse.responseObject(false, message);
-        return JsonResponse.NOT_FOUND(res);
-    }
-
-    public static Response notFound ()
-    {
-        return JsonResponse.notFound("Requested resource not found. No matching indexed node for that value. Isn't art an emotional abstraction? Just imagine it.");
-    }
-
-    private static JSONObject responseObject(Boolean success, String message)
+    public static JSONObject responseObject(Boolean success, String message)
     {
         JSONObject res = new JSONObject();
         res.put("success", success);
@@ -68,10 +36,10 @@ public class JsonResponse {
 
     private static Response build(Response.Status status, JSONObject response)
     {
-        return Response.status( status ).entity( UTF8.encode(response.toString()) ).build();
+        return Response.status( status ).entity( UTF8.encode(response.toString(4)) ).build();
     }
 
-    private static JSONObject exceptionStack(Exception e)
+    public static JSONObject exceptionStack(Exception e)
     {
         JSONObject result = new JSONObject();
         JSONArray stack;
