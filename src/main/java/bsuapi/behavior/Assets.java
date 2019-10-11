@@ -25,11 +25,7 @@ public class Assets extends Behavior
     public void resolveBehavior(Cypher cypher)
     throws CypherException
     {
-        this.assets = new JSONArray();
-        CypherQuery q = TopicAssets.params(topic);
-        for (Node node : cypher.query(q)) {
-            this.assets.put( node.toJsonObject() );
-        }
+        this.assets = TopicAssets.params(topic).exec(cypher);
         super.resolveBehavior(cypher);
     }
 

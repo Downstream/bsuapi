@@ -29,28 +29,10 @@ public class Related extends Behavior
         this.related = new JSONObject();
         for (NodeType n : NodeType.values()) {
             if (n.isTopic()) {
-                this.related.put(n.labelName(), this.relatedByType(cypher, topic, n));
+                this.related.put(n.labelName(), TopicSharedRelations.params(topic, n).exec(cypher));
             }
         }
         super.resolveBehavior(cypher);
-    }
-
-    private JSONArray relatedByType(Cypher cypher, Topic topic, NodeType type)
-    throws CypherException
-    {
-        JSONArray result = new JSONArray();
-        CypherQuery q = TopicSharedRelations.params(topic, type);
-//        result.put(cypher.rawQuery(q));
-
-        for (Node node : cypher.query(q)) {
-            JSONObject n = node.toJsonObject();
-            String uri = node.getUri(type);
-            if (null != uri) {
-                n.put("link", uri);
-            }
-            result.put(n);
-        }
-        return result;
     }
 
     public static BehaviorDescribe describe()

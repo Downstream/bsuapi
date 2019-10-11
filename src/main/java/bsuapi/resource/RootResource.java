@@ -8,7 +8,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import bsuapi.behavior.Related;
-import bsuapi.dbal.NodeType;
+import bsuapi.dbal.*;
+import bsuapi.dbal.query.TopicTop;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -27,8 +28,15 @@ public class RootResource extends BaseResource
         data.put("title","Boise State World Museum Neo4j JSON API");
         data.put("summary","Multiple RESTful URI methods to retrieve preset JSON representations of the graph of curated assets.");
         data.put("note","Project goal: >90% test coverage, and every API method has an equivalent function registered.");
-        data.put("topics", this.topicsList());
         data.put("methods", this.buildMethodList());
+
+        try (
+            Cypher c = new Cypher(db);
+        ) {
+            data.put("topics", this.topicsList(c));
+        } catch (Exception e) {
+            data.put("topics", new JSONObject());
+        }
 
         return response.plain(data);
     }
@@ -52,12 +60,13 @@ public class RootResource extends BaseResource
         return data;
     }
 
-    private JSONArray topicsList()
+    private JSONObject topicsList(Cypher c)
+    throws CypherException
     {
-        JSONArray topics = new JSONArray();
+        JSONObject topics = new JSONObject();
         for (NodeType n : NodeType.values()) {
             if (n.isTopic()) {
-                topics.put(n.labelName());
+                topics.put(n.labelName(), TopicTop.params(n).exec(c));
             }
         }
         return topics;

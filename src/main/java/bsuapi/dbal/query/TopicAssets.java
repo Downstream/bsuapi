@@ -19,10 +19,10 @@ public class TopicAssets extends CypherQuery {
         ;
 
     protected Topic topic;
-    protected NodeType target = NodeType.ARTWORK;
 
     public TopicAssets(String query) {
         super(query);
+        this.target = NodeType.ARTWORK;
     }
 
     public static TopicAssets params (Topic topic)

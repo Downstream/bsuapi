@@ -31,7 +31,6 @@ public class TopicSharedRelations extends CypherQuery {
         ;
 
     protected Topic topic;
-    protected NodeType target;
 
     public TopicSharedRelations(String query) {
         super(query);

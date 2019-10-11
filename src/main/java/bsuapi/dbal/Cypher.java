@@ -83,24 +83,19 @@ public class Cypher implements AutoCloseable
         }
     }
 
-    public ArrayList<Node> query (CypherQuery query)
+    public void query (CypherQuery query)
     throws CypherException
     {
         try (
                 Transaction tx = db.beginTx();
                 Result result = db.execute(query.getCommand());
         ) {
-
-            ArrayList<Node> matchNodes = new ArrayList<>();
-
             Iterator<org.neo4j.graphdb.Node> targetResults = result.columnAs(CypherQuery.resultColumn);
             for (org.neo4j.graphdb.Node neoNode : Iterators.asIterable(targetResults)) {
-                matchNodes.add(new Node(neoNode));
+                query.addResultEntry(query.neoEntryHandler(neoNode));
             }
 
             tx.success();
-            result.close();
-            return matchNodes;
         } catch (Exception e) {
             throw new CypherException("Cypher.query failed: "+query, e);
         }
