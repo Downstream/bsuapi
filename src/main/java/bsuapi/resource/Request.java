@@ -39,4 +39,9 @@ public class Request {
     {
         return this.params;
     }
+
+    public String getBaseUri()
+    {
+        return "https://" + this.uriInfo.getBaseUri().getAuthority();
+    }
 }

@@ -1,4 +1,4 @@
-package bsuapi.dbal;
+package bsuapi.resource;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

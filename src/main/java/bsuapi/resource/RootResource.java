@@ -29,6 +29,7 @@ public class RootResource extends BaseResource
         data.put("summary","Multiple RESTful URI methods to retrieve preset JSON representations of the graph of curated assets.");
         data.put("note","Project goal: >90% test coverage, and every API method has an equivalent function registered.");
         data.put("methods", this.buildMethodList());
+        data.put("schema", this.buildSchema(response));
 
         try (
             Cypher c = new Cypher(db);
@@ -70,5 +71,15 @@ public class RootResource extends BaseResource
             }
         }
         return topics;
+    }
+
+    private JSONObject buildSchema(Response response)
+    {
+        JSONObject result = new JSONObject();
+        for (String s : JsonSchemaResource.elements()) {
+            result.put(s, JsonSchemaResource.schemaUri(response, s));
+        }
+
+        return result;
     }
 }

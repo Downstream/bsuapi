@@ -54,9 +54,11 @@ public class CypherQuery {
 
         JSONObject n = entry.toJsonObject();
         if (this.target != null) {
-            String uri = entry.getUri(this.target);
-            if (null != uri) {
-                n.put("link", uri);
+            if (this.target.isTopic()) {
+                String uri = entry.getUri(this.target);
+                if (null != uri) {
+                    n.put("linkRelated", uri);
+                }
             }
         }
 

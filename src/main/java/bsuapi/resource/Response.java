@@ -1,7 +1,6 @@
 package bsuapi.resource;
 
 import bsuapi.behavior.Behavior;
-import bsuapi.dbal.JsonResponse;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -78,5 +77,10 @@ public class Response {
         }
 
         return this.data(b.toJson(), b.getMessage());
+    }
+
+    public String buildUri(String path)
+    {
+        return q.getBaseUri() + "/bsuapi" + path; // @todo no hardcoded url !
     }
 }
