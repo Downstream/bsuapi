@@ -71,6 +71,43 @@ public class RelatedTest extends BaseCypherTest {
     }
 
     @Test
+    public void integrationTestRelatedFromType() throws CypherException {
+        try (
+                Transaction tx = db.beginTx();
+                Cypher c = new Cypher(db)
+        ) {
+            Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
+            c.resolveTopic(t);
+            Behavior a = BehaviorType.RELATED.compose(t, c);
+
+            assertEquals(a.getBehaviorKey(), "related");
+            String msg = a.getMessage();
+            assertTrue(msg.length() > 0);
+
+            JSONObject data = (JSONObject) a.getBehaviorData();
+
+            assertEquals("French", data.query("/Nation/0/name"));
+            assertEquals("Drawings", data.query("/Classification/0/name"));
+            assertEquals("Men", data.query("/Tag/0/name"));
+
+            JSONObject result = a.toJson();
+
+            assertEquals("Artist", result.query("/topic"));
+            assertNotNull(result.query("/node/linkRelated"));
+            assertEquals("Edgar Degas",result.query("/node/name"));
+
+            assertEquals("Men", result.query("/related/Tag/0/name"));
+            assertEquals("French", result.query("/related/Nation/0/name"));
+            assertEquals("Drawings", result.query("/related/Classification/0/name"));
+            assertEquals("Men", result.query("/related/Tag/0/name"));
+
+            assertEquals(334323L, result.query("/assets/0/objectID"));
+            assertEquals("Profiles", ((String[]) result.query("/assets/0/tags"))[1]);
+            assertEquals("Head of a Saint (profile to the right), after Fra Angelico", result.query("/assets/0/title").toString());
+        }
+    }
+
+    @Test
     public void integrationTestRelatedDescribe() {
         BehaviorDescribe desc = Related.describe();
 

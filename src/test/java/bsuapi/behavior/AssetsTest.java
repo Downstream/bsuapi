@@ -72,6 +72,28 @@ public class AssetsTest extends BaseCypherTest {
     }
 
     @Test
+    public void integrationTestRelatedFromType() throws CypherException {
+        try (
+                Transaction tx = db.beginTx();
+                Cypher c = new Cypher(db)
+        ) {
+            Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
+            Behavior a = BehaviorType.ASSETS.compose(t, c);
+
+            assertEquals(a.getBehaviorKey(), "assets");
+            String msg = a.getMessage();
+            assertTrue(msg.length() > 0);
+
+            JSONArray data = (JSONArray) a.getBehaviorData();
+            JSONObject asset = (JSONObject) data.get(0);
+
+            assertEquals(334323L, asset.query("/objectID"));
+            assertEquals("Profiles", ((String[]) asset.query("/tags"))[1]);
+            assertEquals("Head of a Saint (profile to the right), after Fra Angelico", asset.query("/title").toString());
+        }
+    }
+
+    @Test
     public void integrationTestAssetsDescribe() {
         BehaviorDescribe desc = Related.describe();
 
