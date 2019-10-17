@@ -2,7 +2,6 @@ package bsuapi.test;
 
 import apoc.util.Util;
 import org.json.JSONObject;
-import org.junit.Test;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -25,9 +24,9 @@ abstract public class BaseJsonTest {
 
     public void testJsonLoaded()
     {
-        this.queryAssert("/objectID", "436533");
-        this.queryAssert("/constituents/0/name", "Vincent van Gogh");
-        this.queryAssert("/tags/0", "Shoes");
+        this.queryAssert("/objectID", "334323");
+        this.queryAssert("/constituents/0/name", "Edgar Degas");
+        this.queryAssert("/tags/0", "Men");
     }
 
     public static void preLoadJsonResource(String resourceName)

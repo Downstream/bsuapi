@@ -37,6 +37,10 @@ public abstract class Behavior {
 
     public void putAppendedBehaviors(JSONObject json)
     {
+        if (null == this.appendedBehaviors) {
+            return;
+        }
+
         for (Behavior child : this.appendedBehaviors) {
             child.putBehaviorData(json);
         }

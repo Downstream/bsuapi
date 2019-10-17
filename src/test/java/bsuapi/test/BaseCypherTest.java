@@ -28,16 +28,6 @@ abstract public class BaseCypherTest {
         BaseCypherTest.closeResource();
     }
 
-    @Test
-    public void testGraphLoaded()
-    {
-        try (Transaction tx = db.beginTx()) {
-            Node n = this.queryOne("c", "MATCH (c:Person {name: 'Keanu Reeves'}) RETURN c");
-            assertEquals(n.getProperty("name"), "Keanu Reeves");
-            assertEquals(n.getProperty("born"), 1964L);
-        }
-    }
-
     public static void preloadCypherResource(String resourceName)
     {
         db = new TestGraphDatabaseFactory().newImpermanentDatabase();
