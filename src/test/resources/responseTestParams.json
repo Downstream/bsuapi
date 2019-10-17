@@ -1,0 +1,20 @@
+{
+  "querystring": {
+    "empty": {},
+    "tokenPlain": {
+      "requestToken": "mytoken"
+    },
+    "tokenComplex": {
+      "requestToken": "XI+zZ/RV#aO Ze8B!@w1 AV8)bP\\I1(gdPPz7 z2g:j3; I F00*25o1$YWI ~s6u1`FBK&KT% axc3aR Ko5#TF5=V"
+    }
+  },
+  "responseObject": {
+    "plainGeneric": {
+      "str": "should handle anything",
+      "obj": {
+        "name": "value"
+      },
+      "array": [1,2,3]
+    }
+  }
+}
