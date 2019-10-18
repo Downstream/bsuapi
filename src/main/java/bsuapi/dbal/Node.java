@@ -2,7 +2,6 @@ package bsuapi.dbal;
 
 import bsuapi.resource.URLCoder;
 import org.json.JSONObject;
-import org.neo4j.graphdb.Label;
 
 import java.util.Map;
 import java.lang.String;

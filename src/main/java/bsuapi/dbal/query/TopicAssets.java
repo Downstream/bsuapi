@@ -2,7 +2,6 @@ package bsuapi.dbal.query;
 
 import bsuapi.dbal.NodeType;
 import bsuapi.dbal.Topic;
-import org.neo4j.cypher.internal.compiler.v2_3.No;
 
 public class TopicAssets extends CypherQuery {
     /**
@@ -20,20 +19,20 @@ public class TopicAssets extends CypherQuery {
 
     protected Topic topic;
 
-    public TopicAssets(String query) {
-        super(query);
+    public TopicAssets(Topic topic) {
+        super(TopicAssets.query);
         this.target = NodeType.ARTWORK;
+        this.topic = topic;
     }
 
-    public static TopicAssets params (Topic topic)
+    public String getCommand()
     {
-        TopicAssets q = new TopicAssets(TopicAssets.query);
-        String rel = topic.getType().relFromAsset();
-
-        q.args = new String[]{topic.toCypherMatch(), rel, q.target.labelName()};
-        q.topic = topic;
-        q.resultQuery = String.format(q.initQuery, topic.toCypherMatch(), rel, q.target.labelName(), q.limit);
-
-        return q;
+        return this.resultQuery = String.format(
+            this.initQuery,
+            this.topic.toCypherMatch(),
+            this.topic.getType().relFromAsset(),
+            this.target.labelName(),
+            this.limit
+        );
     }
 }

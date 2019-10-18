@@ -13,7 +13,7 @@
   <description>Define and resolve API methods which retrieve preset structures from the Neo4j database.</description>
 
   <properties>
-    <neo4j.version>3.5.8</neo4j.version>
+    <neo4j.version>3.5.12</neo4j.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 

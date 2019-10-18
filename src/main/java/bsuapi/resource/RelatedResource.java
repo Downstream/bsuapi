@@ -49,7 +49,7 @@ public class RelatedResource extends BaseResource
                 log.info("No match "+ t.toString());
                 return response.notFound();
             } else {
-                return response.behavior(BehaviorType.RELATED.compose(t, c));
+                return response.behavior(BehaviorType.RELATED, t, c);
             }
         }
         catch (Exception e)

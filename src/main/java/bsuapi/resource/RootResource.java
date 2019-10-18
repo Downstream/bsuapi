@@ -9,6 +9,7 @@ import javax.ws.rs.core.UriInfo;
 
 import bsuapi.behavior.Related;
 import bsuapi.dbal.*;
+import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.TopicTop;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -67,7 +68,9 @@ public class RootResource extends BaseResource
         JSONObject topics = new JSONObject();
         for (NodeType n : NodeType.values()) {
             if (n.isTopic()) {
-                topics.put(n.labelName(), TopicTop.params(n).exec(c));
+                CypherQuery query = new TopicTop(n);
+                query.setLimit(this.getParam("limit"));
+                topics.put(n.labelName(), query.exec(c));
             }
         }
         return topics;

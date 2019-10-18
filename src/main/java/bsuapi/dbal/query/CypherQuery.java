@@ -7,7 +7,7 @@ import bsuapi.dbal.NodeType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class CypherQuery {
+abstract public class CypherQuery {
     protected String[] args;
     protected String initQuery;
     protected String resultQuery;
@@ -22,18 +22,24 @@ public class CypherQuery {
         this.resultQuery = query;
     }
 
-    public static CypherQuery parameterized (String parametrizedQuery, String... args)
-    {
-        CypherQuery q = new CypherQuery(parametrizedQuery);
-        q.args = args;
-        q.resultQuery = String.format(q.initQuery, (Object) args);
+    abstract public String getCommand();
 
-        return q;
+    public void setLimit(String limit)
+    {
+        int lim = this.limit;
+        try {
+            lim = Integer.parseInt(limit);
+            lim = Math.abs(lim);
+        } catch (NumberFormatException e) {
+            lim = this.limit;
+        } finally {
+            this.setLimit(lim);
+        }
     }
 
-    public String getCommand()
+    public void setLimit(int limit)
     {
-        return this.resultQuery;
+        this.limit = limit;
     }
 
     public String toString()

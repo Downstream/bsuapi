@@ -1,6 +1,5 @@
 package bsuapi.resource;
 
-import bsuapi.behavior.Behavior;
 import bsuapi.test.BaseJsonTest;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,7 +12,6 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.*;

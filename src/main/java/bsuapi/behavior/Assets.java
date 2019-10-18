@@ -3,9 +3,7 @@ package bsuapi.behavior;
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.TopicAssets;
-import bsuapi.dbal.query.TopicSharedRelations;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class Assets extends Behavior
 {
@@ -25,7 +23,9 @@ public class Assets extends Behavior
     public void resolveBehavior(Cypher cypher)
     throws CypherException
     {
-        this.assets = TopicAssets.params(topic).exec(cypher);
+        CypherQuery query = new TopicAssets(topic);
+        query.setLimit(this.getConfigParam("limit"));
+        this.assets = query.exec(cypher);
         super.resolveBehavior(cypher);
     }
 

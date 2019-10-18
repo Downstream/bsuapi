@@ -1,6 +1,10 @@
 package bsuapi.resource;
 
 import bsuapi.behavior.Behavior;
+import bsuapi.behavior.BehaviorType;
+import bsuapi.dbal.Cypher;
+import bsuapi.dbal.CypherException;
+import bsuapi.dbal.Topic;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -15,6 +19,15 @@ public class Response {
         r.q = q;
         r.params = q.getQueryParameters();
         return r;
+    }
+
+    public String getParam(String key)
+    {
+        if (!this.params.containsKey(key)) {
+            return null;
+        }
+
+        return this.params.get(key);
     }
 
     private JSONObject appendToken(JSONObject data)
@@ -70,8 +83,11 @@ public class Response {
         return this.notFound("Requested resource not found. No matching indexed node for that value. Isn't art an emotional abstraction? Just imagine it.");
     }
 
-    public javax.ws.rs.core.Response behavior(Behavior b)
+    public javax.ws.rs.core.Response behavior(BehaviorType behaviorType, Topic t, Cypher c)
+    throws CypherException
     {
+        Behavior b = behaviorType.compose(t, c, this.params);
+
         if (null == b) {
             return this.notFound("Could not resolve related behavior.");
         }

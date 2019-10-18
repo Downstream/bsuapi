@@ -17,6 +17,8 @@ abstract public class BaseResource
     @Context
     public Log log;
 
+    protected Response response;
+
     public Topic prepareTopic(Cypher c, String label, String key)
     throws CypherException
     {
@@ -29,6 +31,11 @@ abstract public class BaseResource
 
     public Response prepareResponse(UriInfo uriInfo)
     {
-        return Response.prepare(new Request(uriInfo));
+        return this.response = Response.prepare(new Request(uriInfo));
+    }
+
+    protected String getParam(String key)
+    {
+        return this.response.getParam(key);
     }
 }

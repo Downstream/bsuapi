@@ -1,7 +1,6 @@
 package bsuapi.dbal.query;
 
 import bsuapi.dbal.NodeType;
-import bsuapi.dbal.Topic;
 
 public class TopicTop extends CypherQuery {
     /**
@@ -16,18 +15,18 @@ public class TopicTop extends CypherQuery {
         "LIMIT %3$d; "
         ;
 
-    public TopicTop(String query) {
-        super(query);
+    public TopicTop(NodeType target) {
+        super(TopicTop.query);
+        this.target = target;
     }
 
-    public static TopicTop params (NodeType target)
+    public String getCommand()
     {
-        TopicTop q = new TopicTop(TopicTop.query);
-
-        q.target = target;
-        q.args = new String[]{q.target.labelName(), NodeType.TOPIC.labelName()};
-        q.resultQuery = String.format(q.initQuery, q.target.labelName(), NodeType.TOPIC.labelName(), q.limit);
-
-        return q;
+        return this.resultQuery = String.format(
+            this.initQuery,
+            this.target.labelName(),
+            NodeType.TOPIC.labelName(),
+            this.limit
+        );
     }
 }

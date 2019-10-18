@@ -32,24 +32,25 @@ public class TopicSharedRelations extends CypherQuery {
 
     protected Topic topic;
 
-    public TopicSharedRelations(String query) {
-        super(query);
+    public TopicSharedRelations(Topic topic, NodeType target) {
+        super(TopicSharedRelations.query);
+        if (topic.name().equals(target.labelName())) {
+            this.initQuery = TopicSharedRelations.querySameTopic;
+            this.resultQuery = TopicSharedRelations.querySameTopic;
+        };
+
+        this.topic = topic;
+        this.target = target;
     }
 
-    public static TopicSharedRelations params (Topic topic, NodeType target)
+    public String getCommand()
     {
-        TopicSharedRelations q;
-        if (topic.name().equals(target.labelName())) {
-            q = new TopicSharedRelations(TopicSharedRelations.querySameTopic);
-        } else {
-            q = new TopicSharedRelations(TopicSharedRelations.query);
-        }
-
-        q.args = new String[]{topic.toCypherMatch(), target.relFromTopic(), target.labelName()};
-        q.topic = topic;
-        q.target = target;
-        q.resultQuery = String.format(q.initQuery, topic.toCypherMatch(), target.relFromTopic(), target.labelName(), q.limit);
-
-        return q;
+        return this.resultQuery = String.format(
+            this.initQuery,
+            this.topic.toCypherMatch(),
+            this.target.relFromTopic(),
+            this.target.labelName(),
+            this.limit
+        );
     }
 }

@@ -1,12 +1,12 @@
 package bsuapi.resource;
 
-import bsuapi.behavior.Behavior;
 import bsuapi.test.BaseJsonTest;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.string.UTF8;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -124,46 +124,6 @@ public class ResponseTest extends BaseJsonTest {
     }
 
     @Test
-    public void integrationTestResponseBehaviorNull() {
-        Response response = this.prepareResponse("tokenPlain");
-
-        javax.ws.rs.core.Response result = response.behavior(null);
-
-        assertEquals(result.getStatus(), 404);
-
-        JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
-
-        assertEquals(responseData.get("requestToken").toString(), "mytoken");
-        assertEquals(responseData.query("/success"), false);
-        assertFalse(responseData.query("/message").toString().isEmpty());
-    }
-
-    @Test
-    public void integrationTestResponseBehavior() {
-        Response response = this.prepareResponse("tokenPlain");
-
-        JSONObject behaviorData = (JSONObject) this.query("/responseObject/plainGeneric");
-        Behavior behavior = mock(Behavior.class);
-        when(behavior.toJson()).thenReturn(behaviorData);
-        when(behavior.getMessage()).thenReturn("Some Response Message");
-
-        javax.ws.rs.core.Response result = response.behavior(behavior);
-
-        assertEquals(result.getStatus(), 200);
-
-        JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
-
-        assertEquals(responseData.get("requestToken").toString(), "mytoken");
-        assertEquals(responseData.query("/success"), true);
-        assertEquals(responseData.query("/message").toString(), "Some Response Message");
-        assertEquals(responseData.query("/data/str").toString(), "should handle anything");
-        assertEquals(responseData.query("/data/obj/name").toString(), "value");
-        assertEquals(responseData.query("/data/array/0"), 1);
-        assertEquals(responseData.query("/data/array/1"), 2);
-        assertEquals(responseData.query("/data/array/2"), 3);
-    }
-
-    @Test
     public void integrationTestResponseBuildUri() {
         Response response = this.prepareResponse("tokenPlain");
 
@@ -193,14 +153,13 @@ public class ResponseTest extends BaseJsonTest {
 
     private Map<String, String> buildParams(String namedParamSet)
     {
-        Map<String, String> map = (Map<String, String>) mock(Map.class);
+        Map<String, String> map = new HashMap<>();
 
         JSONObject params = (JSONObject) this.query("/querystring/" + namedParamSet);
         for (Iterator<String> it = params.keys(); it.hasNext(); ) {
             String key = it.next();
             String val = params.get(key).toString();
-
-            when(map.getOrDefault(key, null)).thenReturn(val);
+            map.put(key, val);
         }
 
         return map;

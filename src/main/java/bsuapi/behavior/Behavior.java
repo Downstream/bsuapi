@@ -8,27 +8,68 @@ import org.json.JSONObject;
 import org.neo4j.logging.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Behavior {
     public Topic topic;
     public Node node;
     protected String message;
     protected ArrayList<Behavior> appendedBehaviors;
+    protected Map<String, String> config;
 
     public Behavior(Topic topic)
     {
         this.topic = topic;
         this.node = topic.getNode();
+        this.setConfig(Behavior.defaultConfig());
     }
 
     public void resolveBehavior(Cypher cypher)
     throws CypherException
     {
+        if (null != this.appendedBehaviors) {
+            for (Behavior child : this.appendedBehaviors) {
+                child.resolveBehavior(cypher);
+            };
+        }
+
         this.message = this.buildMessage(this.topic);
     }
 
     abstract public String getBehaviorKey();
     abstract public Object getBehaviorData();
+
+    public static Map<String, String> defaultConfig()
+    {
+        Map<String, String> m = new HashMap<>();
+        m.put("limit", "10");
+        return m;
+    }
+
+    public static Map<String, String> cleanConfig(Map<String, String> map)
+    {
+        if (null != map) {
+            Map<String, String> result = new HashMap<>();
+            for (String key : new String[]{"limit"}) {
+                if (map.containsKey(key)) {
+                    result.put(key, map.get(key));
+                }
+            }
+        }
+
+        return Behavior.defaultConfig();
+    }
+
+    public void setConfig(Map<String, String> config)
+    {
+        this.config = config;
+    }
+
+    public String getConfigParam(String key)
+    {
+        return this.config.get(key);
+    }
 
     public void putBehaviorData(JSONObject json)
     {
