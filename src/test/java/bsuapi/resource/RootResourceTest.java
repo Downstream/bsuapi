@@ -7,12 +7,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.string.UTF8;
 
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -65,19 +64,16 @@ public class RootResourceTest extends BaseJsonTest {
 
     private MultivaluedMap<String, String> buildParams(String namedParamSet)
     {
-        MultivaluedMap<String, String> map = (MultivaluedMap<String, String>) mock(MultivaluedMap.class);
-        Set<String> keys = new HashSet<>();
+        MultivaluedMap<String, String> map = new MultivaluedHashMap<>();
 
         JSONObject params = (JSONObject) this.query("/querystring/" + namedParamSet);
         for (Iterator<String> it = params.keys(); it.hasNext(); ) {
             String key = it.next();
             String val = params.get(key).toString();
-
-            keys.add(key);
-            when(map.getFirst(key)).thenReturn(val);
+            List<String> list = new ArrayList<>();
+            list.add(val);
+            map.put(key, list);
         }
-
-        when(map.keySet()).thenReturn(keys);
 
         return map;
     }
