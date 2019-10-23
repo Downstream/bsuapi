@@ -24,7 +24,7 @@ public class Assets extends Behavior
     throws CypherException
     {
         CypherQuery query = new TopicAssets(topic);
-        query.setLimit(this.getConfigParam("limit"));
+        this.setQueryConfig(query);
         this.assets = query.exec(cypher);
         super.resolveBehavior(cypher);
     }

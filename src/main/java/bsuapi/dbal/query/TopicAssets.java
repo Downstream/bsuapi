@@ -13,8 +13,7 @@ public class TopicAssets extends CypherQuery {
     protected static String query =
         "MATCH (%1$s)<-[:%2$s]-("+ CypherQuery.resultColumn +":%3$s) " +
         "RETURN "+ CypherQuery.resultColumn +" " +
-        "ORDER BY "+ CypherQuery.resultColumn +".objectID ASC " +
-        "LIMIT %4$d; "
+        "ORDER BY "+ CypherQuery.resultColumn +".objectID ASC "
         ;
 
     protected Topic topic;
@@ -31,8 +30,7 @@ public class TopicAssets extends CypherQuery {
             this.initQuery,
             this.topic.toCypherMatch(),
             this.topic.getType().relFromAsset(),
-            this.target.labelName(),
-            this.limit
-        );
+            this.target.labelName()
+        ) + this.getPageLimitCmd();
     }
 }

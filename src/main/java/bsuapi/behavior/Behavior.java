@@ -4,6 +4,7 @@ import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
 import bsuapi.dbal.Topic;
 import bsuapi.dbal.Node;
+import bsuapi.dbal.query.CypherQuery;
 import org.json.JSONObject;
 import org.neo4j.logging.Log;
 
@@ -30,6 +31,7 @@ public abstract class Behavior {
     {
         if (null != this.appendedBehaviors) {
             for (Behavior child : this.appendedBehaviors) {
+                child.setConfig(this.config);
                 child.resolveBehavior(cypher);
             };
         }
@@ -47,23 +49,27 @@ public abstract class Behavior {
         return m;
     }
 
-    public static Map<String, String> cleanConfig(Map<String, String> map)
+    public Map<String, String> cleanConfig(Map<String, String> map)
     {
+        Map<String, String> result = (null == this.config)
+            ? Behavior.defaultConfig()
+            : this.config
+            ;
+
         if (null != map) {
-            Map<String, String> result = new HashMap<>();
-            for (String key : new String[]{"limit"}) {
+            for (String key : new String[]{"limit","page"}) {
                 if (map.containsKey(key)) {
                     result.put(key, map.get(key));
                 }
             }
         }
 
-        return Behavior.defaultConfig();
+        return result;
     }
 
     public void setConfig(Map<String, String> config)
     {
-        this.config = config;
+        this.config = this.cleanConfig(config);
     }
 
     public String getConfigParam(String key)
@@ -71,12 +77,18 @@ public abstract class Behavior {
         return this.config.get(key);
     }
 
+    public void setQueryConfig(CypherQuery query)
+    {
+        query.setLimit(this.getConfigParam("limit"));
+        query.setPage(this.getConfigParam("page"));
+    }
+
     public void putBehaviorData(JSONObject json)
     {
         json.put(this.getBehaviorKey(), this.getBehaviorData());
     }
 
-    public void putAppendedBehaviors(JSONObject json)
+    public void putAppendedBehaviorData(JSONObject json)
     {
         if (null == this.appendedBehaviors) {
             return;
@@ -120,7 +132,7 @@ public abstract class Behavior {
         data.put("topic", this.topic.name());
         data.put("node", this.topic.toJson());
         this.putBehaviorData(data);
-        this.putAppendedBehaviors(data);
+        this.putAppendedBehaviorData(data);
         return data;
     }
 

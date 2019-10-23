@@ -6,6 +6,7 @@ import bsuapi.dbal.NodeType;
 import bsuapi.dbal.Topic;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.TopicSharedRelations;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Related extends Behavior
@@ -25,13 +26,16 @@ public class Related extends Behavior
     throws CypherException
     {
         this.related = new JSONObject();
+        JSONArray tmp = new JSONArray();
         for (NodeType n : NodeType.values()) {
             if (n.isTopic()) {
                 CypherQuery query = new TopicSharedRelations(topic, n);
-                query.setLimit(this.getConfigParam("limit"));
+                this.setQueryConfig(query);
+                //tmp.put(query.getCommand());
                 this.related.put(n.labelName(), query.exec(cypher));
             }
         }
+        //this.related.put("cypher",tmp);
         super.resolveBehavior(cypher);
     }
 

@@ -11,8 +11,7 @@ public class TopicTop extends CypherQuery {
     protected static String query =
         "MATCH p=("+ CypherQuery.resultColumn +":%1$s)-[]->(:%2$s) " +
         "WITH "+ CypherQuery.resultColumn +", count(p) as n " +
-        "RETURN "+ CypherQuery.resultColumn +" ORDER BY n DESC " +
-        "LIMIT %3$d; "
+        "RETURN "+ CypherQuery.resultColumn +" ORDER BY n DESC "
         ;
 
     public TopicTop(NodeType target) {
@@ -25,8 +24,7 @@ public class TopicTop extends CypherQuery {
         return this.resultQuery = String.format(
             this.initQuery,
             this.target.labelName(),
-            NodeType.TOPIC.labelName(),
-            this.limit
-        );
+            NodeType.TOPIC.labelName()
+        ) + this.getPageLimitCmd();
     }
 }

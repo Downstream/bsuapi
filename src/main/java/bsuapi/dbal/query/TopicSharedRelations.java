@@ -16,8 +16,7 @@ public class TopicSharedRelations extends CypherQuery {
         "MATCH p=(a)-[]->(:Topic)-[:%2$s]->("+ CypherQuery.resultColumn +") " +
         "WITH a, "+ CypherQuery.resultColumn +", count(p) as n " +
         "RETURN "+ CypherQuery.resultColumn +", n " +
-        "ORDER BY n DESC " +
-        "LIMIT %4$d; "
+        "ORDER BY n DESC "
         ;
 
     protected static String querySameTopic =
@@ -26,8 +25,7 @@ public class TopicSharedRelations extends CypherQuery {
         "WHERE "+ CypherQuery.resultColumn +" <> a " +
         "WITH a, "+ CypherQuery.resultColumn +", count(p) as n " +
         "RETURN "+ CypherQuery.resultColumn +", n " +
-        "ORDER BY n DESC " +
-        "LIMIT %4$d; "
+        "ORDER BY n DESC "
         ;
 
     protected Topic topic;
@@ -49,8 +47,7 @@ public class TopicSharedRelations extends CypherQuery {
             this.initQuery,
             this.topic.toCypherMatch(),
             this.target.relFromTopic(),
-            this.target.labelName(),
-            this.limit
-        );
+            this.target.labelName()
+        ) + this.getPageLimitCmd();
     }
 }

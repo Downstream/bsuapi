@@ -69,6 +69,7 @@ public class RootResource extends BaseResource
         for (NodeType n : NodeType.values()) {
             if (n.isTopic()) {
                 CypherQuery query = new TopicTop(n);
+                query.setPage(this.getParam("page"));
                 query.setLimit(this.getParam("limit"));
                 topics.put(n.labelName(), query.exec(c));
             }
