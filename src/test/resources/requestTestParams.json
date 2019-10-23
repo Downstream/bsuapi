@@ -10,6 +10,11 @@
     "mixed": {
       "a": 123,
       "b": "abc"
+    },
+    "pageAndLimit": {
+      "limit": 2,
+      "page": 2,
+      "requestToken": "mytoken"
     }
   }
 }

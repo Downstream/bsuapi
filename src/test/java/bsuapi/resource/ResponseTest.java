@@ -1,7 +1,8 @@
 package bsuapi.resource;
 
-import bsuapi.test.BaseJsonTest;
+import bsuapi.test.TestJsonResource;
 import org.json.JSONObject;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.string.UTF8;
@@ -13,50 +14,59 @@ import java.util.Map;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class ResponseTest extends BaseJsonTest {
+public class ResponseTest
+{
+    protected static TestJsonResource j;
+
     @BeforeClass
     public static void setUp() {
-        BaseJsonTest.preLoadJsonResource("responseTestParams");
+        j = new TestJsonResource("responseTestParams");
+    }
+
+    @AfterClass
+    public static void tearDown()
+    {
+        j.close();
     }
 
     @Test
     public void integrationTestResponsePlainGeneric() {
         Response response = this.prepareResponse("tokenPlain");
-        JSONObject preData = (JSONObject) this.query("/responseObject/plainGeneric");
+        JSONObject preData = (JSONObject) j.query("/responseObject/plainGeneric");
 
         javax.ws.rs.core.Response result = response.plain(preData);
 
-        assertEquals(result.getStatus(), 200);
+        assertEquals(200, result.getStatus());
 
         JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
 
-        assertEquals(responseData.get("requestToken").toString(), "mytoken");
-        assertEquals(responseData.query("/str").toString(), "should handle anything");
-        assertEquals(responseData.query("/obj/name").toString(), "value");
-        assertEquals(responseData.query("/array/0"), 1);
-        assertEquals(responseData.query("/array/1"), 2);
-        assertEquals(responseData.query("/array/2"), 3);
+        assertEquals("mytoken", responseData.get("requestToken").toString());
+        assertEquals("should handle anything", responseData.query("/str").toString());
+        assertEquals("value", responseData.query("/obj/name").toString());
+        assertEquals(1, responseData.query("/array/0"));
+        assertEquals(2,responseData.query("/array/1"));
+        assertEquals(3, responseData.query("/array/2"));
     }
 
     @Test
     public void integrationTestResponseDataGeneric() {
         Response response = this.prepareResponse("tokenPlain");
-        JSONObject preData = (JSONObject) this.query("/responseObject/plainGeneric");
+        JSONObject preData = (JSONObject) j.query("/responseObject/plainGeneric");
 
         javax.ws.rs.core.Response result = response.data(preData, "Response Message");
 
-        assertEquals(result.getStatus(), 200);
+        assertEquals(200, result.getStatus());
 
         JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
 
-        assertEquals(responseData.get("requestToken").toString(), "mytoken");
-        assertEquals(responseData.query("/success"), true);
-        assertEquals(responseData.query("/message").toString(), "Response Message");
-        assertEquals(responseData.query("/data/str").toString(), "should handle anything");
-        assertEquals(responseData.query("/data/obj/name").toString(), "value");
-        assertEquals(responseData.query("/data/array/0"), 1);
-        assertEquals(responseData.query("/data/array/1"), 2);
-        assertEquals(responseData.query("/data/array/2"), 3);
+        assertEquals("mytoken", responseData.get("requestToken").toString());
+        assertTrue((Boolean) responseData.query("/success"));
+        assertEquals("Response Message",responseData.query("/message").toString());
+        assertEquals("should handle anything", responseData.query("/data/str").toString());
+        assertEquals("value", responseData.query("/data/obj/name").toString());
+        assertEquals(1, responseData.query("/data/array/0"));
+        assertEquals(2, responseData.query("/data/array/1"));
+        assertEquals(3, responseData.query("/data/array/2"));
     }
 
     @Test
@@ -65,13 +75,13 @@ public class ResponseTest extends BaseJsonTest {
 
         javax.ws.rs.core.Response result = response.badRequest("Response Message");
 
-        assertEquals(result.getStatus(), 406);
+        assertEquals(406, result.getStatus());
 
         JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
 
-        assertEquals(responseData.get("requestToken").toString(), "mytoken");
-        assertEquals(responseData.query("/success"), false);
-        assertEquals(responseData.query("/message").toString(), "Response Message");
+        assertEquals("mytoken", responseData.get("requestToken").toString());
+        assertFalse((Boolean) responseData.query("/success"));
+        assertEquals("Response Message", responseData.query("/message").toString());
     }
 
     @Test
@@ -80,13 +90,13 @@ public class ResponseTest extends BaseJsonTest {
 
         javax.ws.rs.core.Response result = response.notFound("Response Message");
 
-        assertEquals(result.getStatus(), 404);
+        assertEquals(404, result.getStatus());
 
         JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
 
-        assertEquals(responseData.get("requestToken").toString(), "mytoken");
-        assertEquals(responseData.query("/success"), false);
-        assertEquals(responseData.query("/message").toString(), "Response Message");
+        assertEquals("mytoken", responseData.get("requestToken").toString());
+        assertFalse((Boolean) responseData.query("/success"));
+        assertEquals("Response Message", responseData.query("/message").toString());
     }
 
     @Test
@@ -95,12 +105,12 @@ public class ResponseTest extends BaseJsonTest {
 
         javax.ws.rs.core.Response result = response.notFound();
 
-        assertEquals(result.getStatus(), 404);
+        assertEquals(404, result.getStatus());
 
         JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
 
-        assertEquals(responseData.get("requestToken").toString(), "mytoken");
-        assertEquals(responseData.query("/success"), false);
+        assertEquals("mytoken", responseData.get("requestToken").toString());
+        assertFalse((Boolean) responseData.query("/success"));
         assertFalse(responseData.query("/message").toString().isEmpty());
     }
 
@@ -112,13 +122,13 @@ public class ResponseTest extends BaseJsonTest {
 
         javax.ws.rs.core.Response result = response.exception(e);
 
-        assertEquals(result.getStatus(), 500);
+        assertEquals(500, result.getStatus());
 
         JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
 
-        assertEquals(responseData.get("requestToken").toString(), "mytoken");
-        assertEquals(responseData.query("/success"), false);
-        assertEquals(responseData.query("/message").toString(), "Some Exception");
+        assertEquals("mytoken", responseData.get("requestToken").toString());
+        assertFalse((Boolean) responseData.query("/success"));
+        assertEquals("Some Exception", responseData.query("/message").toString());
         assertFalse(responseData.query("/data").toString().isEmpty());
         assertNotNull(responseData.query("/stack"));
     }
@@ -127,7 +137,7 @@ public class ResponseTest extends BaseJsonTest {
     public void integrationTestResponseBuildUri() {
         Response response = this.prepareResponse("tokenPlain");
 
-        assertEquals(response.buildUri("/any/path/at/all"), "https://bsu.downstreamlabs.com/bsuapi/any/path/at/all");
+        assertEquals("https://bsu.downstreamlabs.com/bsuapi/any/path/at/all", response.buildUri("/any/path/at/all"));
     }
 
     private Response prepareResponse(String namedParamSet)
@@ -155,7 +165,7 @@ public class ResponseTest extends BaseJsonTest {
     {
         Map<String, String> map = new HashMap<>();
 
-        JSONObject params = (JSONObject) this.query("/querystring/" + namedParamSet);
+        JSONObject params = (JSONObject) j.query("/querystring/" + namedParamSet);
         for (Iterator<String> it = params.keys(); it.hasNext(); ) {
             String key = it.next();
             String val = params.get(key).toString();

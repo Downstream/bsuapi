@@ -11,7 +11,7 @@ abstract public class CypherQuery {
     protected String initQuery;
     protected String resultQuery;
     private JSONArray results;
-    public int limit = 10;
+    public int limit = 20;
     public int page = 0;
     public NodeType target;
     public static String resultColumn = "t"; // target

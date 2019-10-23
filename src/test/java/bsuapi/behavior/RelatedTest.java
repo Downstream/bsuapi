@@ -4,26 +4,41 @@ import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
 import bsuapi.dbal.NodeType;
 import bsuapi.dbal.Topic;
-import bsuapi.test.BaseCypherTest;
-import org.json.JSONArray;
+import bsuapi.test.TestCypherResource;
 import org.json.JSONObject;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 
 import static org.junit.Assert.*;
 
-public class RelatedTest extends BaseCypherTest {
+public class RelatedTest
+{
+    protected static TestCypherResource db;
+
+    @BeforeClass
+    public static void setUp() {
+        db = new TestCypherResource("mockGraph");
+    }
+
+    @AfterClass
+    public static void tearDown()
+    {
+        db.close();
+    }
 
     @Test
     public void integrationTestRelatedComposeArtist() throws CypherException {
         try (
                 Transaction tx = db.beginTx();
-                Cypher c = new Cypher(db)
+                Cypher c = db.createCypher()
         ) {
             Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
             c.resolveTopic(t);
             Related a = new Related(t);
             a.resolveBehavior(c);
+            tx.success();
 
             assertEquals(a.getBehaviorKey(), "related");
             String msg = a.getMessage();
@@ -41,11 +56,12 @@ public class RelatedTest extends BaseCypherTest {
     public void integrationTestRelatedNotResolved() throws CypherException {
         try (
                 Transaction tx = db.beginTx();
-                Cypher c = new Cypher(db)
+                Cypher c = db.createCypher()
         ) {
             Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
             c.resolveTopic(t);
             Related a = new Related(t);
+            tx.success();
 
             assertEquals("Related not Resolved.", a.getMessage());
             assertNull(a.getBehaviorData());
@@ -56,11 +72,12 @@ public class RelatedTest extends BaseCypherTest {
     public void integrationTestRelatedTopicNotResolved() throws CypherException {
         try (
                 Transaction tx = db.beginTx();
-                Cypher c = new Cypher(db)
+                Cypher c = db.createCypher()
         ) {
             Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
             Related a = new Related(t);
             a.resolveBehavior(c);
+            tx.success();
 
             assertEquals("No Match Found For :Artist", a.getMessage());
             assertNotNull(a.getBehaviorData());
@@ -74,11 +91,12 @@ public class RelatedTest extends BaseCypherTest {
     public void integrationTestRelatedFromType() throws CypherException {
         try (
                 Transaction tx = db.beginTx();
-                Cypher c = new Cypher(db)
+                Cypher c = db.createCypher()
         ) {
             Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
             c.resolveTopic(t);
             Behavior a = BehaviorType.RELATED.compose(t, c);
+            tx.success();
 
             assertEquals(a.getBehaviorKey(), "related");
             String msg = a.getMessage();

@@ -45,7 +45,7 @@ public abstract class Behavior {
     public static Map<String, String> defaultConfig()
     {
         Map<String, String> m = new HashMap<>();
-        m.put("limit", "10");
+        m.put("limit", "20");
         return m;
     }
 
