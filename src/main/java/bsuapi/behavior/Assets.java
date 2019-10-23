@@ -31,7 +31,7 @@ public class Assets extends Behavior
 
     public static BehaviorDescribe describe()
     {
-        BehaviorDescribe desc = BehaviorDescribe.resource("/assets/{TOPIC}/{VALUE}",
+        BehaviorDescribe desc = BehaviorDescribe.resource("/topic-assets/{TOPIC}/{VALUE}",
             "Find the top scored assets related to a TOPIC who's key matches VALUE "
         );
 
@@ -40,6 +40,4 @@ public class Assets extends Behavior
 
         return desc;
     }
-
-
 }

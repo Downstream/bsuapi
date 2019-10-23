@@ -7,6 +7,12 @@
   <version>0.1.2</version>
   <description>Define and resolve API methods which retrieve preset structures from the Neo4j database.</description>
   <build>
+    <resources>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>

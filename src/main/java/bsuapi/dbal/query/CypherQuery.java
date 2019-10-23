@@ -90,10 +90,8 @@ abstract public class CypherQuery {
         JSONObject n = entry.toJsonObject();
         if (this.target != null) {
             if (this.target.isTopic()) {
-                String uri = entry.getUri(this.target);
-                if (null != uri) {
-                    n.put("linkRelated", uri);
-                }
+                n.put("linkRelated", entry.getUri("related", this.target));
+                n.put("linkAssets", entry.getUri("topic-assets", this.target));
             }
         }
 

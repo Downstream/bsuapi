@@ -137,7 +137,7 @@ public class ResponseTest
     public void integrationTestResponseBuildUri() {
         Response response = this.prepareResponse("tokenPlain");
 
-        assertEquals("https://bsu.downstreamlabs.com/bsuapi/any/path/at/all", response.buildUri("/any/path/at/all"));
+        assertEquals("https://"+ Config.get("domain") + Config.get("baseuri") +"/any/path/at/all", response.buildUri("/any/path/at/all"));
     }
 
     private Response prepareResponse(String namedParamSet)
@@ -156,7 +156,7 @@ public class ResponseTest
         Map<String, String> map = this.buildParams(namedParamSet);
 
         when(request.getQueryParameters()).thenReturn(map);
-        when(request.getBaseUri()).thenReturn("https://bsu.downstreamlabs.com");
+        when(request.getBaseUri()).thenReturn("https://"+ Config.get("domain") + Config.get("baseuri"));
 
         return request;
     }

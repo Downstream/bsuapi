@@ -97,6 +97,6 @@ public class Response {
 
     public String buildUri(String path)
     {
-        return q.getBaseUri() + "/bsuapi" + path; // @todo no hardcoded url !
+        return q.getBaseUri() + path;
     }
 }

@@ -4,18 +4,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <properties>
+    <neo4j.version>3.5.12</neo4j.version>
+    <project.version>0.1.2</project.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <groupId>edu.boisestate.bsuapi</groupId>
   <artifactId>bsuapi</artifactId>
-  <version>0.1.2</version>
+  <version>${project.version}</version>
 
   <packaging>jar</packaging>
   <name>Neo4j JSON API Resolver</name>
   <description>Define and resolve API methods which retrieve preset structures from the Neo4j database.</description>
-
-  <properties>
-    <neo4j.version>3.5.12</neo4j.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
 
   <dependencies>
     <!-- MAIN -->
@@ -111,5 +112,11 @@
         </executions>
       </plugin>
     </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
   </build>
 </project>

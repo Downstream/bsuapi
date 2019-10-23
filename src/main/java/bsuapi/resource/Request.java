@@ -42,6 +42,6 @@ public class Request {
 
     public String getBaseUri()
     {
-        return "https://" + this.uriInfo.getBaseUri().getAuthority();
+        return "https://" + Config.get("domain") + Config.get("baseuri");
     }
 }

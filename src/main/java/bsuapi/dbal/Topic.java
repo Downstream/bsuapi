@@ -54,10 +54,8 @@ public class Topic implements org.neo4j.graphdb.Label
         JSONObject n = node.toJsonObject();
 
         if (this.type.isTopic()) {
-            String uri = node.getUri(this.type);
-            if (null != uri) {
-                n.put("linkRelated", uri);
-            }
+            n.put("linkRelated", node.getUri("related", this.type));
+            n.put("linkAssets", node.getUri("topic-assets", this.type));
         }
 
         return n;

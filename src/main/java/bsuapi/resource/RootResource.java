@@ -7,6 +7,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import bsuapi.behavior.Assets;
 import bsuapi.behavior.Related;
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.CypherQuery;
@@ -30,7 +31,9 @@ public class RootResource extends BaseResource
         data.put("summary","Multiple RESTful URI methods to retrieve preset JSON representations of the graph of curated assets.");
         data.put("note","Project goal: >90% test coverage, and every API method has an equivalent function registered.");
         data.put("methods", this.buildMethodList());
+        data.put("parameters", this.buildParamList());
         data.put("schema", this.buildSchema(response));
+        this.attachPackageDetails(data);
 
         try (
             Cypher c = new Cypher(db);
@@ -49,8 +52,19 @@ public class RootResource extends BaseResource
         methods.put(this.youarehere());
 
         methods.put(Related.describe());
+        methods.put(Assets.describe());
 
         return methods;
+    }
+
+    private JSONObject buildParamList()
+    {
+        JSONObject params = new JSONObject();
+        params.put("limit", "(int) default:20 ignored:<1 - max number of results in a set :: /related will return 20 assets, and 20 of each topic-type.");
+        params.put("page", "(int) default:1 ignored:<1 - paginated results according to limit, sets beyond the last page will be omitted :: limit=2&page=5 will return result entries 9 and 10 for each set (counting from 1).");
+        params.put("requestToken", "(any urlencoded str) - will include the same token in the response body :: requestToken=abc123 => response: { \"requestToken\": \"abc123\"}");
+
+        return params;
     }
 
     private JSONObject youarehere()
@@ -85,5 +99,12 @@ public class RootResource extends BaseResource
         }
 
         return result;
+    }
+
+    private void attachPackageDetails(JSONObject data)
+    {
+        data.put("version", Config.getDefault("version", "0.1"));
+        data.put("package", Config.getDefault("package", "bsuapi"));
+        data.put("canonical", Config.buildUri("/"));
     }
 }

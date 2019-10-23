@@ -74,6 +74,6 @@ public class RequestTest {
     {
         Request request = new Request(j.mockUriInfo("empty"));
 
-        assertEquals("https://bsu.downstreamlabs.com", request.getBaseUri());
+        assertEquals("https://" + Config.get("domain") + Config.get("baseuri"), request.getBaseUri());
     }
 }

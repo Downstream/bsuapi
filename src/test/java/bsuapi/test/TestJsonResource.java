@@ -1,6 +1,7 @@
 package bsuapi.test;
 
 import apoc.util.Util;
+import bsuapi.resource.Config;
 import org.json.JSONObject;
 
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -39,7 +40,7 @@ public class TestJsonResource implements AutoCloseable
         MultivaluedMap<String, String> map = this.buildParams(namedParamSet);
 
         when(m.getQueryParameters(true)).thenReturn(map);
-        when(m.getBaseUri()).thenReturn(URI.create("https://bsu.downstreamlabs.com"));
+        when(m.getBaseUri()).thenReturn(URI.create("https://"+ Config.get("domain")));
 
         return m;
     }
