@@ -1,6 +1,7 @@
 # Releases
 
 ## Dev
+* [`0.1.3`](bsuapi-0.1.3.jar) 
 * [`0.1.2`](bsuapi-0.1.2.jar) Core behaviors, tests, and optional request parameters
    * refined patterns for behaviors and cypherQueries.
    * added querystring parameters: 
