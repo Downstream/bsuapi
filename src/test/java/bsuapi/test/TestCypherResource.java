@@ -1,6 +1,6 @@
 package bsuapi.test;
 
-import apoc.util.Util;
+import bsuapi.resource.Util;
 import bsuapi.dbal.Cypher;
 import bsuapi.resource.BaseResource;
 import org.neo4j.graphdb.GraphDatabaseService;

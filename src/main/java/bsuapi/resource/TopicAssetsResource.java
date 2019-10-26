@@ -18,7 +18,6 @@ public class TopicAssetsResource extends BaseResource
 {
     private static final int TIMEOUT = 1000;
 
-    // @todo: refactor to separate request/response handling from behavior
     @Path("/{topic: [a-z]*}/{value}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
