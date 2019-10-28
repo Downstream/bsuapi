@@ -37,13 +37,13 @@ public class Node
 
     public String getProperty(String key){ return (String) this.properties.get(key); }
 
-    public String getUri(String method, NodeType type)
+    public String getUri(NodeType type)
     {
         if (!type.isTopic()) {
             return null;
         }
 
-        return "/"+ method +"/" + type.labelName().toLowerCase() + "/" + URLCoder.encode(this.getNodeKey());
+        return "/" + type.labelName().toLowerCase() + "/" + URLCoder.encode(this.getNodeKey());
     }
 
     public JSONObject toJsonObject()

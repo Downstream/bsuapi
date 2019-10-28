@@ -4,6 +4,7 @@ import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
 import bsuapi.dbal.Node;
 import bsuapi.dbal.NodeType;
+import bsuapi.resource.Config;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -90,8 +91,9 @@ abstract public class CypherQuery {
         JSONObject n = entry.toJsonObject();
         if (this.target != null) {
             if (this.target.isTopic()) {
-                n.put("linkRelated", entry.getUri("related", this.target));
-                n.put("linkAssets", entry.getUri("topic-assets", this.target));
+                String topicPath = entry.getUri(this.target);
+                n.put("linkRelated", Config.buildUri("/related" + topicPath));
+                n.put("linkAssets", Config.buildUri("/topic-assets" + topicPath));
             }
         }
 

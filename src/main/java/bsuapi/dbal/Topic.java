@@ -1,5 +1,6 @@
 package bsuapi.dbal;
 
+import bsuapi.resource.Config;
 import org.json.JSONObject;
 
 public class Topic implements org.neo4j.graphdb.Label
@@ -54,8 +55,9 @@ public class Topic implements org.neo4j.graphdb.Label
         JSONObject n = node.toJsonObject();
 
         if (this.type.isTopic()) {
-            n.put("linkRelated", node.getUri("related", this.type));
-            n.put("linkAssets", node.getUri("topic-assets", this.type));
+            String topicPath = node.getUri(this.type);
+            n.put("linkRelated", Config.buildUri("/related" + topicPath));
+            n.put("linkAssets", Config.buildUri("/topic-assets" + topicPath));
         }
 
         return n;
