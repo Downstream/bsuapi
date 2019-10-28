@@ -3,6 +3,7 @@ CREATE (start:Info {
   name: "Info",
   smallImage: "https://bsu.downstreamlabs.com/bsuapi/data/infoQuestion.png",
   largeImage: "https://bsu.downstreamlabs.com/bsuapi/data/infoDetail.png",
+  linkInfo: "https://bsu.downstreamlabs.com/bsuapi/info/Info",
   biography: ""
 })
 
@@ -11,6 +12,7 @@ CREATE (museums:Info {
   name: "Museums",
   smallImage: "https://bsu.downstreamlabs.com/bsuapi/data/museumIcon.png",
   largeImage: "https://bsu.downstreamlabs.com/bsuapi/data/museums.png",
+  linkInfo: "https://bsu.downstreamlabs.com/bsuapi/info/Museums",
   biography: "Museums around the world curate detailed digital archives, with data about every asset and artwork. This data includes the artist, time, culture, medium, and content, and many other useful details.
 
   Development was done entirely with data provided by The Met, thanks to their Open Access policy."
@@ -21,6 +23,7 @@ CREATE (openpipe:Info {
   name: "OpenPipe",
   smallImage: "http://mec402.boisestate.edu/ui/favicon.png",
   largeImage: "https://bsu.downstreamlabs.com/bsuapi/data/openpipe.png",
+  linkInfo: "https://bsu.downstreamlabs.com/bsuapi/info/OpenPipe",
   biography: "A Distributed Content Production Pipeline with a DAMS system attached that runs on AWS.
 
   OpenPipe is an open source federated content production pipeline this is lightweight, extensible and documented.
@@ -43,6 +46,7 @@ CREATE (neo4j:Info {
   name: "Neo4j",
   smallImage: "https://bsu.downstreamlabs.com/bsuapi/data/neo4jIcon.png",
   largeImage: "https://bsu.downstreamlabs.com/bsuapi/data/neo4jLarge.png",
+  linkInfo: "https://bsu.downstreamlabs.com/bsuapi/info/Neo4j",
   biography: ""
 })
 
@@ -51,6 +55,7 @@ CREATE (app:Info {
   name: "Exhibit",
   smallImage: "https://bsu.downstreamlabs.com/bsuapi/data/downstreamIcon.png",
   largeImage: "https://bsu.downstreamlabs.com/bsuapi/data/neo4jLarge.png",
+  linkInfo: "https://bsu.downstreamlabs.com/bsuapi/info/Exhibit",
   biography: ""
 })
 

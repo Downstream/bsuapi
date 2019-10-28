@@ -20,6 +20,15 @@ public class InfoResource extends BaseResource
 {
     private static final int TIMEOUT = 1000;
 
+    @Path("/")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public javax.ws.rs.core.Response apiAssets(
+            @Context UriInfo uriInfo
+    ){
+        return this.apiAssets("Info", uriInfo);
+    }
+
     @Path("/{card: [a-zA-Z]*}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
