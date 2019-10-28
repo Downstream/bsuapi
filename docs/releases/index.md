@@ -1,7 +1,12 @@
 # Releases
 
 ## Dev
-* [`0.1.3`](bsuapi-0.1.3.jar) 
+* [`0.1.4`](bsuapi-0.1.4.jar) Bugfixes for links and InfoCards
+* [`0.1.3`](bsuapi-0.1.3.jar) API CypherCommands and InfoCards
+   * `/info/`
+   * removed apoc dependency
+   * domain config from config file
+   * urls in results are now absolute instead of relative
 * [`0.1.2`](bsuapi-0.1.2.jar) Core behaviors, tests, and optional request parameters
    * refined patterns for behaviors and cypherQueries.
    * added querystring parameters: 
