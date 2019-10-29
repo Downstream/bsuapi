@@ -4,7 +4,7 @@
   <groupId>edu.boisestate.bsuapi</groupId>
   <artifactId>bsuapi</artifactId>
   <name>Neo4j JSON API Resolver</name>
-  <version>${project.version}</version>
+  <version>0.1.4</version>
   <description>Define and resolve API methods which retrieve preset structures from the Neo4j database.</description>
   <build>
     <resources>
@@ -194,7 +194,6 @@
     </dependency>
   </dependencies>
   <properties>
-    <project.version>0.1.4</project.version>
     <neo4j.version>3.5.12</neo4j.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>

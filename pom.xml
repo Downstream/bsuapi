@@ -6,13 +6,12 @@
 
   <properties>
     <neo4j.version>3.5.12</neo4j.version>
-    <project.version>0.1.4</project.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <groupId>edu.boisestate.bsuapi</groupId>
   <artifactId>bsuapi</artifactId>
-  <version>${project.version}</version>
+  <version>0.1.4</version>
 
   <packaging>jar</packaging>
   <name>Neo4j JSON API Resolver</name>

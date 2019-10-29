@@ -77,9 +77,17 @@ abstract public class CypherQuery {
         return this.getClass().getSimpleName() +" "+ this.initQuery;
     }
 
-    public Node neoEntryHandler(org.neo4j.graphdb.Node neoNode)
+    public Node entryHandler(org.neo4j.graphdb.Node neoNode)
     {
         return new Node(neoNode);
+    }
+
+    public String entryHandler(String entry) {
+        return entry;
+    }
+
+    public String entryHandler(Object entry) {
+        return entry.toString();
     }
 
     public void addResultEntry(Node entry)
@@ -98,6 +106,15 @@ abstract public class CypherQuery {
         }
 
         this.results.put(n);
+    }
+
+    public void addResultEntry(String entry)
+    {
+        if (this.results == null) {
+            this.results = new JSONArray();
+        }
+
+        this.results.put(entry);
     }
 
     public JSONArray exec(Cypher c)

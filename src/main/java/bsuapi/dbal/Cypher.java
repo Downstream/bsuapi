@@ -11,7 +11,6 @@ import org.neo4j.helpers.collection.Iterators;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 
 public class Cypher implements AutoCloseable
 {
@@ -90,35 +89,17 @@ public class Cypher implements AutoCloseable
                 Transaction tx = db.beginTx();
                 Result result = db.execute(query.getCommand());
         ) {
-            Iterator<org.neo4j.graphdb.Node> targetResults = result.columnAs(CypherQuery.resultColumn);
-            for (org.neo4j.graphdb.Node neoNode : Iterators.asIterable(targetResults)) {
-                query.addResultEntry(query.neoEntryHandler(neoNode));
+
+            Iterator<Object> resultIterator = result.columnAs(CypherQuery.resultColumn);
+            for (Object entry : Iterators.asIterable(resultIterator)) {
+                if (entry instanceof org.neo4j.graphdb.Node) {
+                    query.addResultEntry(query.entryHandler((org.neo4j.graphdb.Node) entry));
+                } else {
+                    query.addResultEntry(query.entryHandler(entry));
+                }
             }
 
             tx.success();
-        } catch (Exception e) {
-            throw new CypherException("Cypher.query failed: "+query, e);
-        }
-    }
-
-    public String rawQuery (CypherQuery query)
-    throws CypherException
-    {
-        try (
-                Transaction tx = db.beginTx();
-        ) {
-            Result r = db.execute(query.getCommand());
-            StringBuilder rows = new StringBuilder();
-            while ( r.hasNext()) {
-                Map<String,Object> row = r.next();
-                for ( Map.Entry<String,Object> column : row.entrySet() )
-                {
-                    rows.append(column.getKey()).append(": ").append(column.getValue()).append("; ");
-                }
-                rows.append("\n");
-            }
-            return rows.toString();
-            //return db.execute(query.getCommand());
         } catch (Exception e) {
             throw new CypherException("Cypher.query failed: "+query, e);
         }
