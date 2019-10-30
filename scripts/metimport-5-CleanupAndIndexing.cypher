@@ -1,0 +1,1 @@
+CALL db.index.fulltext.createNodeIndex("nameIndex",["Artist","Classification","Culture","Nation","Tag","Artwork"],["name","title"]);

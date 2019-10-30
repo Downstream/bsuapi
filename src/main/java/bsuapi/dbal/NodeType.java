@@ -120,4 +120,20 @@ public enum NodeType {
                 return false;
         }
     }
+
+    public static NodeType fromNeoNode(org.neo4j.graphdb.Node node)
+    {
+        for (Label l : node.getLabels()) {
+            String lName = l.name();
+            if (lName.equals("Topic")) continue;
+            if (lName.equals("Artwork")) return ARTWORK;
+            if (lName.equals("Artist")) return ARTIST;
+            if (lName.equals("Tag")) return TAG;
+            if (lName.equals("Culture")) return CULTURE;
+            if (lName.equals("Nation")) return NATION;
+            if (lName.equals("Classification")) return CLASS;
+        }
+
+        return null;
+    }
 }

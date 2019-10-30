@@ -96,16 +96,11 @@ abstract public class CypherQuery {
             this.results = new JSONArray();
         }
 
-        JSONObject n = entry.toJsonObject();
-        if (this.target != null) {
-            if (this.target.isTopic()) {
-                String topicPath = entry.getUri(this.target);
-                n.put("linkRelated", Config.buildUri("/related" + topicPath));
-                n.put("linkAssets", Config.buildUri("/topic-assets" + topicPath));
-            }
+        if (null != this.target && null == entry.type) {
+            entry.type = this.target;
         }
 
-        this.results.put(n);
+        this.results.put(entry.toJsonObject());
     }
 
     public void addResultEntry(String entry)

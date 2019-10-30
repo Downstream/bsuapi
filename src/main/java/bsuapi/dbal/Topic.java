@@ -52,15 +52,11 @@ public class Topic implements org.neo4j.graphdb.Label
             return null;
         }
 
-        JSONObject n = node.toJsonObject();
-
-        if (this.type.isTopic()) {
-            String topicPath = node.getUri(this.type);
-            n.put("linkRelated", Config.buildUri("/related" + topicPath));
-            n.put("linkAssets", Config.buildUri("/topic-assets" + topicPath));
+        if (null == node.type) {
+            node.type = this.type;
         }
 
-        return n;
+        return node.toJsonObject();
     }
 
     public String toCypherMatch()

@@ -1,6 +1,8 @@
 package bsuapi.dbal;
 
 import bsuapi.dbal.query.CypherQuery;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Result;
@@ -11,6 +13,7 @@ import org.neo4j.helpers.collection.Iterators;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 public class Cypher implements AutoCloseable
 {
@@ -103,6 +106,11 @@ public class Cypher implements AutoCloseable
         } catch (Exception e) {
             throw new CypherException("Cypher.query failed: "+query, e);
         }
+    }
+
+    public Result execute (String command)
+    {
+        return db.execute(command);
     }
 
     @Override
