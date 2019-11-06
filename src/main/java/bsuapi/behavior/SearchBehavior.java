@@ -5,14 +5,12 @@ import bsuapi.dbal.query.Search;
 import bsuapi.resource.Util;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.neo4j.graphdb.Result;
 import org.neo4j.logging.Log;
-
-import java.util.Map;
 
 public class SearchBehavior extends Behavior
 {
     private JSONArray searchResults = null;
+    private long searchResultCount = 0;
     private Search query;
 
     public SearchBehavior(Search query) {
@@ -33,6 +31,7 @@ public class SearchBehavior extends Behavior
     throws CypherException
     {
         this.searchResults = this.query.exec(cypher);
+        this.searchResultCount = this.query.getResultCount();
         super.resolveBehavior(cypher);
     }
 
@@ -42,10 +41,22 @@ public class SearchBehavior extends Behavior
         // most behaviors should have a topic (may need to refactor to abstract the topic dependency)
         // this case will never have a specific topic, so it will always be null
         if (this.length()>0) {
-            return "Found "+ this.length() +" matches for "+ this.query.toString() +".";
+            return  "Showing "+ this.length() +" of "+ this.searchResultCount +" matches," +
+                    " starting from item "+ this.getFirstItemIndex() +
+                    " for "+ this.query.toString() +"."
+                    ;
         }
 
         return "No results found.";
+    }
+
+    private String getFirstItemIndex()
+    {
+        if (this.query.page > 1) {
+            return ""+ (((this.query.page -1) * this.query.limit) + 1);
+        }
+
+        return "1";
     }
 
     @Override
@@ -54,6 +65,8 @@ public class SearchBehavior extends Behavior
         JSONObject data = new JSONObject();
 
         if (this.length() > 0) {
+            data.put("resultCount", this.searchResultCount);
+
             JSONObject best = this.searchResults.optJSONObject(0);
             if (!best.isEmpty()) {
                 data.put("node", best);

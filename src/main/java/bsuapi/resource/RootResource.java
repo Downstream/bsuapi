@@ -47,14 +47,14 @@ public class RootResource extends BaseResource
         return response.plain(data);
     }
 
-    private JSONArray buildMethodList()
+    private JSONObject buildMethodList()
     {
-        JSONArray methods = new JSONArray();
-        methods.put(this.youarehere());
+        JSONObject methods = new JSONObject();
 
-        methods.put(Related.describe());
-        methods.put(Assets.describe());
-        methods.put(SearchBehavior.describe());
+        methods.put("root", this.youarehere());
+        methods.put("related", Related.describe());
+        methods.put("topic-assets", Assets.describe());
+        methods.put("search", SearchBehavior.describe());
 
         return methods;
     }

@@ -7,13 +7,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.neo4j.graphdb.Result;
-import org.neo4j.graphdb.Transaction;
 
 import java.util.Map;
 import java.util.regex.Pattern;
 
 public class Search extends CypherQuery {
     private static final String indexName = "nameIndex";
+    private long resultCount = 0;
 
     public Search(String query) {
         this.initQuery = query;
@@ -23,6 +23,8 @@ public class Search extends CypherQuery {
     {
         return this.resultQuery = this.cleanCommand(this.initQuery) + this.getPageLimitCmd();
     }
+
+    public long getResultCount() { return this.resultCount; }
 
     /**
      * @todo add to RootResource & document search-syntax
@@ -40,9 +42,12 @@ public class Search extends CypherQuery {
 
         // DANGER! injection potential
         return
-            "CALL db.index.fulltext.queryNodes(\""+Search.indexName+"\", \""+query+"\")" +
+            "CALL db.index.fulltext.queryNodes(\""+Search.indexName+"\", \""+query+"\") "+
+            "YIELD node " +
+            "WITH count(node) as total " +
+            "CALL db.index.fulltext.queryNodes(\""+Search.indexName+"\", \""+query+"\") " +
             "YIELD node, score " +
-            "RETURN node, score "
+            "RETURN node, score, total "
             ;
     }
 
@@ -99,6 +104,10 @@ public class Search extends CypherQuery {
                         } catch (ClassCastException ignored) {
                             score = 0;
                         }
+                    } else if (0 == this.resultCount && column.getKey().equals("total")) {
+                        try {
+                            this.resultCount = (long) value;
+                        } catch (ClassCastException ignored) {}
                     }
                 }
 

@@ -50,8 +50,11 @@ public class RootResourceTest
         javax.ws.rs.core.Response result = resource.home(uriInfo);
 
         JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
-        JSONArray methods = (JSONArray) responseData.query("/methods");
+        JSONObject methods = (JSONObject) responseData.query("/methods");
 
-        assertTrue(methods.length() >= 2);
+        assertNotNull(responseData.query("/methods/root"));
+        assertNotNull(responseData.query("/methods/related"));
+        assertNotNull(responseData.query("/methods/topic-assets"));
+        assertNotNull(responseData.query("/methods/search"));
     }
 }

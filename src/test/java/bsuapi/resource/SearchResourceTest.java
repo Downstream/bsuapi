@@ -40,8 +40,9 @@ public class SearchResourceTest
         JSONObject responseData = this.searchDegas("empty");
 
         assertTrue((Boolean) responseData.query("/success"));
-        assertNotNull(responseData.query("/data/results/0/searchScore"));
-        assertEquals(5, ((JSONArray) responseData.query("/data/results")).length());
+        assertNotNull(responseData.query("/data/search-results/0/searchScore"));
+        assertEquals(5, ((JSONArray) responseData.query("/data/search-results")).length());
+        assertEquals(5, (responseData.query("/data/resultCount")));
     }
 
     @Test
@@ -49,8 +50,9 @@ public class SearchResourceTest
         JSONObject responseData = this.searchDegas("limit2Page1");
 
         assertTrue((Boolean) responseData.query("/success"));
-        assertNotNull(responseData.query("/data/results/0/searchScore"));
-        assertEquals(2, ((JSONArray) responseData.query("/data/results")).length());
+        assertNotNull(responseData.query("/data/search-results/0/searchScore"));
+        assertEquals(2, ((JSONArray) responseData.query("/data/search-results")).length());
+        assertEquals(5, (responseData.query("/data/resultCount")));
     }
 
     @Test
@@ -58,8 +60,9 @@ public class SearchResourceTest
         JSONObject responseData = this.searchDegas("limit2Page3");
 
         assertTrue((Boolean) responseData.query("/success"));
-        assertNotNull(responseData.query("/data/results/0/searchScore"));
-        assertEquals(1, ((JSONArray) responseData.query("/data/results")).length());
+        assertNotNull(responseData.query("/data/search-results/0/searchScore"));
+        assertEquals(1, ((JSONArray) responseData.query("/data/search-results")).length());
+        assertEquals(5, (responseData.query("/data/resultCount")));
     }
 
     // @todo: test malformed
