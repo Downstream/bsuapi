@@ -1,13 +1,12 @@
 package bsuapi.resource;
 
+import bsuapi.behavior.Assets;
+import bsuapi.behavior.Related;
+import bsuapi.behavior.SearchBehavior;
 import bsuapi.dbal.Cypher;
-import bsuapi.dbal.CypherException;
-import bsuapi.dbal.Node;
-import bsuapi.dbal.query.CypherQuery;
-import bsuapi.dbal.query.CypherScriptFile;
+import bsuapi.dbal.query.Search;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 
 import javax.ws.rs.GET;
@@ -17,84 +16,67 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import java.util.HashMap;
-import java.util.Map;
-
 
 @Path("/search")
 public class SearchResource extends BaseResource
 {
     private static final int TIMEOUT = 1000;
 
+    protected Request request;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public javax.ws.rs.core.Response search(
+            @Context UriInfo uriInfo
+    ){
+        Response response = this.prepareSearchResponse(uriInfo);
+        return response.notImplemented(SearchBehavior.describe(), "Search form or UI not implemented.");
+    }
+
     @Path("/{query}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response search(
-            @Context UriInfo uriInfo,
-            @PathParam("query") String query
+            @PathParam("query") String query,
+            @Context UriInfo uriInfo
     ){
-        Response response = this.prepareResponse(uriInfo);
+        Response response = this.prepareSearchResponse(uriInfo);
 
         try (
                 Cypher c = new Cypher(db);
+                Transaction tx = db.beginTx();
         ) {
-            JSONObject data = new JSONObject();
-            JSONArray results = this.runQuery(c, this.cleanCommand(query));
-            data.put("results",results);
+            // prepare
+            Search search = new Search(URLCoder.decode(query));
+            SearchBehavior b = new SearchBehavior(search);
 
-            return response.data(data, "search results for: "+query);
+            // compose
+            b.setConfig(this.request.getQueryParameters()); // querystring params sanitized into behavior params
+            b.setQueryConfig(search); // pulls preset behavior params into CypherQuery
+
+            // resolve
+            b.resolveBehavior(c);
+            b.addToLog(log);
+
+            tx.success();
+
+            if (b.length() <= 0) {
+                return response.noContent(b.getMessage());
+            }
+
+            return response.data(b.toJson(), b.getMessage());
         }
         catch (Exception e)
         {
+            Util.logException(log, e, "Search Error");
             return response.exception(e);
         }
     }
 
-    private String cleanCommand(String query)
+    public Response prepareSearchResponse(UriInfo uriInfo)
     {
-        // @todo sanitize for lucene
-        // @todo add to RootResource & document search-syntax
-        // lucene.apache.org/core/5_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description
-        // neo4j.com/docs/cypher-manual/3.5/schema/index/#schema-index-fulltext-search
-        // neo4j.com/developer/kb/fulltext-search-in-neo4j
-        return "CALL db.index.fulltext.queryNodes(\"nameIndex\", \""+query+"\")";
+        this.request = new Request(uriInfo);
+        return this.response = Response.prepare(this.request);
     }
 
-    private JSONArray runQuery(Cypher c, String command)
-    throws CypherException
-    {
-        try (
-                Transaction tx = db.beginTx();
-                Result r = c.execute(command)
-        ) {
-            JSONArray data = new JSONArray();
-            while ( r.hasNext()) {
-                Map<String,Object> row = r.next();
-                JSONObject node = null;
-                double score = 0;
-                for ( Map.Entry<String,Object> column : row.entrySet() ) {
-                    Object value = column.getValue();
-                    if (column.getKey().equals("node") && value instanceof org.neo4j.graphdb.Node) {
-                        node = (new Node((org.neo4j.graphdb.Node) value)).toJsonObject();
-                    } else if (column.getKey().equals("score")) {
-                        try {
-                            score = (double) value;
-                        } catch (ClassCastException ignored) {
-                            score = 0;
-                        }
-                    }
-                }
-
-                if (null != node) {
-                    node.put("searchScore", score);
-                    data.put(node);
-                }
-            }
-            tx.success();
-            return data;
-
-        } catch (Exception e) {
-            throw new CypherException("Cypher full-text-index query failed: "+command, e);
-        }
-    }
 }

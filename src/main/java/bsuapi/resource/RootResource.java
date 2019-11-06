@@ -9,6 +9,7 @@ import javax.ws.rs.core.UriInfo;
 
 import bsuapi.behavior.Assets;
 import bsuapi.behavior.Related;
+import bsuapi.behavior.SearchBehavior;
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.TopicTop;
@@ -53,6 +54,7 @@ public class RootResource extends BaseResource
 
         methods.put(Related.describe());
         methods.put(Assets.describe());
+        methods.put(SearchBehavior.describe());
 
         return methods;
     }

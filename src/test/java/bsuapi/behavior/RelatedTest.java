@@ -48,7 +48,7 @@ public class RelatedTest
 
             assertEquals("French", data.query("/Nation/0/name"));
             assertEquals("Drawings", data.query("/Classification/0/name"));
-            assertEquals("Men", data.query("/Tag/0/name"));
+            assertEquals("Profiles", data.query("/Tag/0/name"));
         }
     }
 
@@ -106,7 +106,7 @@ public class RelatedTest
 
             assertEquals("French", data.query("/Nation/0/name"));
             assertEquals("Drawings", data.query("/Classification/0/name"));
-            assertEquals("Men", data.query("/Tag/0/name"));
+            assertEquals("Profiles", data.query("/Tag/0/name"));
 
             JSONObject result = a.toJson();
 
@@ -114,10 +114,9 @@ public class RelatedTest
             assertNotNull(result.query("/node/linkRelated"));
             assertEquals("Edgar Degas",result.query("/node/name"));
 
-            assertEquals("Men", result.query("/related/Tag/0/name"));
             assertEquals("French", result.query("/related/Nation/0/name"));
             assertEquals("Drawings", result.query("/related/Classification/0/name"));
-            assertEquals("Men", result.query("/related/Tag/0/name"));
+            assertEquals("Profiles", result.query("/related/Tag/0/name"));
 
             assertEquals(334323L, result.query("/assets/0/objectID"));
             assertEquals("Profiles", ((String[]) result.query("/assets/0/tags"))[1]);

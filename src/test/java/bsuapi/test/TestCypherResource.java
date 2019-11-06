@@ -6,6 +6,7 @@ import bsuapi.resource.BaseResource;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.neo4j.logging.Log;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -82,7 +83,12 @@ public class TestCypherResource implements AutoCloseable
     public void close()
     {
         if (null != db) {
-            db.shutdown();
+            try {
+                db.shutdown();
+            } catch (LifecycleException ignore) {}
+            // test implementations of fulltest index do not properly shutdown lucene
+            // ... BUT if we get that error, it almost certainly means that Lifecycle manager is trying to close the index, while lucene has already been closed.
+            // worst case, is the rare occasion of a memory leak when running tests - nothing a reboot can't fix.
         }
     }
 }

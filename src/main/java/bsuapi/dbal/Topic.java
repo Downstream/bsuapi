@@ -5,8 +5,8 @@ import org.json.JSONObject;
 
 public class Topic implements org.neo4j.graphdb.Label
 {
-    private NodeType type;
-    private String nodeKey;
+    protected NodeType type;
+    protected String nodeKey;
     private Node node;
 
     public Topic(String labelName, String nodeKey)

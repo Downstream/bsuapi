@@ -1,0 +1,76 @@
+{
+  "lucene": "Built on Apache Lucene with Neo4j full-text-index, so follows lucene patterns, but does not allow special characters or regex search.",
+  "luceneRef": "http://lucene.apache.org/core/5_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description",
+  "examples": {
+    "basic": {
+      "character": "[a-zA-Z0-9]",
+      "description": "Any word or set of words may be searched, exact word-match results only. Results will have higher scores for matching case and more matched terms.",
+      "pattern": "Andre",
+      "encodedPattern": "Andre"
+    },
+    "phrase": {
+      "character": "\"",
+      "description": "Words may be grouped in quotes to form a single term. Exact matches only.",
+      "pattern": "\"16th Century\"",
+      "encodedPattern": "%2216th+Century%22"
+    },
+    "wildcard-single": {
+      "character": "?",
+      "description": "Match any single character in a term. French or France:",
+      "pattern": "Fr?nc?",
+      "encodedPattern": "Fr%3Fnc%3F"
+    },
+    "wildcard-multi": {
+      "character": "*",
+      "description": "Match on or more characters. Greek or Greece or Greeble, etc.",
+      "pattern": "Gree*",
+      "encodedPattern": "Gree%2A"
+    },
+    "fuzzy": {
+      "character": "~",
+      "description": "Includes similar terms, scored by edit-distance (how many letters must be changed to match). Find mis-spellings.",
+      "pattern": "anymouse~",
+      "encodedPattern": "anymouse~"
+    },
+    "proximity": {
+      "character": "\"term1 term2\"~[0-9]",
+      "description": "Find instances where the two terms occur within N words of each other, scored by distance.",
+      "pattern": "\"french revolution\"~5",
+      "encodedPattern": "%22french+revolution%22~5"
+    },
+    "required": {
+      "character": "+",
+      "description": "Make a term required. All results will include this term",
+      "pattern": "+anonymous",
+      "encodedPattern": "%2Banonymous"
+    },
+    "negation": {
+      "character": "NOT -",
+      "description": "Do not return any results which contain this term.",
+      "pattern": "-anonymous",
+      "pattern2": "NOT anonymous",
+      "encodedPattern": "-anonymous",
+      "encodedPattern2": "NOT+anonymous"
+    },
+    "boolean-or": {
+      "character": "OR",
+      "description": "Default operator if none is used (space separated terms). Includes results from all OR terms, higher scores for more matched terms.",
+      "pattern": "greece rome \"Peloponnesian War\"",
+      "pattern2": "greece OR rome OR \"Peloponnesian War\"",
+      "encodedPattern": "greece+rome+%22Peloponnesian+War%22",
+      "encodedPattern2": "greece+OR+rome+OR+%22Peloponnesian+War%22"
+    },
+    "boolean-and": {
+      "character": "AND",
+      "description": "Only include results which contain all AND terms.",
+      "pattern": "greek AND roman",
+      "encodedPattern": "greek+AND+roman"
+    },
+    "grouping": {
+      "character": "()",
+      "description": "Group clauses of different operations. Multiple Boolean operations and a fuzzy search.",
+      "pattern": "rome~ AND (gree* Athen* -general)",
+      "encodedPattern": "rome~+AND+%28gree%2A+Athen%2A+-general%29"
+    }
+  }
+}

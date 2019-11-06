@@ -2,6 +2,7 @@ package bsuapi.resource;
 
 import bsuapi.test.TestCypherResource;
 import bsuapi.test.TestJsonResource;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -36,22 +37,46 @@ public class SearchResourceTest
 
     @Test
     public void searchDegas() {
-        UriInfo uriInfo = j.mockUriInfo("empty");
-        SearchResource resource = new SearchResource();
-        db.baseResourceInjection(resource);
-        javax.ws.rs.core.Response result = resource.search(uriInfo, "Degas");
-
-        assertEquals(result.getStatus(), 200);
-
-        JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
+        JSONObject responseData = this.searchDegas("empty");
 
         assertTrue((Boolean) responseData.query("/success"));
-        assertEquals("infoCards.cypher graph generated", responseData.query("/message").toString());
-        assertNotNull(responseData.query("/data/clear/0"));
-        assertNotNull(responseData.query("/data/create/0"));
+        assertNotNull(responseData.query("/data/results/0/searchScore"));
+        assertEquals(5, ((JSONArray) responseData.query("/data/results")).length());
     }
 
-    // @todo: test limit
-    // @todo: test page
+    @Test
+    public void searchDegasLimit() {
+        JSONObject responseData = this.searchDegas("limit2Page1");
+
+        assertTrue((Boolean) responseData.query("/success"));
+        assertNotNull(responseData.query("/data/results/0/searchScore"));
+        assertEquals(2, ((JSONArray) responseData.query("/data/results")).length());
+    }
+
+    @Test
+    public void searchDegasPage() {
+        JSONObject responseData = this.searchDegas("limit2Page3");
+
+        assertTrue((Boolean) responseData.query("/success"));
+        assertNotNull(responseData.query("/data/results/0/searchScore"));
+        assertEquals(1, ((JSONArray) responseData.query("/data/results")).length());
+    }
+
     // @todo: test malformed
+
+    private JSONObject searchDegas(String paramSet)
+    {
+        UriInfo uriInfo = j.mockUriInfo(paramSet);
+        SearchResource resource = new SearchResource();
+        db.baseResourceInjection(resource);
+
+        try (Transaction tx = db.beginTx()) {
+            javax.ws.rs.core.Response result = resource.search("Degas", uriInfo);
+            tx.success();
+
+            assertEquals(result.getStatus(), 200);
+
+            return new JSONObject(UTF8.decode((byte[]) result.getEntity()));
+        }
+    }
 }

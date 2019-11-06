@@ -78,9 +78,42 @@ public class Response {
         return JsonResponse.NOT_FOUND(res);
     }
 
+    public javax.ws.rs.core.Response noContent (String message)
+    {
+        JSONObject res = this.buildResponse(false, message);
+        return JsonResponse.NO_CONTENT(res);
+    }
+
+    public javax.ws.rs.core.Response notImplemented (JSONObject doc, String message)
+    {
+        JSONObject res = this.buildResponse(true, message);
+        res.put("data", doc);
+        return JsonResponse.NOT_IMPLEMENTED(res);
+    }
+
+    public javax.ws.rs.core.Response notImplemented (String message)
+    {
+        return this.notImplemented(new JSONObject(), message);
+    }
+
+    public javax.ws.rs.core.Response notImplemented (JSONObject doc)
+    {
+        return this.notImplemented(doc, "Requested Method Not Supported");
+    }
+
+    public javax.ws.rs.core.Response notImplemented ()
+    {
+        return this.notImplemented("Requested Method Not Supported");
+    }
+
     public javax.ws.rs.core.Response notFound ()
     {
         return this.notFound("Requested resource not found. No matching indexed node for that value. Isn't art an emotional abstraction? Just imagine it.");
+    }
+
+    public javax.ws.rs.core.Response noContent ()
+    {
+        return this.noContent("Requested resource exists, but has no content or data to return.");
     }
 
     public javax.ws.rs.core.Response behavior(BehaviorType behaviorType, Topic t, Cypher c)

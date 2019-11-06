@@ -2,9 +2,9 @@ package bsuapi.test;
 
 import bsuapi.resource.Util;
 import bsuapi.resource.Config;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import org.json.JSONObject;
 
-import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
@@ -47,7 +47,7 @@ public class TestJsonResource implements AutoCloseable
 
     private MultivaluedMap<String, String> buildParams(String namedParamSet)
     {
-        MultivaluedMap<String, String> map = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> map = new MultivaluedMapImpl();
 
         JSONObject params = (JSONObject) j.query("/querystring/" + namedParamSet);
         for (Iterator<String> it = params.keys(); it.hasNext(); ) {

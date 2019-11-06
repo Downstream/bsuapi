@@ -11,7 +11,7 @@ import org.json.JSONObject;
 abstract public class CypherQuery {
     protected String initQuery;
     protected String resultQuery;
-    private JSONArray results;
+    protected JSONArray results;
     public int limit = 20;
     public int page = 0;
     public NodeType target;
@@ -22,6 +22,8 @@ abstract public class CypherQuery {
         this.initQuery = query;
         this.resultQuery = query;
     }
+
+    protected CypherQuery() {}
 
     abstract public String getCommand();
 
@@ -74,7 +76,7 @@ abstract public class CypherQuery {
 
     public String toString()
     {
-        return this.getClass().getSimpleName() +" "+ this.initQuery;
+        return this.getClass().getSimpleName() +": \""+ this.initQuery +"\"";
     }
 
     public Node entryHandler(org.neo4j.graphdb.Node neoNode)
@@ -92,18 +94,18 @@ abstract public class CypherQuery {
 
     public void addResultEntry(Node entry)
     {
-        if (this.results == null) {
-            this.results = new JSONArray();
-        }
-
         if (null != this.target && null == entry.type) {
             entry.type = this.target;
         }
 
-        this.results.put(entry.toJsonObject());
+        this.addResultEntry(entry.toJsonObject());
     }
 
-    public void addResultEntry(String entry)
+    public void addResultEntry(String entry) { this.addEntry(entry); }
+
+    public void addResultEntry(JSONObject entry) { this.addEntry(entry); }
+
+    protected void addEntry(Object entry)
     {
         if (this.results == null) {
             this.results = new JSONArray();

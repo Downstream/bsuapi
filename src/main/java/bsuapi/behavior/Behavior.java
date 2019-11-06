@@ -19,6 +19,11 @@ public abstract class Behavior {
     protected ArrayList<Behavior> appendedBehaviors;
     protected Map<String, String> config;
 
+    protected Behavior()
+    {
+        this.setConfig(Behavior.defaultConfig());
+    }
+
     public Behavior(Topic topic)
     {
         this.topic = topic;
@@ -136,9 +141,9 @@ public abstract class Behavior {
         return data;
     }
 
-    public void debug (Log log)
+    public void addToLog (Log log)
     {
-        log.info(
+        log.debug(
             "Behavior debuging for "+ this.getClass().getName() +
             "\n    topic: " + this.topic.toString() +
             "\n    node: " + this.node.toString() +

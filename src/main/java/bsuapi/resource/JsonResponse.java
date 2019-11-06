@@ -8,22 +8,32 @@ import javax.ws.rs.core.Response;
 public class JsonResponse {
     public static Response SERVER_ERROR (JSONObject response)
     {
-        return JsonResponse.build(Response.Status.INTERNAL_SERVER_ERROR, response);
+        return JsonResponse.build(ResponseStatus.INTERNAL_SERVER_ERROR, response);
     }
 
     public static Response NOT_ACCEPTABLE (JSONObject response)
     {
-        return JsonResponse.build(Response.Status.NOT_ACCEPTABLE, response);
+        return JsonResponse.build(ResponseStatus.NOT_ACCEPTABLE, response);
     }
 
     public static Response NOT_FOUND (JSONObject response)
     {
-        return JsonResponse.build(Response.Status.NOT_FOUND, response);
+        return JsonResponse.build(ResponseStatus.NOT_FOUND, response);
+    }
+
+    public static Response NO_CONTENT (JSONObject response)
+    {
+        return JsonResponse.build(ResponseStatus.NO_CONTENT, response);
+    }
+
+    public static Response NOT_IMPLEMENTED (JSONObject response)
+    {
+        return JsonResponse.build(ResponseStatus.NOT_IMPLEMENTED, response);
     }
 
     public static Response OK (JSONObject response)
     {
-        return JsonResponse.build(Response.Status.OK, response);
+        return JsonResponse.build(ResponseStatus.OK, response);
     }
 
     public static JSONObject responseObject(Boolean success, String message)
@@ -34,7 +44,7 @@ public class JsonResponse {
         return res;
     }
 
-    private static Response build(Response.Status status, JSONObject response)
+    private static Response build(ResponseStatus status, JSONObject response)
     {
         return Response.status( status ).entity( UTF8.encode(response.toString(4)) ).build();
     }

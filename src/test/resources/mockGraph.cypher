@@ -28,6 +28,14 @@ CREATE (tMen:Tag:Topic {name: "Men",artCount: 32172})
 CREATE (tProfiles:Tag:Topic {name: "Profiles",artCount: 4101})
 CREATE (tSaints:Tag:Topic {name: "Saints",artCount: 896})
 
+// SEARCH TEST LIMIT and PAGE
+CREATE (searchDegas1:Artist {name: "Degas One"})
+CREATE (searchDegas2:Artist {name: "degas two"})
+CREATE (searchDegas3:Artist {name: "DEGAS THREE"})
+CREATE (searchDegas4:Artist {name: "degas four"})
+CREATE (searchDegas5:Artist {name: "Some other Bob Degasa"}) // no match
+CREATE (searchDegas6:Artist {name: "dega"}) // no match
+
 CREATE (degas)<-[:BY]-(art)
 CREATE (draw)<-[:ART_CLASS]-(art)
 CREATE (french)<-[:ART_NATION]-(art)

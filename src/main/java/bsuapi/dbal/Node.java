@@ -71,6 +71,8 @@ public class Node
 
         NodeType type = this.getType();
         if (null != type) {
+            result.put("type", type.labelName());
+
             if (type.isTopic()) {
                 String topicPath = this.getUri();
                 result.put("linkRelated", Config.buildUri("/related" + topicPath));

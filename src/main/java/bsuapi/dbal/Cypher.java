@@ -108,6 +108,7 @@ public class Cypher implements AutoCloseable
         }
     }
 
+    // !IMPORTANT: Requires a cypher.db transaction
     public Result execute (String command)
     {
         return db.execute(command);

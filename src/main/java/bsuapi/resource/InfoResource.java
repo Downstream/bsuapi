@@ -20,7 +20,6 @@ public class InfoResource extends BaseResource
 {
     private static final int TIMEOUT = 1000;
 
-    @Path("/")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response apiAssets(
