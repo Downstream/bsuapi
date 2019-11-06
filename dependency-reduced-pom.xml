@@ -4,7 +4,7 @@
   <groupId>edu.boisestate.bsuapi</groupId>
   <artifactId>bsuapi</artifactId>
   <name>Neo4j JSON API Resolver</name>
-  <version>0.1.4</version>
+  <version>0.1.5</version>
   <description>Define and resolve API methods which retrieve preset structures from the Neo4j database.</description>
   <build>
     <resources>
@@ -90,8 +90,8 @@
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-      <version>2.1</version>
+      <artifactId>jsr311-api</artifactId>
+      <version>1.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

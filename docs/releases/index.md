@@ -1,6 +1,9 @@
 # Releases
 
 ## Dev
+* [`0.1.5`](bsuapi-0.1.5.jar) Added full-text search and api-triggered cypher commands
+   * `/search/{QUERY}` follows basic Lucene syntax (no special characters)
+   * `/generate/{COMMAND_NAME}` runs predefined cypher-script
 * [`0.1.4`](bsuapi-0.1.4.jar) Bugfixes for links and InfoCards
 * [`0.1.3`](bsuapi-0.1.3.jar) API CypherCommands and InfoCards
    * `/info/`
