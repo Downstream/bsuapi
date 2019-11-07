@@ -28,7 +28,7 @@ public class InfoResource extends BaseResource
         return this.apiAssets("Info", uriInfo);
     }
 
-    @Path("/{card: [a-zA-Z]*}")
+    @Path("/{card: [a-zA-Z0-9_\\-]*}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response apiAssets(
