@@ -1,6 +1,9 @@
 # Releases
 
 ## Dev
+* [`0.1.6`](bsuapi-0.1.6.jar) Root filters and infoCard bugs
+   * `/?filter=period:Classical` optional filter for home results (not performant)
+   * `/info/Neo4j` 404 fixed
 * [`0.1.5`](bsuapi-0.1.5.jar) Added full-text search and api-triggered cypher commands
    * `/search/{QUERY}` follows basic Lucene syntax (no special characters)
    * `/generate/{COMMAND_NAME}` runs predefined cypher-script
