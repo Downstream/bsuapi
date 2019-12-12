@@ -31,3 +31,36 @@ ORDER BY c DESC
 //country
 //culture
 //artistDisplayBio
+
+
+// periods and counts
+MATCH (x:Artwork)
+WITH DISTINCT x.period as period, coalesce(x.artistEndDate) as artDate, count(x) as cnt
+WITH DISTINCT period, head(collect(artDate)) as randDate, sum(cnt) as s
+RETURN period, randDate, s ORDER BY s DESC
+
+
+// intersections
+MATCH (a:Artist)-[]->(x)<-[]-(t:Tag)
+WHERE a.name = 'Edgar Degas' and t.name = 'Women'
+WITH x
+MATCH (x)-[]->(c:Classification)
+WITH c.name as n, count(x) as cnt
+RETURN n, cnt
+ORDER BY cnt desc
+
+MATCH (a:Nation)-[]->(x)<-[]-(t:Tag)
+  WHERE
+  a.name = 'Greek' and t.name = 'Men'
+WITH x
+MATCH (c:Classification)-[]->(x)
+  WHERE c.name = 'Sculpture'
+RETURN filter(l in labels(x) WHERE l<>'Topic')[0], x.name, x.smallImage
+
+MATCH (a:Culture)<-[:ART_CULTURE]-(x:Artwork)-[:ART_TAG]->(b:Tag)
+  WHERE
+  a.name = 'Greek' and b.name = 'Men'
+WITH a,b,x
+MATCH (c:Classification)<-[:ART_CLASS]-(x:Artwork)
+  WHERE c.name CONTAINS 'Sculpture'
+RETURN a,b,c,x

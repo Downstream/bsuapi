@@ -23,6 +23,14 @@
     "limit2Page3": {
       "limit": 2,
       "page": 3
+    },
+    "rootFilter": {
+      "requestToken": "mytoken",
+      "filter": "artistRole:Draftsman"
+    },
+    "rootFilterEmpty": {
+      "requestToken": "mytoken",
+      "filter": ""
     }
   }
 }

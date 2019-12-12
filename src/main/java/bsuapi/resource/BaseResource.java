@@ -19,6 +19,15 @@ abstract public class BaseResource
 
     protected Response response;
 
+    public Topic sanitizedTopic(Cypher c, String label, String key)
+    throws CypherException
+    {
+        label = label.substring(0, 1).toUpperCase() + label.substring(1);
+        key = URLCoder.decode(key);
+
+        return this.prepareTopic(c, label, key);
+    }
+
     public Topic prepareTopic(Cypher c, String label, String key)
     throws CypherException
     {
@@ -37,5 +46,15 @@ abstract public class BaseResource
     protected String getParam(String key)
     {
         return this.response.getParam(key);
+    }
+
+    protected String getParam(String key, String fallback)
+    {
+        String val = this.response.getParam(key);
+        if (val == null) {
+            return fallback;
+        }
+
+        return val;
     }
 }

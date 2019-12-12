@@ -6,7 +6,6 @@ public class TopicTop extends CypherQuery {
     /**
      * 1: Topic label
      * 2: label to use for rel count ":Topic"
-     * 3: max # of matches
      */
     protected static String query =
         "MATCH p=("+ CypherQuery.resultColumn +":%1$s)-[]->(:%2$s) " +

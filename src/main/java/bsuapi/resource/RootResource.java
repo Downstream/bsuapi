@@ -13,8 +13,11 @@ import bsuapi.behavior.SearchBehavior;
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.TopicTop;
+import bsuapi.dbal.query.TopicTopFiltered;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.regex.Pattern;
 
 @Path( "/" )
 public class RootResource extends BaseResource
@@ -75,19 +78,48 @@ public class RootResource extends BaseResource
         data.put("uri", "/");
         data.put("description", "API HOME - you are here - a place to help you get where you're going.");
         data.put("representation", "(THIS)");
+
+        JSONObject params = new JSONObject();
+        params.put("filter", "(optional) filter topics here by asset property. default \""+ Config.get("homeFilter") +"\"; example ?filter=period:Classical");
+        data.put("parameters", params);
         return data;
     }
 
     private JSONObject topicsList(Cypher c)
     throws CypherException
     {
+        // Collect and sanitize filter argument
+        // @todo: can this be moved to become a global optional param? (affects every query, but may be possible)
+        String[] filter = this.getParam("filter", Config.get("homeFilter")).split(":", 2);
+        String filterField = null;
+        String filterValue = null;
+        if (filter.length > 1) {
+            filterField = filter[0];
+            filterValue = filter[1];
+
+            Pattern strip = Pattern.compile("[^a-zA-Z0-9\\s]");
+            filterField = strip.matcher(filterField).replaceAll("");
+            filterValue = strip.matcher(filterValue).replaceAll("");
+
+            if (filterValue == null || filterField.isEmpty() || filterValue.isEmpty()) {
+                filterField = null;
+            }
+        }
+
         JSONObject topics = new JSONObject();
         for (NodeType n : NodeType.values()) {
             if (n.isTopic()) {
-                CypherQuery query = new TopicTop(n);
+                CypherQuery query;
+                if (filterField != null) {
+                    query = new TopicTopFiltered(n, filterField, filterValue);
+                } else {
+                    query = new TopicTop(n);
+                }
+
                 query.setPage(this.getParam("page"));
                 query.setLimit(this.getParam("limit"));
-                topics.put(n.labelName(), query.exec(c));
+                JSONArray results = query.exec(c);
+                topics.put(n.labelName(), results);
             }
         }
         return topics;
