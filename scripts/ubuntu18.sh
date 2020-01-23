@@ -132,6 +132,19 @@ echo "server {
     error_log /var/log/error.log;
     access_log /var/log/access.log;
 
+    location /data {
+        alias /var/www/data;
+    }
+
+    location /viewer {
+        alias /var/www/html/viewer;
+
+        location /viewer/css {}
+        location /viewer/js {}
+
+        try_files /index.html =404;
+    }
+
     location /bsuapi/data {
         alias /var/www/data;
     }
