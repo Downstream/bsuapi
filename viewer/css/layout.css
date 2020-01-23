@@ -1,0 +1,23 @@
+section#viewer {
+    padding: 0.3vw;
+}
+
+.topic-column > * {
+    display: block;
+    align-content: center;
+    text-align: center;
+}
+
+.topic {
+    width: 10vw;
+    height: 11vw;
+    position: relative;
+    margin: auto;
+}
+
+.topic .topic-label {
+    display: block;
+    position: absolute;
+    top: 8vw;
+    width: 100%;
+}

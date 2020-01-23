@@ -1,0 +1,74 @@
+.form-control, .form-control:focus {
+    background-color: #000;
+    color:#eee;
+}
+
+a, a:hover {
+    color: #00bc8c;
+}
+a, .nav-item {
+    cursor: pointer;
+    opacity: 0.8;
+}
+a:hover, .nav-item:hover {
+    opacity: 1;
+}
+
+/* viewer */
+section#viewer h2, section#viewer h3, section#viewer p {
+    margin-left: 2vw;
+    display: inline-block;
+    color: #777;
+    font-weight: bold;
+}
+
+.topic-column > h4 {
+    margin-bottom: 2vw;
+    font-weight: bold;
+    font-size: 1.5vw;
+}
+
+.topic img, .topic-card img {
+    width: 8vw;
+    height:8vw;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: auto;
+}
+
+.topic .topic-label {
+    color: #fff;
+    font-size: 1vw;
+}
+
+/* assets */
+.topic-assets .gallery {
+    column-count: 4;
+    column-gap: 1vw;
+}
+
+.topic-assets .gallery .asset-small {
+    height: 10vw;
+    display: inline-block;
+    margin: 0 0 1em;
+    width: 100%;
+    position: relative;
+    padding-left: 8.5vw;
+}
+
+.asset-small img {
+    max-width: 8vw;
+    max-height: 8vw;
+    position: absolute;
+    left: 0;
+}
+
+.asset-small span, .asset-small p {
+    display: block;
+    width: 100%;
+}
+
+section#viewer .asset-small p {
+    margin-left: 1vw;
+    margin-bottom: 0;
+}
