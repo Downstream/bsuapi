@@ -1,7 +1,7 @@
 package bsuapi.behavior;
 
 import bsuapi.dbal.*;
-import bsuapi.dbal.query.Search;
+import bsuapi.dbal.query.IndexQuery;
 import bsuapi.resource.Util;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -11,9 +11,9 @@ public class SearchBehavior extends Behavior
 {
     private JSONArray searchResults = null;
     private long searchResultCount = 0;
-    private Search query;
+    private IndexQuery query;
 
-    public SearchBehavior(Search query) {
+    public SearchBehavior(IndexQuery query) {
         super();
         this.query = query;
     }

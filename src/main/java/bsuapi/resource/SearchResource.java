@@ -1,12 +1,8 @@
 package bsuapi.resource;
 
-import bsuapi.behavior.Assets;
-import bsuapi.behavior.Related;
 import bsuapi.behavior.SearchBehavior;
 import bsuapi.dbal.Cypher;
-import bsuapi.dbal.query.Search;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import bsuapi.dbal.query.IndexQuery;
 import org.neo4j.graphdb.Transaction;
 
 import javax.ws.rs.GET;
@@ -47,12 +43,12 @@ public class SearchResource extends BaseResource
                 Transaction tx = db.beginTx();
         ) {
             // prepare
-            Search search = new Search(URLCoder.decode(query));
-            SearchBehavior b = new SearchBehavior(search);
+            IndexQuery indexQuery = new IndexQuery("nameIndex", URLCoder.decode(query));
+            SearchBehavior b = new SearchBehavior(indexQuery);
 
             // compose
             b.setConfig(this.request.getQueryParameters()); // querystring params sanitized into behavior params
-            b.setQueryConfig(search); // pulls preset behavior params into CypherQuery
+            b.setQueryConfig(indexQuery); // pulls preset behavior params into CypherQuery
 
             // resolve
             b.resolveBehavior(c);

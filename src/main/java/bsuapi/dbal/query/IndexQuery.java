@@ -11,11 +11,12 @@ import org.neo4j.graphdb.Result;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class Search extends CypherQuery {
-    private static final String indexName = "nameIndex";
+public class IndexQuery extends CypherQuery {
+    private String indexName;
     private long resultCount = 0;
 
-    public Search(String query) {
+    public IndexQuery(String indexName, String query) {
+        this.indexName = indexName;
         this.initQuery = query;
     }
 
@@ -38,14 +39,14 @@ public class Search extends CypherQuery {
      */
     private String cleanCommand(String query)
     {
-        query = Search.sanitizeQuery(query);
+        query = IndexQuery.sanitizeQuery(query);
 
         // DANGER! injection potential
         return
-            "CALL db.index.fulltext.queryNodes(\""+Search.indexName+"\", \""+query+"\") "+
+            "CALL db.index.fulltext.queryNodes(\""+ this.indexName+"\", \""+query+"\") "+
             "YIELD node " +
             "WITH count(node) as total " +
-            "CALL db.index.fulltext.queryNodes(\""+Search.indexName+"\", \""+query+"\") " +
+            "CALL db.index.fulltext.queryNodes(\""+ this.indexName+"\", \""+query+"\") " +
             "YIELD node, score " +
             "RETURN node, score, total "
             ;
@@ -119,7 +120,12 @@ public class Search extends CypherQuery {
             return this.results;
 
         } catch (Exception e) {
-            throw new CypherException("Cypher full-text-index query failed: "+this.initQuery, e);
+            throw new CypherException("Cypher command failed: "+this.toString(), e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return this.indexName +" "+ super.toString();
     }
 }
