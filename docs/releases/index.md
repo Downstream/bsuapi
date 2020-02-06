@@ -1,6 +1,8 @@
 # Releases
 
 ## Dev
+* [`0.1.7`](bsuapi-0.1.7.jar) Search results organized, and initial simple-viewer
+   * `/viewer` simple UI for the api 
 * [`0.1.6`](bsuapi-0.1.6.jar) Root filters and infoCard bugs
    * `/?filter=period:Classical` optional filter for home results (not performant)
    * `/info/Neo4j` 404 fixed
