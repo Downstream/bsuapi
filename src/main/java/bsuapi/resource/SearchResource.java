@@ -1,5 +1,6 @@
 package bsuapi.resource;
 
+import bsuapi.behavior.IndexQueryBehavior;
 import bsuapi.behavior.SearchBehavior;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.query.IndexQuery;
@@ -43,12 +44,10 @@ public class SearchResource extends BaseResource
                 Transaction tx = db.beginTx();
         ) {
             // prepare
-            IndexQuery indexQuery = new IndexQuery("nameIndex", URLCoder.decode(query));
-            SearchBehavior b = new SearchBehavior(indexQuery);
+            SearchBehavior b = new SearchBehavior(URLCoder.decode(query));
 
             // compose
             b.setConfig(this.request.getQueryParameters()); // querystring params sanitized into behavior params
-            b.setQueryConfig(indexQuery); // pulls preset behavior params into CypherQuery
 
             // resolve
             b.resolveBehavior(c);

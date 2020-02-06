@@ -24,7 +24,8 @@ public class SearchResourceTest
         db = new TestCypherResource("mockGraph");
         j = new TestJsonResource("requestTestParams");
         try (Transaction tx = db.beginTx()) {
-            TestCypherResource.db.execute("CALL db.index.fulltext.createNodeIndex(\"nameIndex\",[\"Artist\",\"Classification\",\"Culture\",\"Nation\",\"Tag\"],[\"name\"])");
+            TestCypherResource.db.execute("CALL db.index.fulltext.createNodeIndex(\"topicNameIndex\",[\"Artist\",\"Classification\",\"Culture\",\"Nation\",\"Tag\"],[\"name\"])");
+            TestCypherResource.db.execute("CALL db.index.fulltext.createNodeIndex(\"assetNameIndex\",[\"Artwork\"],[\"name\"])");
             tx.success();
         }
     }
@@ -77,7 +78,7 @@ public class SearchResourceTest
             javax.ws.rs.core.Response result = resource.search("Degas", uriInfo);
             tx.success();
 
-            assertEquals(result.getStatus(), 200);
+            assertEquals(200, result.getStatus());
 
             return new JSONObject(UTF8.decode((byte[]) result.getEntity()));
         }

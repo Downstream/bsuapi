@@ -20,6 +20,8 @@ public class IndexQuery extends CypherQuery {
         this.initQuery = query;
     }
 
+    public String getName() { return this.indexName; }
+
     public String getCommand()
     {
         return this.resultQuery = this.cleanCommand(this.initQuery) + this.getPageLimitCmd();

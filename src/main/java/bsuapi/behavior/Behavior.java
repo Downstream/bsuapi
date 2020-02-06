@@ -124,7 +124,9 @@ public abstract class Behavior {
 
     public String buildMessage(Topic topic)
     {
-        if (topic.hasMatch()) {
+        if (topic == null) {
+            return "No Match Found";
+        } else if (topic.hasMatch()) {
             return "Found :"+ topic.name() +" {"+ topic.getNodeKeyField() +":\""+ topic.getNodeKey() +"\"}";
         } else {
             return "No Match Found For :"+ topic.name();
