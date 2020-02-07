@@ -18,7 +18,7 @@ public class BaseBehaviorTest
         Topic t = this.mockTopic();
         Behavior b = new Assets(t);
 
-        String result = b.buildMessage(t);
+        String result = b.buildMessage();
         assertEquals("Found :LABEL {FIELD:\"KEY\"}", result);
     }
 
@@ -28,7 +28,7 @@ public class BaseBehaviorTest
         doReturn(false).when(t).hasMatch();
         Behavior b = new Assets(t);
 
-        String result = b.buildMessage(t);
+        String result = b.buildMessage();
         assertEquals("No Match Found For :LABEL", result);
     }
 

@@ -1,9 +1,6 @@
 package bsuapi.behavior;
 
-import bsuapi.dbal.Cypher;
-import bsuapi.dbal.CypherException;
-import bsuapi.dbal.NodeType;
-import bsuapi.dbal.Topic;
+import bsuapi.dbal.*;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.TopicSharedRelations;
 import org.json.JSONArray;
@@ -12,14 +9,34 @@ import org.json.JSONObject;
 public class Related extends Behavior
 {
     private JSONObject related;
+    public Topic topic;
+    public Node node;
 
-    public Related(Topic topic) { super(topic); }
+    public Related(Topic topic) {
+        super();
+        this.topic = topic;
+        this.node = topic.getNode();
+    }
+
+    public org.neo4j.graphdb.Node getNeoNode() { return this.node.getNeoNode(); }
 
     @Override
     public String getBehaviorKey() { return "related"; }
 
     @Override
     public Object getBehaviorData() { return this.related; }
+
+    @Override
+    public String buildMessage()
+    {
+        if (this.topic == null) {
+            return "No Match Found";
+        } else if (this.topic.hasMatch()) {
+            return "Found :"+ this.topic.name() +" {"+ this.topic.getNodeKeyField() +":\""+ this.topic.getNodeKey() +"\"}";
+        } else {
+            return "No Match Found For :"+ this.topic.name();
+        }
+    }
 
     @Override
     public void resolveBehavior(Cypher cypher)
@@ -29,7 +46,7 @@ public class Related extends Behavior
         JSONArray tmp = new JSONArray();
         for (NodeType n : NodeType.values()) {
             if (n.isTopic()) {
-                CypherQuery query = new TopicSharedRelations(topic, n);
+                CypherQuery query = new TopicSharedRelations(this.topic, n);
                 this.setQueryConfig(query);
                 //tmp.put(query.getCommand());
                 this.related.put(n.labelName(), query.exec(cypher));
@@ -37,6 +54,14 @@ public class Related extends Behavior
         }
         //this.related.put("cypher",tmp);
         super.resolveBehavior(cypher);
+    }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject data = super.toJson();
+        data.put("topic", this.topic.name());
+        data.put("node", this.topic.toJson());
+        return data;
     }
 
     public static BehaviorDescribe describe()

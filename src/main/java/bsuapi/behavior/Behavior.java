@@ -2,8 +2,6 @@ package bsuapi.behavior;
 
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
-import bsuapi.dbal.Topic;
-import bsuapi.dbal.Node;
 import bsuapi.dbal.query.CypherQuery;
 import org.json.JSONObject;
 import org.neo4j.logging.Log;
@@ -13,21 +11,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Behavior {
-    public Topic topic;
-    public Node node;
+
     protected String message;
     protected ArrayList<Behavior> appendedBehaviors;
     protected Map<String, String> config;
 
     protected Behavior()
     {
-        this.setConfig(Behavior.defaultConfig());
-    }
-
-    public Behavior(Topic topic)
-    {
-        this.topic = topic;
-        this.node = topic.getNode();
         this.setConfig(Behavior.defaultConfig());
     }
 
@@ -41,11 +31,12 @@ public abstract class Behavior {
             };
         }
 
-        this.message = this.buildMessage(this.topic);
+        this.message = this.buildMessage();
     }
 
     abstract public String getBehaviorKey();
     abstract public Object getBehaviorData();
+    abstract public String buildMessage();
 
     public static Map<String, String> defaultConfig()
     {
@@ -112,8 +103,6 @@ public abstract class Behavior {
         this.appendedBehaviors.add(child);
     }
 
-    public org.neo4j.graphdb.Node getNeoNode() { return this.node.getNeoNode(); }
-
     public String getMessage() {
         if (null == this.message) {
             return this.getClass().getSimpleName() + " not Resolved.";
@@ -122,22 +111,9 @@ public abstract class Behavior {
         }
     }
 
-    public String buildMessage(Topic topic)
-    {
-        if (topic == null) {
-            return "No Match Found";
-        } else if (topic.hasMatch()) {
-            return "Found :"+ topic.name() +" {"+ topic.getNodeKeyField() +":\""+ topic.getNodeKey() +"\"}";
-        } else {
-            return "No Match Found For :"+ topic.name();
-        }
-    }
-
     public JSONObject toJson()
     {
         JSONObject data = new JSONObject();
-        data.put("topic", this.topic.name());
-        data.put("node", this.topic.toJson());
         this.putBehaviorData(data);
         this.putAppendedBehaviorData(data);
         return data;
@@ -147,8 +123,6 @@ public abstract class Behavior {
     {
         log.debug(
             "Behavior debuging for "+ this.getClass().getName() +
-            "\n    topic: " + this.topic.toString() +
-            "\n    node: " + this.node.toString() +
             "\n    message: " + this.message
         );
     }

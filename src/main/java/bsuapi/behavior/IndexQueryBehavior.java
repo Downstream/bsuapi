@@ -44,7 +44,7 @@ public class IndexQueryBehavior extends Behavior
     }
 
     @Override
-    public String buildMessage(Topic topic)
+    public String buildMessage()
     {
         // most behaviors should have a topic (may need to refactor to abstract the topic dependency)
         // this case will never have a specific topic, so it will always be null

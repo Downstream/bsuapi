@@ -2,14 +2,11 @@ package bsuapi.behavior;
 
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
-import bsuapi.dbal.Topic;
 import bsuapi.dbal.query.IndexQuery;
 import bsuapi.resource.URLCoder;
 import bsuapi.resource.Util;
 import org.json.JSONObject;
 import org.neo4j.logging.Log;
-
-import java.util.Map;
 
 public class SearchBehavior extends Behavior
 {
@@ -57,13 +54,13 @@ public class SearchBehavior extends Behavior
     }
 
     @Override
-    public String buildMessage(Topic topic)
+    public String buildMessage()
     {
         StringBuilder result = new StringBuilder();
         result.append("Results for topics and assets: ");
 
         for (Behavior child : this.appendedBehaviors) {
-            result.append(child.buildMessage(null)).append(", ");
+            result.append(child.buildMessage()).append(", ");
         }
 
         return result
