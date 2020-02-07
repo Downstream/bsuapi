@@ -6,16 +6,17 @@ import bsuapi.dbal.query.TopicAssets;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Map;
+
 public class Assets extends Behavior
 {
     private JSONArray assets;
     public Topic topic;
     public Node node;
 
-    public Assets(Topic topic) {
-        super();
-        this.topic = topic;
-        this.node = topic.getNode();
+    public Assets(Map<String, String> config) {
+        super(config);
+        this.topic = new Topic(this.getConfigParam(Topic.labelParam), this.getConfigParam(Topic.keyParam));
     }
 
     @Override
@@ -36,10 +37,19 @@ public class Assets extends Behavior
         }
     }
 
+    private void resolveTopic(Cypher cypher)
+            throws CypherException
+    {
+        if (!this.topic.hasMatch()) { cypher.resolveTopic(this.topic); }
+        this.node = topic.getNode();
+    }
+
     @Override
     public void resolveBehavior(Cypher cypher)
     throws CypherException
     {
+        this.resolveTopic(cypher);
+
         CypherQuery query = new TopicAssets(this.topic);
         this.setQueryConfig(query);
         this.assets = query.exec(cypher);

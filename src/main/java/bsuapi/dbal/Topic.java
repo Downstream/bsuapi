@@ -3,11 +3,26 @@ package bsuapi.dbal;
 import bsuapi.resource.Config;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Topic implements org.neo4j.graphdb.Label
 {
+    public static final String labelParam = "topicLabel";
+    public static final String keyParam = "topicKey";
+
     protected NodeType type;
     protected String nodeKey;
     private Node node;
+
+    public static Map<String, String> plainMap(String label, String key)
+    {
+        Map<String, String> m = new HashMap<>();
+        m.put(Topic.labelParam, label);
+        m.put(Topic.keyParam, key);
+
+        return m;
+    }
 
     public Topic(String labelName, String nodeKey)
     {

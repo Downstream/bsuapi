@@ -9,41 +9,27 @@ public enum BehaviorType {
     RELATED,
     ASSETS;
 
-    private Behavior prepare(Topic t, Cypher c)
-    throws CypherException
+    private Behavior prepare(Map<String, String> config)
     {
-        if (!t.hasMatch()) { c.resolveTopic(t); }
-
         Behavior b;
         switch ( this ) {
             case RELATED:
-                b = new Related(t);
-                b.appendBehavior(BehaviorType.ASSETS.prepare(t, c));
+                b = new Related(config);
+                b.appendBehavior(BehaviorType.ASSETS.prepare(config));
                 return b;
             case ASSETS:
-                b = new Assets(t);
+                b = new Assets(config);
                 return b;
         }
 
         return null;
     }
 
-    public Behavior compose(Topic t, Cypher c)
-    throws CypherException
+    public Behavior compose(Cypher c, Map<String, String> config)
+            throws CypherException
     {
+        Behavior b = this.prepare(config);
 
-        Behavior b = this.prepare(t, c);
-        if (b != null) {
-            return this.resolve(b, c);
-        }
-
-        return null;
-    }
-
-    public Behavior compose(Topic t, Cypher c, Map<String, String> config)
-    throws CypherException
-    {
-        Behavior b = this.prepare(t, c);
         if (b != null) {
             b.setConfig(config);
             return this.resolve(b, c);

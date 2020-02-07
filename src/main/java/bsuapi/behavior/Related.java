@@ -6,16 +6,17 @@ import bsuapi.dbal.query.TopicSharedRelations;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Map;
+
 public class Related extends Behavior
 {
     private JSONObject related;
     public Topic topic;
     public Node node;
 
-    public Related(Topic topic) {
-        super();
-        this.topic = topic;
-        this.node = topic.getNode();
+    public Related(Map<String, String> config) {
+        super(config);
+        this.topic = new Topic(this.getConfigParam(Topic.labelParam), this.getConfigParam(Topic.keyParam));
     }
 
     public org.neo4j.graphdb.Node getNeoNode() { return this.node.getNeoNode(); }
@@ -38,21 +39,28 @@ public class Related extends Behavior
         }
     }
 
+    private void resolveTopic(Cypher cypher)
+    throws CypherException
+    {
+        if (!this.topic.hasMatch()) { cypher.resolveTopic(this.topic); }
+        this.node = topic.getNode();
+    }
+
     @Override
     public void resolveBehavior(Cypher cypher)
     throws CypherException
     {
+        this.resolveTopic(cypher);
+
         this.related = new JSONObject();
-        JSONArray tmp = new JSONArray();
         for (NodeType n : NodeType.values()) {
             if (n.isTopic()) {
                 CypherQuery query = new TopicSharedRelations(this.topic, n);
                 this.setQueryConfig(query);
-                //tmp.put(query.getCommand());
                 this.related.put(n.labelName(), query.exec(cypher));
             }
         }
-        //this.related.put("cypher",tmp);
+
         super.resolveBehavior(cypher);
     }
 

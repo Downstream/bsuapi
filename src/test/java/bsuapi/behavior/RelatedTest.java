@@ -11,6 +11,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 public class RelatedTest
@@ -29,73 +32,12 @@ public class RelatedTest
     }
 
     @Test
-    public void integrationTestRelatedComposeArtist() throws CypherException {
-        try (
-                Transaction tx = db.beginTx();
-                Cypher c = db.createCypher()
-        ) {
-            Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
-            c.resolveTopic(t);
-            Related a = new Related(t);
-            a.resolveBehavior(c);
-            tx.success();
-
-            assertEquals(a.getBehaviorKey(), "related");
-            String msg = a.getMessage();
-            assertTrue(msg.length() > 0);
-
-            JSONObject data = (JSONObject) a.getBehaviorData();
-
-            assertEquals("French", data.query("/Nation/0/name"));
-            assertEquals("Drawings", data.query("/Classification/0/name"));
-            assertEquals("Profiles", data.query("/Tag/0/name"));
-        }
-    }
-
-    @Test
-    public void integrationTestRelatedNotResolved() throws CypherException {
-        try (
-                Transaction tx = db.beginTx();
-                Cypher c = db.createCypher()
-        ) {
-            Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
-            c.resolveTopic(t);
-            Related a = new Related(t);
-            tx.success();
-
-            assertEquals("Related not Resolved.", a.getMessage());
-            assertNull(a.getBehaviorData());
-        }
-    }
-
-    @Test
-    public void integrationTestRelatedTopicNotResolved() throws CypherException {
-        try (
-                Transaction tx = db.beginTx();
-                Cypher c = db.createCypher()
-        ) {
-            Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
-            Related a = new Related(t);
-            a.resolveBehavior(c);
-            tx.success();
-
-            assertEquals("No Match Found For :Artist", a.getMessage());
-            assertNotNull(a.getBehaviorData());
-
-            JSONObject behavior = a.toJson();
-            assertNull(behavior.query("/node"));
-        }
-    }
-
-    @Test
     public void integrationTestRelatedFromType() throws CypherException {
         try (
                 Transaction tx = db.beginTx();
                 Cypher c = db.createCypher()
         ) {
-            Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
-            c.resolveTopic(t);
-            Behavior a = BehaviorType.RELATED.compose(t, c);
+            Behavior a = BehaviorType.RELATED.compose(c, Topic.plainMap(NodeType.ARTIST.labelName(), "Edgar Degas"));
             tx.success();
 
             assertEquals(a.getBehaviorKey(), "related");

@@ -10,6 +10,9 @@ import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.UserFunction;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RelatedFunction
 {
     @Context
@@ -18,16 +21,15 @@ public class RelatedFunction
     @UserFunction
     @Description("bsuapi.related('Topic','IndexedValue') - find all Topics with a matching indexed value, with related Topics and Assets. API /related/{Topic}/{Value}")
     public Node related(
-            @Name("labelName") String labelName,
-            @Name("value") String value
+            @Name("topicLabel") String topicLabel,
+            @Name("topicKey") String topicKey
     ) throws CypherException
     {
         try (
                 Cypher c = new Cypher(db);
         ) {
-            Topic t = new Topic(labelName, value);
-            c.resolveTopic(t);
-            Related rel = new Related(t);
+
+            Related rel = new Related(Topic.plainMap(topicLabel, topicKey));
             rel.resolveBehavior(c);
 
             return rel.getNeoNode(); // @todo: return a list of properties matching the resource response (Neo4j doesn't handle JSONObject)

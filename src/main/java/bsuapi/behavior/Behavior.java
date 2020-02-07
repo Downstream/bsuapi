@@ -2,6 +2,7 @@ package bsuapi.behavior;
 
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
+import bsuapi.dbal.Topic;
 import bsuapi.dbal.query.CypherQuery;
 import org.json.JSONObject;
 import org.neo4j.logging.Log;
@@ -10,15 +11,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Behavior {
-
+public abstract class Behavior
+{
     protected String message;
     protected ArrayList<Behavior> appendedBehaviors;
     protected Map<String, String> config;
+    protected CypherQuery query;
 
     protected Behavior()
     {
         this.setConfig(Behavior.defaultConfig());
+    }
+
+    protected Behavior(Map<String, String> config)
+    {
+        this.setConfig(config);
+    }
+
+    protected Behavior(CypherQuery query)
+    {
+        this.setConfig(Behavior.defaultConfig());
+        this.query = query;
     }
 
     public void resolveBehavior(Cypher cypher)
@@ -53,7 +66,7 @@ public abstract class Behavior {
             ;
 
         if (null != map) {
-            for (String key : new String[]{"limit","page"}) {
+            for (String key : new String[]{"limit","page", Topic.keyParam, Topic.labelParam}) {
                 if (map.containsKey(key)) {
                     result.put(key, map.get(key));
                 }
@@ -103,7 +116,8 @@ public abstract class Behavior {
         this.appendedBehaviors.add(child);
     }
 
-    public String getMessage() {
+    public String getMessage()
+    {
         if (null == this.message) {
             return this.getClass().getSimpleName() + " not Resolved.";
         } else {

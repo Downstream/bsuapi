@@ -21,6 +21,12 @@ public class Response {
         return r;
     }
 
+    public void setTopic(String label, String key)
+    {
+        this.params.put(Topic.labelParam, label);
+        this.params.put(Topic.keyParam, key);
+    }
+
     public String getParam(String key)
     {
         if (!this.params.containsKey(key)) {
@@ -116,10 +122,10 @@ public class Response {
         return this.noContent("Requested resource exists, but has no content or data to return.");
     }
 
-    public javax.ws.rs.core.Response behavior(BehaviorType behaviorType, Topic t, Cypher c)
+    public javax.ws.rs.core.Response behavior(BehaviorType behaviorType, Cypher c)
     throws CypherException
     {
-        Behavior b = behaviorType.compose(t, c, this.params);
+        Behavior b = behaviorType.compose(c, this.params);
 
         if (null == b) {
             return this.notFound("Could not resolve related behavior.");

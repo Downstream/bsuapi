@@ -12,6 +12,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 public class AssetsTest
@@ -30,73 +33,12 @@ public class AssetsTest
     }
 
     @Test
-    public void integrationTestAssetsComposeArtist() throws CypherException {
-        try (
-                Transaction tx = db.beginTx();
-                Cypher c = db.createCypher()
-        ) {
-            Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
-            c.resolveTopic(t);
-            Assets a = new Assets(t);
-            a.resolveBehavior(c);
-            tx.success();
-
-            assertEquals(a.getBehaviorKey(), "assets");
-            String msg = a.getMessage();
-            assertTrue(msg.length() > 0);
-
-            JSONArray data = (JSONArray) a.getBehaviorData();
-            JSONObject asset = (JSONObject) data.get(0);
-
-            assertEquals(334323L, asset.query("/objectID"));
-            assertEquals("Profiles", ((String[]) asset.query("/tags"))[1]);
-            assertEquals("Head of a Saint (profile to the right), after Fra Angelico", asset.query("/title").toString());
-        }
-    }
-
-    @Test
-    public void integrationTestAssetsNotResolved() throws CypherException {
-        try (
-                Transaction tx = db.beginTx();
-                Cypher c = db.createCypher()
-        ) {
-            Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
-            c.resolveTopic(t);
-            Assets a = new Assets(t);
-            tx.success();
-
-            assertEquals("Assets not Resolved.", a.getMessage());
-            assertNull(a.getBehaviorData());
-        }
-    }
-
-    @Test
-    public void integrationTestAssetsTopicNotResolved() throws CypherException {
-        try (
-                Transaction tx = db.beginTx();
-                Cypher c = db.createCypher()
-        ) {
-            Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
-            Assets a = new Assets(t);
-            a.resolveBehavior(c);
-            tx.success();
-
-            assertEquals("No Match Found For :Artist", a.getMessage());
-            assertNotNull(a.getBehaviorData());
-
-            JSONObject behavior = a.toJson();
-            assertNull(behavior.query("/node"));
-        }
-    }
-
-    @Test
     public void integrationTestRelatedFromType() throws CypherException {
         try (
                 Transaction tx = db.beginTx();
                 Cypher c = db.createCypher()
         ) {
-            Topic t = new Topic(NodeType.ARTIST.labelName(), "Edgar Degas");
-            Behavior a = BehaviorType.ASSETS.compose(t, c);
+            Behavior a = BehaviorType.ASSETS.compose(c, Topic.plainMap(NodeType.ARTIST.labelName(), "Edgar Degas"));
             tx.success();
 
             assertEquals(a.getBehaviorKey(), "assets");

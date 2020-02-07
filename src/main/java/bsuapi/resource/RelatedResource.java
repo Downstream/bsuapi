@@ -37,19 +37,12 @@ public class RelatedResource extends BaseResource
 
         String searchVal = URLCoder.decode(value);
         String searchTopic = topic.substring(0, 1).toUpperCase() + topic.substring(1); // upper first
+        response.setTopic(searchTopic, searchVal);
 
         try (
                 Cypher c = new Cypher(db);
         ) {
-            Topic t = this.prepareTopic(c, searchTopic, searchVal);
-
-            if (!t.hasMatch())
-            {
-                log.info("No match "+ t.toString());
-                return response.notFound();
-            } else {
-                return response.behavior(BehaviorType.RELATED, t, c);
-            }
+            return response.behavior(BehaviorType.RELATED, c);
         }
         catch (Exception e)
         {
