@@ -22,7 +22,8 @@ public class GenerationResource extends BaseResource
     @Path("/info")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response info(@Context UriInfo uriInfo){
+    public javax.ws.rs.core.Response info(@Context UriInfo uriInfo)
+    {
         Response response = this.prepareResponse(uriInfo);
 
         HashMap<String, CypherQuery> commands = new HashMap<>();
@@ -35,7 +36,7 @@ public class GenerationResource extends BaseResource
     private javax.ws.rs.core.Response executeCommands(Response response, HashMap<String, CypherQuery> commands, String messagePrefix)
     {
         try (
-                Cypher c = new Cypher(db);
+                Cypher c = new Cypher(db)
         ) {
             JSONObject result = new JSONObject();
 

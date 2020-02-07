@@ -2,7 +2,6 @@ package bsuapi.resource;
 
 import bsuapi.behavior.BehaviorType;
 import bsuapi.dbal.Cypher;
-import bsuapi.dbal.Topic;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,10 +21,10 @@ public class TopicAssetsResource extends BaseResource
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response apiAssets(
-            @PathParam("topic") String topic,
-            @PathParam("value") String value,
-            @Context UriInfo uriInfo
-            ){
+        @PathParam("topic") String topic,
+        @PathParam("value") String value,
+        @Context UriInfo uriInfo
+    ){
 
         //Response response = Response.prepare(new Request(uriInfo));
         Response response = this.prepareResponse(uriInfo);
@@ -40,7 +39,7 @@ public class TopicAssetsResource extends BaseResource
         response.setTopic(searchTopic, searchVal);
 
         try (
-                Cypher c = new Cypher(db);
+                Cypher c = new Cypher(db)
         ) {
             return response.behavior(BehaviorType.ASSETS, c);
         }
@@ -48,6 +47,5 @@ public class TopicAssetsResource extends BaseResource
         {
             return response.exception(e);
         }
-
     }
 }

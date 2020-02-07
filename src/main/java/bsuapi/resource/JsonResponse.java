@@ -5,7 +5,8 @@ import org.json.JSONObject;
 import org.neo4j.string.UTF8;
 import javax.ws.rs.core.Response;
 
-public class JsonResponse {
+public class JsonResponse
+{
     public static Response SERVER_ERROR (JSONObject response)
     {
         return JsonResponse.build(ResponseStatus.INTERNAL_SERVER_ERROR, response);

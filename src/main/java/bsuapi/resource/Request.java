@@ -5,7 +5,8 @@ import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Request {
+public class Request
+{
     private UriInfo uriInfo;
     private Map<String, String> params;
 

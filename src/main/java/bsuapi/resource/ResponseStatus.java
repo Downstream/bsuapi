@@ -3,7 +3,8 @@ package bsuapi.resource;
 import javax.ws.rs.core.Response;
 
 // simplify older javax status implementation, and add missing needed codes
-public enum ResponseStatus implements Response.StatusType {
+public enum ResponseStatus implements Response.StatusType
+{
     OK(200, "OK"),
     CREATED(201, "Created"),
     ACCEPTED(202, "Accepted"),
@@ -24,7 +25,8 @@ public enum ResponseStatus implements Response.StatusType {
     private final String reason;
     private Response.Status.Family family;
 
-    ResponseStatus(final int statusCode, final String reasonPhrase) {
+    ResponseStatus(final int statusCode, final String reasonPhrase)
+    {
         this.code = statusCode;
         this.reason = reasonPhrase;
         switch(code/100) {
@@ -38,20 +40,26 @@ public enum ResponseStatus implements Response.StatusType {
     }
 
     @Override
-    public int getStatusCode() {
+    public int getStatusCode()
+    {
         return code;
     }
 
     @Override
-    public Response.Status.Family getFamily() { return family; }
+    public Response.Status.Family getFamily()
+    {
+        return family;
+    }
 
     @Override
-    public String getReasonPhrase() {
+    public String getReasonPhrase()
+    {
         return toString();
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return reason;
     }
 }

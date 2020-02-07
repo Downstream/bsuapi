@@ -3,7 +3,8 @@ package bsuapi.dbal.query;
 import bsuapi.dbal.NodeType;
 import bsuapi.dbal.Topic;
 
-public class TopicSharedRelations extends CypherQuery {
+public class TopicSharedRelations extends CypherQuery
+{
     /**
      * 1: Topic label cypher match
      * 2: relation name (target)<-[:REL_NAME]-(topic)
@@ -30,12 +31,13 @@ public class TopicSharedRelations extends CypherQuery {
 
     protected Topic topic;
 
-    public TopicSharedRelations(Topic topic, NodeType target) {
+    public TopicSharedRelations(Topic topic, NodeType target)
+    {
         super(TopicSharedRelations.query);
         if (topic.name().equals(target.labelName())) {
             this.initQuery = TopicSharedRelations.querySameTopic;
             this.resultQuery = TopicSharedRelations.querySameTopic;
-        };
+        }
 
         this.topic = topic;
         this.target = target;

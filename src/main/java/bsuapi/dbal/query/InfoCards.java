@@ -1,8 +1,7 @@
 package bsuapi.dbal.query;
 
-import bsuapi.dbal.NodeType;
-
-public class InfoCards extends CypherQuery {
+public class InfoCards extends CypherQuery
+{
     /**
      * 1: Topic label
      * 2: label to use for rel count ":Topic"

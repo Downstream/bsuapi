@@ -2,14 +2,14 @@ import Element from "../element.js";
 import Topic from "../topic.js";
 
 export default class RootView {
-    data
+    data;
     constructor (apiData) {
         this.data = apiData
     }
 
     build () {
 
-        let group = Element.columnGroup()
+        let group = Element.columnGroup();
         for (let topicType in this.data.topics) {
             Topic.type(topicType, this.data.topics[topicType]).appendTo(group)
         }

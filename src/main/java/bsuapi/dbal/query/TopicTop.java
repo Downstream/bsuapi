@@ -2,7 +2,8 @@ package bsuapi.dbal.query;
 
 import bsuapi.dbal.NodeType;
 
-public class TopicTop extends CypherQuery {
+public class TopicTop extends CypherQuery
+{
     /**
      * 1: Topic label
      * 2: label to use for rel count ":Topic"
@@ -13,7 +14,8 @@ public class TopicTop extends CypherQuery {
         "RETURN "+ CypherQuery.resultColumn +" ORDER BY n DESC "
         ;
 
-    public TopicTop(NodeType target) {
+    public TopicTop(NodeType target)
+    {
         super(TopicTop.query);
         this.target = target;
     }

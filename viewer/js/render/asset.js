@@ -1,7 +1,7 @@
 import Element from "./element.js"
 
 export default class Asset {
-    data
+    data;
     constructor (assetData) {
         this.data = assetData
     }
@@ -15,8 +15,8 @@ export default class Asset {
     }
 
     build() {
-        let el = Element.create('div', 'asset-small')
-        Element.img(this.data.primaryImageSmall).appendTo(el)
+        let el = Element.create('div', 'asset-small');
+        Element.img(this.data.primaryImageSmall).appendTo(el);
 
         if (this.data.title) {
             Element.label(this.data.title, 'asset-label').appendTo(el)
@@ -28,10 +28,10 @@ export default class Asset {
                         : 'Asset'
                 )); // null coalesce
 
-        Element.text(`${assetName} - ${this.data.objecDate}` ).appendTo(el)
-        Element.text(`${this.data.artistDisplayName}` ).appendTo(el)
-        Element.text(`${this.data.artistDisplayBio}` ).appendTo(el)
-        Element.text(`${this.data.dimensions}` ).appendTo(el)
+        Element.text(`${assetName} - ${this.data.objecDate}` ).appendTo(el);
+        Element.text(`${this.data.artistDisplayName}` ).appendTo(el);
+        Element.text(`${this.data.artistDisplayBio}` ).appendTo(el);
+        Element.text(`${this.data.dimensions}` ).appendTo(el);
 
         return el
     }

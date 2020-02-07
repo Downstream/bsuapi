@@ -92,7 +92,8 @@ public class JsonSchemaResource extends BaseResource
         return response.plain(schema);
     }
 
-    private JSONObject standardResponse(String element, String description){
+    private JSONObject standardResponse(String element, String description)
+    {
 
         JSONObject schema = new JSONObject();
         schema.put("$id", JsonSchemaResource.schemaUri(this.response, element));

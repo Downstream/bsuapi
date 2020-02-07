@@ -2,7 +2,8 @@ package bsuapi.dbal.query;
 
 import bsuapi.dbal.NodeType;
 
-public class TopicTopFiltered extends CypherQuery {
+public class TopicTopFiltered extends CypherQuery
+{
 
     protected String filterField, filterValue;
 
@@ -19,7 +20,8 @@ public class TopicTopFiltered extends CypherQuery {
         "RETURN "+ CypherQuery.resultColumn +" ORDER BY n DESC "
         ;
 
-    public TopicTopFiltered(NodeType target, String field, String value) {
+    public TopicTopFiltered(NodeType target, String field, String value)
+    {
         this.filterField = field;
         this.filterValue = value;
         this.target = target;

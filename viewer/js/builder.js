@@ -3,7 +3,7 @@ import RelatedView from "./render/view/related.js";
 import ErrorView from "./render/view/error.js";
 
 export default class Builder {
-    $root
+    $root;
 
     constructor(root) {
         this.$root = $(root)
@@ -27,7 +27,7 @@ export default class Builder {
         } else if (element instanceof HTMLElement) {
             this.$root.appendChild(element)
         } else {
-            console.log(element)
+            console.log(element);
             throw TypeError(`Builder addElement of type ${typeof element} is not an HTML element`)
         }
     }

@@ -4,7 +4,8 @@ import bsuapi.dbal.query.IndexQuery;
 
 import java.util.Map;
 
-public class AssetIndex extends IndexBehaviorBase {
+public class AssetIndex extends IndexBehaviorBase
+{
     public static final String indexName = "assetNameIndex";
 
     public AssetIndex(Map<String, String> config) {

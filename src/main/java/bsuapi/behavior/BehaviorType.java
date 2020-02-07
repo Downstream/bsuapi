@@ -4,7 +4,8 @@ import bsuapi.dbal.CypherException;
 
 import java.util.Map;
 
-public enum BehaviorType {
+public enum BehaviorType
+{
     RELATED,
     ASSETS,
     SEARCH,
@@ -14,22 +15,27 @@ public enum BehaviorType {
     private Behavior prepare(Map<String, String> config)
     {
         Behavior b;
-        switch ( this ) {
+        switch ( this )
+        {
             case RELATED:
                 b = new Related(config);
                 b.appendBehavior(BehaviorType.ASSETS.prepare(config));
                 return b;
+
             case ASSETS:
                 b = new Assets(config);
                 return b;
+
             case SEARCH:
                 b = new Search(config);
                 b.appendBehavior(BehaviorType.SEARCH_ASSETS.prepare(config));
                 b.appendBehavior(BehaviorType.SEARCH_TOPICS.prepare(config));
                 return b;
+
             case SEARCH_ASSETS:
                 b = new AssetIndex(config);
                 return b;
+
             case SEARCH_TOPICS:
                 b = new TopicIndex(config);
                 return b;
@@ -39,7 +45,7 @@ public enum BehaviorType {
     }
 
     public Behavior compose(Cypher c, Map<String, String> config)
-            throws CypherException
+    throws CypherException
     {
         Behavior b = this.prepare(config);
 

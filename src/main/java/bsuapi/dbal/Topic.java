@@ -1,6 +1,5 @@
 package bsuapi.dbal;
 
-import bsuapi.resource.Config;
 import org.json.JSONObject;
 
 import java.util.HashMap;

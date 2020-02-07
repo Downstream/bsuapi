@@ -25,7 +25,7 @@ public class RootResource extends BaseResource
     @GET
     @Produces( MediaType.APPLICATION_JSON )
     public javax.ws.rs.core.Response home(
-            @Context UriInfo uriInfo
+        @Context UriInfo uriInfo
     ){
 
         Response response = this.prepareResponse(uriInfo);

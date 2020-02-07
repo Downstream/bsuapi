@@ -11,11 +11,13 @@ import org.neo4j.graphdb.Result;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class IndexQuery extends CypherQuery {
+public class IndexQuery extends CypherQuery
+{
     private String indexName;
     private long resultCount = 0;
 
-    public IndexQuery(String indexName, String query) {
+    public IndexQuery(String indexName, String query)
+    {
         this.indexName = indexName;
         this.initQuery = query;
     }

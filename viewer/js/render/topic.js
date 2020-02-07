@@ -1,7 +1,7 @@
 import Element from "./element.js"
 
 export default class Topic {
-    data
+    data;
     constructor (topicData) {
         this.data = topicData
     }
@@ -17,11 +17,11 @@ export default class Topic {
 
     // grouping of topics: Artist, Classification, Nation, etc.
     static type(label, data) {
-        let column = Element.column('topic-column')
-        Element.plain('h4',label).appendTo(column)
+        let column = Element.column('topic-column');
+        Element.plain('h4',label).appendTo(column);
         data.forEach((t) => {
             Topic.small(t).appendTo(column)
-        })
+        });
 
         return column
     }
@@ -32,13 +32,13 @@ export default class Topic {
     }
 
     build() {
-        let el = Element.create('div', 'topic')
-        let urlRelated = Topic.urlApiToViewer(this.data.linkRelated)
+        let el = Element.create('div', 'topic');
+        let urlRelated = Topic.urlApiToViewer(this.data.linkRelated);
 
-        Element.label(this.data.name, 'topic-label').appendTo(el)
+        Element.label(this.data.name, 'topic-label').appendTo(el);
         Element.img(this.data.smallImage)
             .attr('onerror', 'this.parentElement.parentElement.style.display = \'none\';')
-            .appendTo(el)
+            .appendTo(el);
 
         return Element.link(urlRelated, el, 'w-100')
     }

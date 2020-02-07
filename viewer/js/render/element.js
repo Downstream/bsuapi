@@ -1,6 +1,6 @@
 export default class Element {
     static plain(type, content, classname) {
-        let el = $(`<${type}>${content}</{$type}>`)
+        let el = $(`<${type}>${content}</{$type}>`);
         if (classname) {
             el.addClass(classname)
         }
@@ -16,14 +16,14 @@ export default class Element {
         let link;
 
         if (content instanceof jQuery && content[0] instanceof HTMLElement) {
-            link = Element.create('a',classname)
-            link.attr('href',url)
-            content.appendTo(link)
+            link = Element.create('a',classname);
+            link.attr('href',url);
+            content.appendTo(link);
             return link
         }
 
-        link = Element.plain('a',content, classname)
-        link.attr('href',url)
+        link = Element.plain('a',content, classname);
+        link.attr('href',url);
         return link
     }
 

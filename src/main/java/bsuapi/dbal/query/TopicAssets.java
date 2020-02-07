@@ -3,7 +3,8 @@ package bsuapi.dbal.query;
 import bsuapi.dbal.NodeType;
 import bsuapi.dbal.Topic;
 
-public class TopicAssets extends CypherQuery {
+public class TopicAssets extends CypherQuery
+{
     /**
      * 1: Topic label cypher match
      * 2: relation name (topic)<-[:REL]-(asset)
@@ -18,7 +19,8 @@ public class TopicAssets extends CypherQuery {
 
     protected Topic topic;
 
-    public TopicAssets(Topic topic) {
+    public TopicAssets(Topic topic)
+    {
         super(TopicAssets.query);
         this.target = NodeType.ARTWORK;
         this.topic = topic;

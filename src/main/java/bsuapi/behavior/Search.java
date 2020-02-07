@@ -12,12 +12,14 @@ public class Search extends Behavior
 
     private String query;
 
-    public Search(Map<String, String> config) {
+    public Search(Map<String, String> config)
+    {
         super(config);
         this.query = this.getConfigParam(Search.searchParam);
     }
 
-    public int length() {
+    public int length()
+    {
         int result = 0;
         for (Behavior child : this.appendedBehaviors) {
             if (child instanceof IndexBehaviorBase) {
@@ -32,10 +34,12 @@ public class Search extends Behavior
     public String getBehaviorKey() { return "search-results"; }
 
     @Override
-    public Object getBehaviorData() {
+    public Object getBehaviorData()
+    {
         JSONObject data = new JSONObject();
         data.put("title", "Search for "+ this.query);
         data.put("description", "Assets and Topics ordered by the best matches to the query provided.");
+
         return data;
     }
 

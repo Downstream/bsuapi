@@ -3,7 +3,6 @@ package bsuapi.behavior;
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.TopicSharedRelations;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -14,7 +13,8 @@ public class Related extends Behavior
     public Topic topic;
     public Node node;
 
-    public Related(Map<String, String> config) {
+    public Related(Map<String, String> config)
+    {
         super(config);
         this.topic = new Topic(this.getConfigParam(Topic.labelParam), this.getConfigParam(Topic.keyParam));
     }
@@ -65,7 +65,8 @@ public class Related extends Behavior
     }
 
     @Override
-    public JSONObject toJson() {
+    public JSONObject toJson()
+    {
         JSONObject data = super.toJson();
         data.put("topic", this.topic.name());
         data.put("node", this.topic.toJson());
@@ -84,6 +85,4 @@ public class Related extends Behavior
 
         return desc;
     }
-
-
 }

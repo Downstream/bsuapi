@@ -7,21 +7,26 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Scanner;
 
-public class Util {
+public class Util
+{
     // RESOURCE FILES
-    public static String readResourceFile(String filename) {
+    public static String readResourceFile(String filename)
+    {
         return Util.scanner(Util.getResourceFileStream(filename));
     }
 
-    public static JSONObject readResourceJSON(String filename) {
+    public static JSONObject readResourceJSON(String filename)
+    {
         return new JSONObject(Util.readResourceFile(filename+".json"));
     }
 
-    private static InputStream getResourceFileStream(String filename) {
+    private static InputStream getResourceFileStream(String filename)
+    {
         return Util.class.getClassLoader().getResourceAsStream(filename);
     }
 
-    private static String scanner(InputStream stream) {
+    private static String scanner(InputStream stream)
+    {
         return (new Scanner(stream)).useDelimiter("\\Z").next();
     }
 

@@ -39,7 +39,7 @@ public class InfoResource extends BaseResource
         JSONObject data = new JSONObject();
 
         try (
-            Cypher c = new Cypher(db);
+            Cypher c = new Cypher(db)
         ) {
             CypherQuery query = new InfoCards();
 

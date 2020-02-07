@@ -4,11 +4,11 @@ import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
 import bsuapi.dbal.Node;
 import bsuapi.dbal.NodeType;
-import bsuapi.resource.Config;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-abstract public class CypherQuery {
+abstract public class CypherQuery
+{
     protected String initQuery;
     protected String resultQuery;
     protected JSONArray results;
@@ -30,6 +30,7 @@ abstract public class CypherQuery {
     public void setLimit(String limit)
     {
         int lim = this.limit;
+
         try {
             lim = Integer.parseInt(limit);
             lim = Math.abs(lim);

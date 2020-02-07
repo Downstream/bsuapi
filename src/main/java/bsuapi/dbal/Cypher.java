@@ -1,8 +1,6 @@
 package bsuapi.dbal;
 
 import bsuapi.dbal.query.CypherQuery;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Result;
@@ -13,7 +11,6 @@ import org.neo4j.helpers.collection.Iterators;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 
 public class Cypher implements AutoCloseable
 {
@@ -90,7 +87,7 @@ public class Cypher implements AutoCloseable
     {
         try (
                 Transaction tx = db.beginTx();
-                Result result = db.execute(query.getCommand());
+                Result result = db.execute(query.getCommand())
         ) {
 
             Iterator<Object> resultIterator = result.columnAs(CypherQuery.resultColumn);
@@ -115,7 +112,8 @@ public class Cypher implements AutoCloseable
     }
 
     @Override
-    public void close() {
+    public void close()
+    {
         // @todo check4 memory-leak: Topic and Resource close should release memory, but if not, will need to manage Node instances here
     }
 }

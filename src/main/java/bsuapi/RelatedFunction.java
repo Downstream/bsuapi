@@ -10,9 +10,6 @@ import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.UserFunction;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class RelatedFunction
 {
     @Context
@@ -26,7 +23,7 @@ public class RelatedFunction
     ) throws CypherException
     {
         try (
-                Cypher c = new Cypher(db);
+                Cypher c = new Cypher(db)
         ) {
 
             Related rel = new Related(Topic.plainMap(topicLabel, topicKey));

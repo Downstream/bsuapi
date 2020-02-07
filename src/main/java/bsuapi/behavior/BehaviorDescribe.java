@@ -2,7 +2,8 @@ package bsuapi.behavior;
 
 import org.json.JSONObject;
 
-public class BehaviorDescribe extends JSONObject {
+public class BehaviorDescribe extends JSONObject
+{
     private JSONObject arguments;
 
     public static BehaviorDescribe resource(String uri, String description)

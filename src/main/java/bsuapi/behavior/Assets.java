@@ -14,7 +14,8 @@ public class Assets extends Behavior
     public Topic topic;
     public Node node;
 
-    public Assets(Map<String, String> config) {
+    public Assets(Map<String, String> config)
+    {
         super(config);
         this.topic = new Topic(this.getConfigParam(Topic.labelParam), this.getConfigParam(Topic.keyParam));
     }
@@ -38,7 +39,7 @@ public class Assets extends Behavior
     }
 
     private void resolveTopic(Cypher cypher)
-            throws CypherException
+    throws CypherException
     {
         if (!this.topic.hasMatch()) { cypher.resolveTopic(this.topic); }
         this.node = topic.getNode();
@@ -57,7 +58,8 @@ public class Assets extends Behavior
     }
 
     @Override
-    public JSONObject toJson() {
+    public JSONObject toJson()
+    {
         JSONObject data = super.toJson();
         data.put("topicName", this.topic.name());
         data.put("node", this.topic.toJson());

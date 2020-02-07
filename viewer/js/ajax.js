@@ -5,11 +5,11 @@ headers.append('Authorization', 'Basic '+ btoa('neo4j:d0wnstr34m'));
 
 const fetchOpts = {
     headers: headers
-}
+};
 
 export default class Ajax {
     constructor ($root) {
-        this.$root = $root
+        this.$root = $root;
         this.url = $root.data('data-ajax-url')
     }
 

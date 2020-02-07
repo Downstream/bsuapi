@@ -3,7 +3,6 @@ package bsuapi.resource;
 import bsuapi.behavior.BehaviorType;
 import bsuapi.behavior.Search;
 import bsuapi.dbal.Cypher;
-import org.neo4j.graphdb.Transaction;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -23,7 +22,7 @@ public class SearchResource extends BaseResource
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response search(
-            @Context UriInfo uriInfo
+        @Context UriInfo uriInfo
     ){
         Response response = this.prepareSearchResponse(uriInfo);
         return response.notImplemented(Search.describe(), "Search form or UI not implemented.");

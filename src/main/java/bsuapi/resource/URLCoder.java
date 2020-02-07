@@ -1,6 +1,7 @@
 package bsuapi.resource;
 
-public class URLCoder {
+public class URLCoder
+{
     public static String encode(String value)
     {
         try {

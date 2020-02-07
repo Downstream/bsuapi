@@ -10,7 +10,8 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
-public class Response {
+public class Response
+{
     private Request q;
     private Map<String, String> params;
 

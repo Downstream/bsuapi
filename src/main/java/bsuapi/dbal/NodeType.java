@@ -1,7 +1,8 @@
 package bsuapi.dbal;
 import org.neo4j.graphdb.Label;
 
-public enum NodeType {
+public enum NodeType
+{
     ARTWORK,
     ARTIST,
     CLASS,
