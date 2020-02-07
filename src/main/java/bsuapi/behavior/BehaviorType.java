@@ -1,13 +1,15 @@
 package bsuapi.behavior;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
-import bsuapi.dbal.Topic;
 
 import java.util.Map;
 
 public enum BehaviorType {
     RELATED,
-    ASSETS;
+    ASSETS,
+    SEARCH,
+    SEARCH_ASSETS,
+    SEARCH_TOPICS;
 
     private Behavior prepare(Map<String, String> config)
     {
@@ -19,6 +21,17 @@ public enum BehaviorType {
                 return b;
             case ASSETS:
                 b = new Assets(config);
+                return b;
+            case SEARCH:
+                b = new Search(config);
+                b.appendBehavior(BehaviorType.SEARCH_ASSETS.prepare(config));
+                b.appendBehavior(BehaviorType.SEARCH_TOPICS.prepare(config));
+                return b;
+            case SEARCH_ASSETS:
+                b = new AssetIndex(config);
+                return b;
+            case SEARCH_TOPICS:
+                b = new TopicIndex(config);
                 return b;
         }
 

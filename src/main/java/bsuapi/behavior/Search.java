@@ -1,33 +1,27 @@
 package bsuapi.behavior;
 
-import bsuapi.dbal.Cypher;
-import bsuapi.dbal.CypherException;
-import bsuapi.dbal.query.IndexQuery;
-import bsuapi.resource.URLCoder;
 import bsuapi.resource.Util;
 import org.json.JSONObject;
 import org.neo4j.logging.Log;
 
-public class SearchBehavior extends Behavior
+import java.util.Map;
+
+public class Search extends Behavior
 {
+    public static final String searchParam = "search";
+
     private String query;
-    private IndexQuery topicQuery;
-    private IndexQuery assetQuery;
 
-    public SearchBehavior(String query) {
-        this.query = query;
-
-        this.topicQuery = new IndexQuery("topicNameIndex", URLCoder.decode(query));
-        this.assetQuery = new IndexQuery("assetNameIndex", URLCoder.decode(query));
-        this.appendBehavior(new IndexQueryBehavior(this.topicQuery, "topics"));
-        this.appendBehavior(new IndexQueryBehavior(this.assetQuery, "assets"));
+    public Search(Map<String, String> config) {
+        super(config);
+        this.query = this.getConfigParam(Search.searchParam);
     }
 
     public int length() {
         int result = 0;
         for (Behavior child : this.appendedBehaviors) {
-            if (child instanceof IndexQueryBehavior) {
-                result += ((IndexQueryBehavior) child).length();
+            if (child instanceof IndexBehaviorBase) {
+                result += ((IndexBehaviorBase) child).length();
             }
         }
 
@@ -46,14 +40,6 @@ public class SearchBehavior extends Behavior
     }
 
     @Override
-    public void resolveBehavior(Cypher cypher) throws CypherException {
-        this.setQueryConfig(this.topicQuery); // @todo: needs refactor of Behavior/BehaviorType/Topic/CypherQuery dependency pattern
-        this.setQueryConfig(this.assetQuery);
-
-        super.resolveBehavior(cypher);
-    }
-
-    @Override
     public String buildMessage()
     {
         StringBuilder result = new StringBuilder();
@@ -63,11 +49,7 @@ public class SearchBehavior extends Behavior
             result.append(child.buildMessage()).append(", ");
         }
 
-        return result
-            .append("with ")
-            .append(this.topicQuery.getResultCount() + this.assetQuery.getResultCount())
-            .append(" total matches.")
-            .toString();
+        return result.toString();
     }
 
     @Override

@@ -1,9 +1,8 @@
 package bsuapi.resource;
 
-import bsuapi.behavior.IndexQueryBehavior;
-import bsuapi.behavior.SearchBehavior;
+import bsuapi.behavior.BehaviorType;
+import bsuapi.behavior.Search;
 import bsuapi.dbal.Cypher;
-import bsuapi.dbal.query.IndexQuery;
 import org.neo4j.graphdb.Transaction;
 
 import javax.ws.rs.GET;
@@ -27,7 +26,7 @@ public class SearchResource extends BaseResource
             @Context UriInfo uriInfo
     ){
         Response response = this.prepareSearchResponse(uriInfo);
-        return response.notImplemented(SearchBehavior.describe(), "Search form or UI not implemented.");
+        return response.notImplemented(Search.describe(), "Search form or UI not implemented.");
     }
 
     @Path("/{query}")
@@ -38,28 +37,12 @@ public class SearchResource extends BaseResource
             @Context UriInfo uriInfo
     ){
         Response response = this.prepareSearchResponse(uriInfo);
+        response.setSearch(URLCoder.decode(query));
 
         try (
-                Cypher c = new Cypher(db);
-                Transaction tx = db.beginTx();
+                Cypher c = new Cypher(db)
         ) {
-            // prepare
-            SearchBehavior b = new SearchBehavior(URLCoder.decode(query));
-
-            // compose
-            b.setConfig(this.request.getQueryParameters()); // querystring params sanitized into behavior params
-
-            // resolve
-            b.resolveBehavior(c);
-            b.addToLog(log);
-
-            tx.success();
-
-            if (b.length() <= 0) {
-                return response.noContent(b.getMessage());
-            }
-
-            return response.data(b.toJson(), b.getMessage());
+            return response.behavior(BehaviorType.SEARCH, c);
         }
         catch (Exception e)
         {

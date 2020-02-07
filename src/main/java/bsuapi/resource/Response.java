@@ -2,6 +2,7 @@ package bsuapi.resource;
 
 import bsuapi.behavior.Behavior;
 import bsuapi.behavior.BehaviorType;
+import bsuapi.behavior.Search;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
 import bsuapi.dbal.Topic;
@@ -25,6 +26,11 @@ public class Response {
     {
         this.params.put(Topic.labelParam, label);
         this.params.put(Topic.keyParam, key);
+    }
+
+    public void setSearch(String searchQuery)
+    {
+        this.params.put(Search.searchParam, searchQuery);
     }
 
     public String getParam(String key)

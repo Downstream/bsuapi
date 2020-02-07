@@ -9,7 +9,7 @@ import javax.ws.rs.core.UriInfo;
 
 import bsuapi.behavior.Assets;
 import bsuapi.behavior.Related;
-import bsuapi.behavior.SearchBehavior;
+import bsuapi.behavior.Search;
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.TopicTop;
@@ -40,7 +40,7 @@ public class RootResource extends BaseResource
         this.attachPackageDetails(data);
 
         try (
-            Cypher c = new Cypher(db);
+            Cypher c = new Cypher(db)
         ) {
             data.put("topics", this.topicsList(c));
         } catch (Exception e) {
@@ -57,7 +57,7 @@ public class RootResource extends BaseResource
         methods.put("root", this.youarehere());
         methods.put("related", Related.describe());
         methods.put("topic-assets", Assets.describe());
-        methods.put("search", SearchBehavior.describe());
+        methods.put("search", Search.describe());
 
         return methods;
     }

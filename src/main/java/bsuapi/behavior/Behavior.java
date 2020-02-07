@@ -18,20 +18,9 @@ public abstract class Behavior
     protected Map<String, String> config;
     protected CypherQuery query;
 
-    protected Behavior()
-    {
-        this.setConfig(Behavior.defaultConfig());
-    }
-
     protected Behavior(Map<String, String> config)
     {
         this.setConfig(config);
-    }
-
-    protected Behavior(CypherQuery query)
-    {
-        this.setConfig(Behavior.defaultConfig());
-        this.query = query;
     }
 
     public void resolveBehavior(Cypher cypher)
@@ -41,7 +30,7 @@ public abstract class Behavior
             for (Behavior child : this.appendedBehaviors) {
                 child.setConfig(this.config);
                 child.resolveBehavior(cypher);
-            };
+            }
         }
 
         this.message = this.buildMessage();
@@ -66,7 +55,7 @@ public abstract class Behavior
             ;
 
         if (null != map) {
-            for (String key : new String[]{"limit","page", Topic.keyParam, Topic.labelParam}) {
+            for (String key : new String[]{"limit","page", Topic.keyParam, Topic.labelParam, Search.searchParam}) {
                 if (map.containsKey(key)) {
                     result.put(key, map.get(key));
                 }

@@ -7,29 +7,27 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.neo4j.logging.Log;
 
-public class IndexQueryBehavior extends Behavior
+import java.util.Map;
+
+abstract public class IndexBehaviorBase extends Behavior
 {
     private JSONArray searchResults = null;
     private long searchResultCount = 0;
     private IndexQuery indexQuery;
-    private String resultKey;
 
-    public IndexQueryBehavior(IndexQuery indexQuery) {
-        super();
-        this.indexQuery = indexQuery;
-        this.resultKey = indexQuery.getName();
-    }
+    abstract public String resultKey();
+    abstract public IndexQuery createQuery(String value);
 
-    public IndexQueryBehavior(IndexQuery indexQuery, String resultKey) {
-        super();
-        this.indexQuery = indexQuery;
-        this.resultKey = resultKey;
+    public IndexBehaviorBase(Map<String, String> config)
+    {
+        super(config);
+        this.indexQuery = this.createQuery(this.getConfigParam(Search.searchParam));
     }
 
     public int length() { return (null != this.searchResults) ? this.searchResults.length() : 0; }
 
     @Override
-    public String getBehaviorKey() { return this.resultKey; }
+    public String getBehaviorKey() { return this.resultKey(); }
 
     @Override
     public Object getBehaviorData() { return this.searchResults; }
