@@ -8,7 +8,9 @@ public class TopicIndex extends IndexBehaviorBase
 {
     public static final String indexName = "topicNameIndex";
 
-    public TopicIndex(Map<String, String> config) {
+    public TopicIndex(Map<String, String> config)
+    throws BehaviorException
+    {
         super(config);
     }
 

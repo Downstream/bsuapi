@@ -13,6 +13,7 @@ public enum BehaviorType
     SEARCH_TOPICS;
 
     private Behavior prepare(Map<String, String> config)
+    throws BehaviorException
     {
         Behavior b;
         switch ( this )
@@ -45,7 +46,7 @@ public enum BehaviorType
     }
 
     public Behavior compose(Cypher c, Map<String, String> config)
-    throws CypherException
+    throws CypherException, BehaviorException
     {
         Behavior b = this.prepare(config);
 

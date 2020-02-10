@@ -13,9 +13,16 @@ public class Search extends Behavior
     private String query;
 
     public Search(Map<String, String> config)
+    throws BehaviorException
     {
         super(config);
-        this.query = this.getConfigParam(Search.searchParam);
+
+        String search = this.getConfigParam(Search.searchParam);
+        if (null == search) {
+            throw new BehaviorException("Missing required parameter for IndexBehavior "+ getClass() +": "+ Search.searchParam);
+        }
+
+        this.query = this.getConfigParam(search);
     }
 
     public int length()

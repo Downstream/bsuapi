@@ -1,6 +1,7 @@
 package bsuapi.resource;
 
 import bsuapi.behavior.Behavior;
+import bsuapi.behavior.BehaviorException;
 import bsuapi.behavior.BehaviorType;
 import bsuapi.behavior.Search;
 import bsuapi.dbal.Cypher;
@@ -130,7 +131,7 @@ public class Response
     }
 
     public javax.ws.rs.core.Response behavior(BehaviorType behaviorType, Cypher c)
-    throws CypherException
+    throws CypherException, BehaviorException
     {
         Behavior b = behaviorType.compose(c, this.params);
 

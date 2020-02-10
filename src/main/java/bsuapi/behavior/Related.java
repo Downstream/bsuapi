@@ -14,9 +14,18 @@ public class Related extends Behavior
     public Node node;
 
     public Related(Map<String, String> config)
+    throws BehaviorException
     {
         super(config);
-        this.topic = new Topic(this.getConfigParam(Topic.labelParam), this.getConfigParam(Topic.keyParam));
+
+        String labelName = this.getConfigParam(Topic.labelParam);
+        String keyName = this.getConfigParam(Topic.keyParam);
+
+        if (null == labelName || null == keyName) {
+            throw new BehaviorException("Missing required parameters for "+ this.toString()+ ": "+ Topic.labelParam +" and "+ Topic.keyParam);
+        }
+
+        this.topic = new Topic(labelName, keyName);
     }
 
     public org.neo4j.graphdb.Node getNeoNode() { return this.node.getNeoNode(); }

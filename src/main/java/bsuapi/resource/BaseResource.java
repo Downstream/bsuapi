@@ -1,5 +1,7 @@
 package bsuapi.resource;
 
+import bsuapi.behavior.BehaviorException;
+import bsuapi.behavior.BehaviorType;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
 import bsuapi.dbal.Topic;
@@ -19,28 +21,27 @@ abstract public class BaseResource
 
     protected Response response;
 
-    public Topic sanitizedTopic(Cypher c, String label, String key)
-    throws CypherException
+    public javax.ws.rs.core.Response handleBehavior(BehaviorType behaviorType)
     {
-        label = label.substring(0, 1).toUpperCase() + label.substring(1);
-        key = URLCoder.decode(key);
-
-        return this.prepareTopic(c, label, key);
-    }
-
-    public Topic prepareTopic(Cypher c, String label, String key)
-    throws CypherException
-    {
-        Topic t = new Topic(label, key);
-        c.resolveTopic(t);
-
-        log.info(this.getClass().getSimpleName() + " search: :"+ label +" \""+ key+"\"");
-        return t;
+        try (
+            Cypher c = new Cypher(db)
+        ) {
+            return response.behavior(behaviorType, c);
+        }
+        catch (BehaviorException e)
+        {
+            return response.badRequest(e.getMessage());
+        }
+        catch (Exception e)
+        {
+            return response.exception(e);
+        }
     }
 
     public Response prepareResponse(UriInfo uriInfo)
     {
-        return this.response = Response.prepare(new Request(uriInfo));
+        this.response = Response.prepare(new Request(uriInfo));
+        return this.response;
     }
 
     protected String getParam(String key)

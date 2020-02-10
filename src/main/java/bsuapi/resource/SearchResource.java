@@ -38,16 +38,7 @@ public class SearchResource extends BaseResource
         Response response = this.prepareSearchResponse(uriInfo);
         response.setSearch(URLCoder.decode(query));
 
-        try (
-                Cypher c = new Cypher(db)
-        ) {
-            return response.behavior(BehaviorType.SEARCH, c);
-        }
-        catch (Exception e)
-        {
-            Util.logException(log, e, "Search Error");
-            return response.exception(e);
-        }
+        return this.handleBehavior(BehaviorType.SEARCH);
     }
 
     public Response prepareSearchResponse(UriInfo uriInfo)

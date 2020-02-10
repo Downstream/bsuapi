@@ -58,7 +58,7 @@ public class JsonResponse
         do {
             stack = new JSONArray();
             for(StackTraceElement trace : cause.getStackTrace()) {
-                stack.put(trace.getFileName() +"["+ trace.getLineNumber() +"] "+ trace.getClass().getSimpleName() +"."+ trace.getMethodName() +"()");
+                stack.put(trace.getFileName() +"["+ trace.getLineNumber() +"] "+ trace.getClassName() +"."+ trace.getMethodName() +"()");
             }
             result.put(cause.getClass().getSimpleName(), stack);
         } while(null != (cause = e.getCause()));

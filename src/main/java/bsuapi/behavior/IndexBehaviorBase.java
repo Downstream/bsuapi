@@ -19,9 +19,16 @@ abstract public class IndexBehaviorBase extends Behavior
     abstract public IndexQuery createQuery(String value);
 
     public IndexBehaviorBase(Map<String, String> config)
+    throws BehaviorException
     {
         super(config);
-        this.indexQuery = this.createQuery(this.getConfigParam(Search.searchParam));
+
+        String search = this.getConfigParam(Search.searchParam);
+        if (null == search) {
+            throw new BehaviorException("Missing required parameter for IndexBehavior "+ getClass() +": "+ Search.searchParam);
+        }
+
+        this.indexQuery = this.createQuery(search);
     }
 
     public int length() { return (null != this.searchResults) ? this.searchResults.length() : 0; }

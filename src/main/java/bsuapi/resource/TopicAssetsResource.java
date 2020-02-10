@@ -25,27 +25,16 @@ public class TopicAssetsResource extends BaseResource
         @PathParam("value") String value,
         @Context UriInfo uriInfo
     ){
-
-        //Response response = Response.prepare(new Request(uriInfo));
         Response response = this.prepareResponse(uriInfo);
-
-        if (value == null || topic == null)
-        {
-            return response.badRequest("Required method parameters missing: topic label, topic name");
-        }
-
         String searchVal = URLCoder.decode(value);
         String searchTopic = topic.substring(0, 1).toUpperCase() + topic.substring(1); // upper first
         response.setTopic(searchTopic, searchVal);
 
-        try (
-                Cypher c = new Cypher(db)
-        ) {
-            return response.behavior(BehaviorType.ASSETS, c);
-        }
-        catch (Exception e)
+        if (searchVal == null)
         {
-            return response.exception(e);
+            return response.badRequest("Required method parameters missing: topic label, topic name");
         }
+
+        return this.handleBehavior(BehaviorType.ASSETS);
     }
 }

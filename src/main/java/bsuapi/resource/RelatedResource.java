@@ -38,15 +38,6 @@ public class RelatedResource extends BaseResource
         String searchTopic = topic.substring(0, 1).toUpperCase() + topic.substring(1); // upper first
         response.setTopic(searchTopic, searchVal);
 
-        try (
-                Cypher c = new Cypher(db)
-        ) {
-            return response.behavior(BehaviorType.RELATED, c);
-        }
-        catch (Exception e)
-        {
-            return response.exception(e);
-        }
-
+        return this.handleBehavior(BehaviorType.RELATED);
     }
 }
