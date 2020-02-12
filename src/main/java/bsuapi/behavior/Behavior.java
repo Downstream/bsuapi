@@ -43,7 +43,7 @@ public abstract class Behavior
     public static Map<String, String> defaultConfig()
     {
         Map<String, String> m = new HashMap<>();
-        m.put("limit", "20");
+        m.put(CypherQuery.limitParam, "20");
         return m;
     }
 
@@ -55,7 +55,7 @@ public abstract class Behavior
             ;
 
         if (null != map) {
-            for (String key : new String[]{"limit","page", Topic.keyParam, Topic.labelParam, Search.searchParam}) {
+            for (String key : new String[]{CypherQuery.limitParam,CypherQuery.pageParam, Topic.keyParam, Topic.labelParam, Search.searchParam}) {
                 if (map.containsKey(key)) {
                     result.put(key, map.get(key));
                 }
@@ -77,8 +77,8 @@ public abstract class Behavior
 
     public void setQueryConfig(CypherQuery query)
     {
-        query.setLimit(this.getConfigParam("limit"));
-        query.setPage(this.getConfigParam("page"));
+        query.setLimit(this.getConfigParam(CypherQuery.limitParam));
+        query.setPage(this.getConfigParam(CypherQuery.pageParam));
     }
 
     public void putBehaviorData(JSONObject json)

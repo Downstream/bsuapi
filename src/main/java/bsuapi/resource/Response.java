@@ -16,6 +16,8 @@ public class Response
     private Request q;
     private Map<String, String> params;
 
+    public static final String requestTokenParam = "requestToken";
+
     public static Response prepare(Request q)
     {
         Response r = new Response();
@@ -46,9 +48,9 @@ public class Response
 
     private JSONObject appendToken(JSONObject data)
     {
-        String requestToken = this.params.getOrDefault("requestToken", null);
+        String requestToken = this.params.getOrDefault(Response.requestTokenParam, null);
         if (null != requestToken) {
-            data.put("requestToken", requestToken);
+            data.put(Response.requestTokenParam, requestToken);
         }
 
         return data;

@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 
 public class IndexQuery extends CypherQuery
 {
-    private String indexName;
-    private long resultCount = 0;
+    protected String indexName;
+    protected long resultCount = 0;
 
     public IndexQuery(String indexName, String query)
     {
@@ -32,7 +32,6 @@ public class IndexQuery extends CypherQuery
     public long getResultCount() { return this.resultCount; }
 
     /**
-     * @todo add to RootResource & document search-syntax
      * Fulltext Index won't have a stable Java API until neo4j 3.6 at the earliest
      * lucene.apache.org/core/5_5_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html#package.description
      * neo4j.com/docs/cypher-manual/3.5/schema/index/#schema-index-fulltext-search
@@ -41,8 +40,9 @@ public class IndexQuery extends CypherQuery
      * @param query lucene syntax query
      * @return String Cypher command to execute
      */
-    private String cleanCommand(String query)
+    protected String cleanCommand(String query)
     {
+        // @todo add to RootResource & document search-syntax
         query = IndexQuery.sanitizeQuery(query);
 
         // DANGER! injection potential
@@ -60,8 +60,8 @@ public class IndexQuery extends CypherQuery
      * cleanQuery currently allows alphaNumeric, spaces, parens, quotes, +- and *
      * it should safely allow for the majority of lucene syntax queries
      */
-    private static Pattern strip = Pattern.compile("[^a-zA-Z0-9\\s()+\\-*~\"]");
-    private static String sanitizeQuery(String query)
+    protected static Pattern strip = Pattern.compile("[^a-zA-Z0-9\\s()+\\-*~\"]");
+    protected static String sanitizeQuery(String query)
     {
         query = strip.matcher(query).replaceAll("");
 

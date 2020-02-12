@@ -65,9 +65,9 @@ public class RootResource extends BaseResource
     private JSONObject buildParamList()
     {
         JSONObject params = new JSONObject();
-        params.put("limit", "(int) default:20 ignored:<1 - max number of results in a set :: /related will return 20 assets, and 20 of each topic-type.");
-        params.put("page", "(int) default:1 ignored:<1 - paginated results according to limit, sets beyond the last page will be omitted :: limit=2&page=5 will return result entries 9 and 10 for each set (counting from 1).");
-        params.put("requestToken", "(any urlencoded str) - will include the same token in the response body :: requestToken=abc123 => response: { \"requestToken\": \"abc123\"}");
+        params.put(CypherQuery.limitParam, "(int) default:20 ignored:<1 - max number of results in a set :: /related will return 20 assets, and 20 of each topic-type.");
+        params.put(CypherQuery.pageParam, "(int) default:1 ignored:<1 - paginated results according to limit, sets beyond the last page will be omitted :: limit=2&page=5 will return result entries 9 and 10 for each set (counting from 1).");
+        params.put(Response.requestTokenParam, "(any urlencoded str) - will include the same token in the response body :: requestToken=abc123 => response: { \"requestToken\": \"abc123\"}");
 
         return params;
     }
@@ -116,8 +116,8 @@ public class RootResource extends BaseResource
                     query = new TopicTop(n);
                 }
 
-                query.setPage(this.getParam("page"));
-                query.setLimit(this.getParam("limit"));
+                query.setPage(this.getParam(CypherQuery.pageParam));
+                query.setLimit(this.getParam(CypherQuery.limitParam));
                 JSONArray results = query.exec(c);
                 topics.put(n.labelName(), results);
             }

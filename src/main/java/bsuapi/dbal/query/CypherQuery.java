@@ -17,6 +17,9 @@ abstract public class CypherQuery
     public NodeType target;
     public static String resultColumn = "t"; // target
 
+    public static final String limitParam = "limit";
+    public static final String pageParam = "page";
+
     public CypherQuery (String query)
     {
         this.initQuery = query;

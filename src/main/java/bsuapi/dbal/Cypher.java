@@ -5,8 +5,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.schema.IndexDefinition;
-import org.neo4j.graphdb.schema.Schema;
 import org.neo4j.helpers.collection.Iterators;
 
 import java.util.ArrayList;
@@ -42,23 +40,6 @@ public class Cypher implements AutoCloseable
         }
 
         return null;
-    }
-
-    public ArrayList<Node> bestMatchThroughIndices (NodeType type, String keyVal)
-    throws CypherException
-    {
-        Schema schema = db.schema();
-        ArrayList<Node> matches = new ArrayList<>();
-
-        for (IndexDefinition index : schema.getIndexes(type.label()))
-        {
-            for (String keyName : index.getPropertyKeys())
-            {
-                matches.addAll(this.findAll(type, keyName, keyVal));
-            }
-        }
-
-        return matches;
     }
 
     public ArrayList<Node> findAll(NodeType type, String keyName, String keyValue)
