@@ -19,6 +19,11 @@ public class SearchPredictQuery extends IndexQuery
         super(indexName, query);
     }
 
+    @Override
+    public long getResultCount() {
+        return super.getResultCount();
+    }
+
     protected String cleanCommand(String query)
     {
         Matcher isAlnum = SearchPredictQuery.alnum.matcher(query);
@@ -37,7 +42,7 @@ public class SearchPredictQuery extends IndexQuery
     }
 
     @Override
-    public void rowHandler(Map<String, Object> row)
+    protected void rowHandler(Map<String, Object> row)
     {
         for ( Map.Entry<String,Object> column : row.entrySet() ) {
             Object value = column.getValue();

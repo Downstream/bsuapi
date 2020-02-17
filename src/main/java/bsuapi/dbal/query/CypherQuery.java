@@ -6,6 +6,10 @@ import bsuapi.dbal.Node;
 import bsuapi.dbal.NodeType;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.neo4j.graphdb.Result;
+import org.neo4j.helpers.collection.Iterators;
+
+import java.util.Iterator;
 
 abstract public class CypherQuery
 {
@@ -82,6 +86,43 @@ abstract public class CypherQuery
         return this.getClass().getSimpleName() +": \""+ this.initQuery +"\"";
     }
 
+    protected void addEntry(Object entry)
+    {
+        if (this.results == null) {
+            this.results = new JSONArray();
+        }
+
+        this.results.put(entry);
+    }
+
+    public JSONArray exec(Cypher c)
+    throws CypherException
+    {
+        if (this instanceof QueryResultCollector) {
+            c.query((QueryResultCollector) this);
+        } else {
+            throw new CypherException(this.getClass().getSimpleName() +" CypherQuery does not implement a result collector.");
+        }
+
+        return this.results;
+    }
+
+
+
+    //-- QueryResultSingleColumn --//
+    // These should only be in children implementing QueryResultSingleColumn, but I'm avoiding code duplication
+    // haven't yet decided on one of two possible patterns here:
+    //     distinct collector objects
+    //     CypherQuery <-- CollectionType <-- Query
+    public void collectResult(Result result)
+    throws CypherException
+    {
+        Iterator<Object> resultIterator = result.columnAs(QueryResultSingleColumn.resultColumn);
+        for (Object entry : Iterators.asIterable(resultIterator)) {
+            this.entryHandler(entry);
+        }
+    }
+
     public void entryHandler(String entry) {
         this.addResultEntry(entry);
     }
@@ -106,27 +147,4 @@ abstract public class CypherQuery
     public void addResultEntry(String entry) { this.addEntry(entry); }
 
     public void addResultEntry(JSONObject entry) { this.addEntry(entry); }
-
-    protected void addEntry(Object entry)
-    {
-        if (this.results == null) {
-            this.results = new JSONArray();
-        }
-
-        this.results.put(entry);
-    }
-
-    public JSONArray exec(Cypher c)
-    throws CypherException
-    {
-        if (this instanceof QueryResultAggregator) {
-            c.query((QueryResultAggregator) this);
-        } else if (this instanceof QueryResultSingleColumn) {
-            c.query((QueryResultSingleColumn) this);
-        } else {
-            throw new CypherException(this.getClass().getSimpleName() +" CypherQuery does not implement a result collector.");
-        }
-
-        return this.results;
-    }
 }

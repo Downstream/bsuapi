@@ -32,7 +32,7 @@ public class Assets extends Behavior
     public String getBehaviorKey() { return "assets"; }
 
     @Override
-    public Object getBehaviorData() { return this.assets; }
+    public JSONArray getBehaviorData() { return this.assets; }
 
     @Override
     public String buildMessage()
@@ -69,7 +69,6 @@ public class Assets extends Behavior
     public JSONObject toJson()
     {
         JSONObject data = super.toJson();
-        data.put("topicName", this.topic.name());
         data.put("node", this.topic.toJson());
         return data;
     }

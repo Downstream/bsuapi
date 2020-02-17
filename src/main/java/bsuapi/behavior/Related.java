@@ -34,7 +34,7 @@ public class Related extends Behavior
     public String getBehaviorKey() { return "related"; }
 
     @Override
-    public Object getBehaviorData() { return this.related; }
+    public JSONObject getBehaviorData() { return this.related; }
 
     @Override
     public String buildMessage()

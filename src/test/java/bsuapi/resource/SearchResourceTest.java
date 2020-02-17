@@ -30,7 +30,7 @@ public class SearchResourceTest
         j = new TestJsonResource("requestTestParams");
         try (Transaction tx = db.beginTx()) {
             TestCypherResource.db.execute("CALL db.index.fulltext.createNodeIndex(\"topicNameIndex\",[\"Artist\",\"Classification\",\"Culture\",\"Nation\",\"Tag\"],[\"name\"])");
-            TestCypherResource.db.execute("CALL db.index.fulltext.createNodeIndex(\"assetNameIndex\",[\"Artwork\"],[\"name\"])");
+            TestCypherResource.db.execute("CALL db.index.fulltext.createNodeIndex(\"assetNameIndex\",[\"Artwork\"],[\"name\",\"title\"])");
             tx.success();
         }
     }
@@ -76,13 +76,10 @@ public class SearchResourceTest
     public void searchCompositeIntegrationTest()
             throws Exception
     {
-        Request request = new Request(j.mockUriInfo("empty"));
-        Response response = Response.prepare(request);
         String searchQuery ="Degas";
 
         Map<String, String> params = new HashMap<>();
         params.put(Search.searchParam, searchQuery);
-//        response.setSearch(search);
 
         JSONObject result;
         String message;
@@ -110,45 +107,64 @@ public class SearchResourceTest
     }
 
     @Test
-    public void searchDegas() {
-        JSONObject responseData = this.searchDegas("empty");
+    public void searchAssets() {
+        JSONObject responseData = this.search("Saint", "empty");
 
         assertTrue((Boolean) responseData.query("/success"));
-        assertNotNull(responseData.query("/data/search-results/0/searchScore"));
-        assertEquals(5, ((JSONArray) responseData.query("/data/search-results")).length());
-        assertEquals(5, (responseData.query("/data/resultCount")));
+        assertNotNull(responseData.query("/data/asset-results"));
+        assertNotNull(responseData.query("/data/topic-results"));
+        assertNotNull(responseData.query("/data/asset-results/results/0/searchScore"));
+        assertEquals(1, ((JSONArray) responseData.query("/data/asset-results/results")).length());
+        assertEquals(1, (responseData.query("/data/asset-results/resultCount")));
+    }
+
+    @Test
+    public void searchDegas() {
+        JSONObject responseData = this.search("Degas", "empty");
+
+        assertTrue((Boolean) responseData.query("/success"));
+        assertNotNull(responseData.query("/data/asset-results"));
+        assertNotNull(responseData.query("/data/topic-results"));
+        assertNotNull(responseData.query("/data/topic-results/results/0/searchScore"));
+        assertEquals(5, ((JSONArray) responseData.query("/data/topic-results/results")).length());
+        assertEquals(5, (responseData.query("/data/topic-results/resultCount")));
     }
 
     @Test
     public void searchDegasLimit() {
-        JSONObject responseData = this.searchDegas("limit2Page1");
+        JSONObject responseData = this.search("Degas", "limit2Page1");
 
         assertTrue((Boolean) responseData.query("/success"));
-        assertNotNull(responseData.query("/data/search-results/0/searchScore"));
-        assertEquals(2, ((JSONArray) responseData.query("/data/search-results")).length());
-        assertEquals(5, (responseData.query("/data/resultCount")));
+        assertNotNull(responseData.query("/data/asset-results"));
+        assertNotNull(responseData.query("/data/topic-results"));
+        assertNotNull(responseData.query("/data/topic-results/results/0/searchScore"));
+        assertEquals(2, ((JSONArray) responseData.query("/data/topic-results/results")).length());
+        assertEquals(5, (responseData.query("/data/topic-results/resultCount")));
     }
 
     @Test
     public void searchDegasPage() {
-        JSONObject responseData = this.searchDegas("limit2Page3");
+        JSONObject responseData = this.search("Degas", "limit2Page3");
 
         assertTrue((Boolean) responseData.query("/success"));
-        assertNotNull(responseData.query("/data/search-results/0/searchScore"));
-        assertEquals(1, ((JSONArray) responseData.query("/data/search-results")).length());
-        assertEquals(5, (responseData.query("/data/resultCount")));
+
+        assertNotNull(responseData.query("/data/asset-results"));
+        assertNotNull(responseData.query("/data/topic-results"));
+        assertNotNull(responseData.query("/data/topic-results/results/0/searchScore"));
+        assertEquals(1, ((JSONArray) responseData.query("/data/topic-results/results")).length());
+        assertEquals(5, (responseData.query("/data/topic-results/resultCount")));
     }
 
     // @todo: test malformed
 
-    private JSONObject searchDegas(String paramSet)
+    private JSONObject search(String query, String paramSet)
     {
         UriInfo uriInfo = j.mockUriInfo(paramSet);
         SearchResource resource = new SearchResource();
         db.baseResourceInjection(resource);
 
         try (Transaction tx = db.beginTx()) {
-            javax.ws.rs.core.Response result = resource.search("Degas", uriInfo);
+            javax.ws.rs.core.Response result = resource.search(query, uriInfo);
             tx.success();
 
             assertEquals(200, result.getStatus());

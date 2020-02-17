@@ -16,7 +16,7 @@ public class AssetIndex extends IndexBehaviorBase
 
     @Override
     public String resultKey() {
-        return "assets";
+        return "asset-results";
     }
 
     @Override

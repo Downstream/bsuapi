@@ -17,28 +17,14 @@ public class Search extends Behavior
     {
         super(config);
 
-        String search = this.getConfigParam(Search.searchParam);
-        if (null == search) {
+        this.query = this.getConfigParam(Search.searchParam);
+        if (null == this.query) {
             throw new BehaviorException("Missing required parameter for IndexBehavior "+ getClass() +": "+ Search.searchParam);
         }
-
-        this.query = this.getConfigParam(search);
-    }
-
-    public int length()
-    {
-        int result = 0;
-        for (Behavior child : this.appendedBehaviors) {
-            if (child instanceof IndexBehaviorBase) {
-                result += ((IndexBehaviorBase) child).length();
-            }
-        }
-
-        return result;
     }
 
     @Override
-    public String getBehaviorKey() { return "search-results"; }
+    public String getBehaviorKey() { return "search"; }
 
     @Override
     public Object getBehaviorData()
@@ -46,7 +32,6 @@ public class Search extends Behavior
         JSONObject data = new JSONObject();
         data.put("title", "Search for "+ this.query);
         data.put("description", "Assets and Topics ordered by the best matches to the query provided.");
-
         return data;
     }
 

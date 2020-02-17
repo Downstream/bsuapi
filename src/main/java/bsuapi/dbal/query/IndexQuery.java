@@ -1,14 +1,16 @@
 package bsuapi.dbal.query;
 
+import bsuapi.dbal.CypherException;
 import bsuapi.dbal.Node;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
+import org.neo4j.graphdb.Result;
 
 import java.util.Map;
 import java.util.regex.Pattern;
 
 public class IndexQuery extends CypherQuery
-implements QueryResultAggregator
+implements QueryResultCollector
 {
     protected String indexName;
     protected long resultCount = 0;
@@ -85,7 +87,8 @@ implements QueryResultAggregator
         return query;
     }
 
-    public void rowHandler(Map<String, Object> row) {
+    protected void rowHandler(Map<String, Object> row)
+    {
         JSONObject node = null;
         double score = 0;
         for ( Map.Entry<String,Object> column : row.entrySet() ) {
@@ -108,6 +111,16 @@ implements QueryResultAggregator
         if (null != node) {
             node.put("searchScore", score);
             this.addEntry(node);
+        }
+    }
+
+    @Override
+    public void collectResult(Result result)
+    throws CypherException
+    {
+        while ( result.hasNext()) {
+            Map<String,Object> row = result.next();
+            this.rowHandler(row);
         }
     }
 

@@ -1,9 +1,7 @@
 package bsuapi.dbal;
 
-import bsuapi.dbal.query.CypherQuery;
-import bsuapi.dbal.query.QueryResultAggregator;
+import bsuapi.dbal.query.QueryResultCollector;
 import bsuapi.dbal.query.QueryResultSingleColumn;
-import org.json.JSONObject;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Result;
@@ -12,7 +10,6 @@ import org.neo4j.helpers.collection.Iterators;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 
 public class Cypher implements AutoCloseable
 {
@@ -26,24 +23,30 @@ public class Cypher implements AutoCloseable
     public void resolveTopic(Topic topic)
     throws CypherException
     {
+        // @todo pick by (curator/algo) score
         topic.setNode(this.findOne(topic.getType(), topic.getNodeKeyField(), topic.getNodeKey()));
     }
 
     public Node findOne(NodeType type, String keyName, String keyVal)
     throws CypherException
     {
-        ArrayList<Node> matches = new ArrayList<>(this.findAll(type, keyName, keyVal));
+        Node result = null;
 
-        // @todo pick by (curator/algo) score
-        if (matches.size() > 0)
-        {
-            return matches.get(0);
-            // Node result = matches.get(0);
-            // matches.remove(0);
-            // return result;
+        try (
+                Transaction tx = db.beginTx();
+                ResourceIterator<org.neo4j.graphdb.Node> matches = db.findNodes(type.label(), keyName, keyVal)
+        ) {
+            ArrayList<Node> matchNodes = new ArrayList<>();
+            if ( matches.hasNext() ) {
+                result = new Node(matches.next());
+            }
+
+            tx.success();
+            matches.close();
+            return result;
+        } catch (Exception e) {
+            throw new CypherException("Cypher.findAll unable to retrieve matches for (:"+ type.label() +" { "+ keyName +": \""+ keyVal +"\" })", e);
         }
-
-        return null;
     }
 
     public ArrayList<Node> findAll(NodeType type, String keyName, String keyValue)
@@ -67,38 +70,16 @@ public class Cypher implements AutoCloseable
         }
     }
 
-    public void query (QueryResultAggregator query)
+    public void query (QueryResultCollector query)
     throws CypherException
     {
+        String command = query.getCommand();
+
         try (
                 Transaction tx = db.beginTx();
-                Result result = db.execute(query.getCommand())
+                Result result = db.execute(command)
         ) {
-            while ( result.hasNext()) {
-                Map<String,Object> row = result.next();
-                query.rowHandler(row);
-            }
-
-            tx.success();
-        } catch (Throwable e) {
-            throw new CypherException("Cypher.query failed: "+query, e);
-        }
-    }
-
-    public void query (QueryResultSingleColumn query)
-            throws CypherException
-    {
-        try (
-                Transaction tx = db.beginTx();
-                Result result = db.execute(query.getCommand())
-        ) {
-
-            // much faster, but single-column results ONLY
-            Iterator<Object> resultIterator = result.columnAs(QueryResultSingleColumn.resultColumn);
-            for (Object entry : Iterators.asIterable(resultIterator)) {
-                query.entryHandler(entry);
-            }
-
+            query.collectResult(result);
             tx.success();
         } catch (Throwable e) {
             throw new CypherException("Cypher.query failed: "+query, e);

@@ -16,7 +16,7 @@ public class TopicIndex extends IndexBehaviorBase
 
     @Override
     public String resultKey() {
-        return "topics";
+        return "topic-results";
     }
 
     @Override

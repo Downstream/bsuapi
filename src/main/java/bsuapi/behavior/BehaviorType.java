@@ -51,7 +51,6 @@ public enum BehaviorType
         Behavior b = this.prepare(config);
 
         if (b != null) {
-            b.setConfig(config);
             return this.resolve(b, c);
         }
 

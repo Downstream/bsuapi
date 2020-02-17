@@ -29,6 +29,7 @@ abstract public class IndexBehaviorBase extends Behavior
         }
 
         this.indexQuery = this.createQuery(search);
+        this.setQueryConfig(this.indexQuery);
     }
 
     public int length() { return (null != this.searchResults) ? this.searchResults.length() : 0; }
@@ -37,7 +38,23 @@ abstract public class IndexBehaviorBase extends Behavior
     public String getBehaviorKey() { return this.resultKey(); }
 
     @Override
-    public Object getBehaviorData() { return this.searchResults; }
+    public JSONObject getBehaviorData()
+    {
+        JSONObject data = new JSONObject();
+
+        if (this.length() > 0) {
+            data.put("resultCount", this.searchResultCount);
+
+            JSONObject best = this.searchResults.optJSONObject(0);
+            if (!best.isEmpty()) {
+                data.put("node", best);
+            }
+        }
+
+        data.put("results", this.searchResults);
+
+        return data;
+    }
 
     @Override
     public void resolveBehavior(Cypher cypher)
@@ -58,39 +75,6 @@ abstract public class IndexBehaviorBase extends Behavior
         }
 
         return "No results found for "+ this.indexQuery.toString();
-    }
-
-    private String getFirstItemIndex()
-    {
-        if (this.indexQuery.page > 1) {
-            return ""+ (((this.indexQuery.page -1) * this.indexQuery.limit) + 1);
-        }
-
-        return "1";
-    }
-
-    @Override
-    public JSONObject toJson()
-    {
-        JSONObject data = new JSONObject();
-
-        if (this.length() > 0) {
-            data.put("resultCount", this.searchResultCount);
-
-            JSONObject best = this.searchResults.optJSONObject(0);
-            if (!best.isEmpty()) {
-                data.put("node", best);
-
-                String labelName = best.optString("type");
-                if (!labelName.isEmpty()) {
-                    data.put("topic", labelName);
-                }
-            }
-        }
-
-        this.putBehaviorData(data);
-        this.putAppendedBehaviorData(data);
-        return data;
     }
 
     @Override
