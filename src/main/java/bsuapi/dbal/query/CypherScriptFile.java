@@ -4,6 +4,7 @@ import bsuapi.dbal.Topic;
 import bsuapi.resource.Util;
 
 public class CypherScriptFile extends CypherQuery
+implements QueryResultSingleColumn
 {
     protected Topic topic;
 

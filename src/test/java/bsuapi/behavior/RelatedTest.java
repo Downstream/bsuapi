@@ -32,7 +32,9 @@ public class RelatedTest
     }
 
     @Test
-    public void integrationTestRelatedFromType() throws CypherException {
+    public void integrationTestRelatedFromType()
+    throws CypherException, BehaviorException
+    {
         try (
                 Transaction tx = db.beginTx();
                 Cypher c = db.createCypher()

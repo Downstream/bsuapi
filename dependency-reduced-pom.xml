@@ -4,7 +4,7 @@
   <groupId>edu.boisestate.bsuapi</groupId>
   <artifactId>bsuapi</artifactId>
   <name>Neo4j JSON API Resolver</name>
-  <version>0.1.7</version>
+  <version>0.2.0</version>
   <description>Define and resolve API methods which retrieve preset structures from the Neo4j database.</description>
   <build>
     <resources>
@@ -185,12 +185,6 @@
       <artifactId>junit</artifactId>
       <version>4.12</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>hamcrest-core</artifactId>
-          <groupId>org.hamcrest</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
   <properties>

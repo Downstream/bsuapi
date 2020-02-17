@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.neo4j.graphdb.Result;
 
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SearchPredictQuery extends IndexQuery
@@ -20,8 +21,9 @@ public class SearchPredictQuery extends IndexQuery
 
     protected String cleanCommand(String query)
     {
-        if (SearchPredictQuery.alnum.matcher(query).matches()) {
-            query += "*";
+        Matcher isAlnum = SearchPredictQuery.alnum.matcher(query);
+        if (isAlnum.matches()) {
+            this.initQuery = query += "*";
         } else {
             query = IndexQuery.sanitizeQuery(query);
         }
@@ -35,28 +37,16 @@ public class SearchPredictQuery extends IndexQuery
     }
 
     @Override
-    public JSONArray exec(Cypher c)
-    throws CypherException
+    public void rowHandler(Map<String, Object> row)
     {
-        try (
-            Result r = c.execute(this.getCommand())
-        ) {
-            while ( r.hasNext()) {
-                Map<String,Object> row = r.next();
-                for ( Map.Entry<String,Object> column : row.entrySet() ) {
-                    Object value = column.getValue();
-                    if (column.getKey().equals("match")) {
-                        this.addEntry(value);
-                        this.resultCount++;
-                    }
-                }
+        for ( Map.Entry<String,Object> column : row.entrySet() ) {
+            Object value = column.getValue();
+            if (column.getKey().equals("match")) {
+                this.addEntry(value);
+                this.resultCount++;
             }
-            return this.results;
-
-        } catch (Exception e) {
-            throw new CypherException("Cypher command failed: "+this.toString(), e);
         }
     }
 
-    protected static Pattern alnum = Pattern.compile("[^a-zA-Z0-9]");
+    protected static Pattern alnum = Pattern.compile("[a-zA-Z0-9]*");
 }

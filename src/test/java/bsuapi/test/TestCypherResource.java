@@ -6,6 +6,7 @@ import bsuapi.resource.BaseResource;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.kernel.lifecycle.LifecycleException;
 import org.neo4j.logging.Log;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -21,9 +22,31 @@ public class TestCypherResource implements AutoCloseable
 {
     public static GraphDatabaseService db;
 
+    private TestCypherResource() {};
+
     public TestCypherResource (String filename)
     {
         db = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+        this.loadFileResource(filename);
+    }
+
+    public static TestCypherResource JaxWS (String filename)
+    {
+        /* can't do this and keep the db static */
+//        TestCypherResource t = new TestCypherResource();
+//        TestCypherResource.db = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder()
+//            .setConfig(GraphDatabaseSettings.auth_enabled, String.valueOf(true))
+//            .newGraphDatabase();
+//
+//        t.loadFileResource(filename);
+//        return t;
+
+        return new TestCypherResource(filename);
+    }
+
+    private void loadFileResource(String filename)
+    {
         String cypherScript = Util.readResourceFile(filename+".cypher");
         try (Transaction tx = db.beginTx()) {
             db.execute(cypherScript);

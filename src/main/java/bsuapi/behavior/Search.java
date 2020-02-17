@@ -91,4 +91,16 @@ public class Search extends Behavior
 
         return desc;
     }
+
+    public static BehaviorDescribe describeCompletion()
+    {
+        BehaviorDescribe desc = BehaviorDescribe.resource("/search_completion/{QUERY}",
+                "Return a list of strings of most like Topic matches for QUERY."
+        );
+
+        desc.arg("query", "url-encoded lucene search. simplest example: greek");
+        desc.put("syntax", "see /search/ syntax");
+
+        return desc;
+    }
 }

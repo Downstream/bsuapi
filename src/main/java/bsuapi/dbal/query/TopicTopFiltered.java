@@ -3,6 +3,7 @@ package bsuapi.dbal.query;
 import bsuapi.dbal.NodeType;
 
 public class TopicTopFiltered extends CypherQuery
+implements QueryResultSingleColumn
 {
 
     protected String filterField, filterValue;
@@ -15,9 +16,9 @@ public class TopicTopFiltered extends CypherQuery
      */
     protected static String query =
         "MATCH (x:Artwork) WHERE x.%3$s=\"%4$s\" " +
-        "MATCH p=(x)-[]->("+ CypherQuery.resultColumn +":%1$s)-[]->(:%2$s) " +
-        "WITH "+ CypherQuery.resultColumn +", count(p) as n " +
-        "RETURN "+ CypherQuery.resultColumn +" ORDER BY n DESC "
+        "MATCH p=(x)-[]->("+ QueryResultSingleColumn.resultColumn +":%1$s)-[]->(:%2$s) " +
+        "WITH "+ QueryResultSingleColumn.resultColumn +", count(p) as n " +
+        "RETURN "+ QueryResultSingleColumn.resultColumn +" ORDER BY n DESC "
         ;
 
     public TopicTopFiltered(NodeType target, String field, String value)

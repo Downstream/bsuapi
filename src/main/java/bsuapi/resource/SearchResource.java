@@ -4,7 +4,6 @@ import bsuapi.behavior.BehaviorType;
 import bsuapi.behavior.Search;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.query.CypherQuery;
-import bsuapi.dbal.query.IndexQuery;
 import bsuapi.dbal.query.SearchPredictQuery;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,14 +21,12 @@ public class SearchResource extends BaseResource
 {
     private static final int TIMEOUT = 1000;
 
-    protected Request request;
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response search(
         @Context UriInfo uriInfo
     ){
-        Response response = this.prepareSearchResponse(uriInfo);
+        Response response = this.prepareResponse(uriInfo);
         return response.notImplemented(Search.describe(), "Search form or UI not implemented.");
     }
 
@@ -37,24 +34,24 @@ public class SearchResource extends BaseResource
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response search(
-            @PathParam("searchQuery") String searchQuery,
-            @Context UriInfo uriInfo
+        @PathParam("searchQuery") String searchQuery,
+        @Context UriInfo uriInfo
     ){
-        Response response = this.prepareSearchResponse(uriInfo);
+        Response response = this.prepareResponse(uriInfo);
         response.setSearch(URLCoder.decode(searchQuery));
 
         return this.handleBehavior(BehaviorType.SEARCH);
     }
 
     /* currently built to only check Topics */
-    @Path("/predict/{searchQuery}")
+    @Path("/completion/{searchQuery}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response predict(
+    public javax.ws.rs.core.Response complete(
             @PathParam("searchQuery") String searchQuery,
             @Context UriInfo uriInfo
     ){
-        Response response = this.prepareSearchResponse(uriInfo);
+        Response response = this.prepareResponse(uriInfo);
 
         SearchPredictQuery query = new SearchPredictQuery("topicNameIndex", URLCoder.decode(searchQuery));
         query.setLimit(response.getParam(CypherQuery.limitParam));
@@ -73,11 +70,5 @@ public class SearchResource extends BaseResource
         } catch (Exception e) {
             return response.exception(e);
         }
-    }
-
-    public Response prepareSearchResponse(UriInfo uriInfo)
-    {
-        this.request = new Request(uriInfo);
-        return this.response = Response.prepare(this.request);
     }
 }

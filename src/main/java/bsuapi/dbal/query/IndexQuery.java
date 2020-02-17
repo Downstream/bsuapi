@@ -1,17 +1,14 @@
 package bsuapi.dbal.query;
 
-import bsuapi.dbal.Cypher;
-import bsuapi.dbal.CypherException;
 import bsuapi.dbal.Node;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.neo4j.graphdb.Result;
 
 import java.util.Map;
 import java.util.regex.Pattern;
 
 public class IndexQuery extends CypherQuery
+implements QueryResultAggregator
 {
     protected String indexName;
     protected long resultCount = 0;
@@ -88,43 +85,29 @@ public class IndexQuery extends CypherQuery
         return query;
     }
 
-    @Override
-    public JSONArray exec(Cypher c)
-    throws CypherException
-    {
-        try (
-            Result r = c.execute(this.getCommand())
-        ) {
-            while ( r.hasNext()) {
-                Map<String,Object> row = r.next();
-                JSONObject node = null;
-                double score = 0;
-                for ( Map.Entry<String,Object> column : row.entrySet() ) {
-                    Object value = column.getValue();
-                    if (column.getKey().equals("node") && value instanceof org.neo4j.graphdb.Node) {
-                        node = (new Node((org.neo4j.graphdb.Node) value)).toJsonObject();
-                    } else if (column.getKey().equals("score")) {
-                        try {
-                            score = (double) value;
-                        } catch (ClassCastException ignored) {
-                            score = 0;
-                        }
-                    } else if (0 == this.resultCount && column.getKey().equals("total")) {
-                        try {
-                            this.resultCount = (long) value;
-                        } catch (ClassCastException ignored) {}
-                    }
+    public void rowHandler(Map<String, Object> row) {
+        JSONObject node = null;
+        double score = 0;
+        for ( Map.Entry<String,Object> column : row.entrySet() ) {
+            Object value = column.getValue();
+            if (column.getKey().equals("node") && value instanceof org.neo4j.graphdb.Node) {
+                node = (new Node((org.neo4j.graphdb.Node) value)).toJsonObject();
+            } else if (column.getKey().equals("score")) {
+                try {
+                    score = (double) value;
+                } catch (ClassCastException ignored) {
+                    score = 0;
                 }
-
-                if (null != node) {
-                    node.put("searchScore", score);
-                    this.addEntry(node);
-                }
+            } else if (0 == this.resultCount && column.getKey().equals("total")) {
+                try {
+                    this.resultCount = (long) value;
+                } catch (ClassCastException ignored) {}
             }
-            return this.results;
+        }
 
-        } catch (Exception e) {
-            throw new CypherException("Cypher command failed: "+this.toString(), e);
+        if (null != node) {
+            node.put("searchScore", score);
+            this.addEntry(node);
         }
     }
 

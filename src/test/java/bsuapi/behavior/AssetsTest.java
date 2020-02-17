@@ -33,7 +33,9 @@ public class AssetsTest
     }
 
     @Test
-    public void integrationTestRelatedFromType() throws CypherException {
+    public void integrationTestRelatedFromType()
+    throws CypherException, BehaviorException
+    {
         try (
                 Transaction tx = db.beginTx();
                 Cypher c = db.createCypher()
@@ -55,7 +57,8 @@ public class AssetsTest
     }
 
     @Test
-    public void integrationTestAssetsDescribe() {
+    public void integrationTestAssetsDescribe()
+    {
         BehaviorDescribe desc = Related.describe();
 
         assertNotNull(desc.query("/uri"));

@@ -1,5 +1,6 @@
 package bsuapi;
 
+import bsuapi.behavior.BehaviorException;
 import bsuapi.behavior.Related;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
@@ -30,6 +31,10 @@ public class RelatedFunction
             rel.resolveBehavior(c);
 
             return rel.getNeoNode(); // @todo: return a list of properties matching the resource response (Neo4j doesn't handle JSONObject)
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        return null;
     }
 }

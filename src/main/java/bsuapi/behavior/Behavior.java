@@ -28,7 +28,6 @@ public abstract class Behavior
     {
         if (null != this.appendedBehaviors) {
             for (Behavior child : this.appendedBehaviors) {
-                child.setConfig(this.config);
                 child.resolveBehavior(cypher);
             }
         }

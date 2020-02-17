@@ -1,5 +1,7 @@
 package bsuapi.resource;
 
+import bsuapi.behavior.*;
+import bsuapi.dbal.Cypher;
 import bsuapi.test.TestCypherResource;
 import bsuapi.test.TestJsonResource;
 import org.json.JSONArray;
@@ -11,6 +13,9 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.string.UTF8;
 
 import javax.ws.rs.core.UriInfo;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -34,6 +39,74 @@ public class SearchResourceTest
     public static void tearDown() {
         db.close();
         j.close();
+    }
+
+    @Test
+    public void searchIndexIntegrationTest()
+    throws Exception
+    {
+        Request request = new Request(j.mockUriInfo("empty"));
+        Response response = Response.prepare(request);
+        String searchQuery ="Degas";
+
+        Map<String, String> params = new HashMap<>();
+        params.put(Search.searchParam, searchQuery);
+//        response.setSearch(search);
+
+        JSONObject result;
+        String message;
+
+        try (
+            Transaction tx = db.beginTx()
+        ) {
+            Cypher c = db.createCypher();
+            Behavior b = new TopicIndex(params);
+            b.resolveBehavior(c);
+
+            result = b.toJson();
+            message = b.getMessage();
+            tx.success();
+        }
+
+        assertNotNull(result);
+        assertNotNull(message);
+    }
+
+    @Test
+    public void searchCompositeIntegrationTest()
+            throws Exception
+    {
+        Request request = new Request(j.mockUriInfo("empty"));
+        Response response = Response.prepare(request);
+        String searchQuery ="Degas";
+
+        Map<String, String> params = new HashMap<>();
+        params.put(Search.searchParam, searchQuery);
+//        response.setSearch(search);
+
+        JSONObject result;
+        String message;
+
+        try (
+                Transaction tx = db.beginTx()
+        ) {
+            Cypher c = db.createCypher();
+
+            Behavior search = new Search(params);
+            Behavior a = new TopicIndex(params);
+            Behavior b = new AssetIndex(params);
+            search.appendBehavior(a);
+            search.appendBehavior(b);
+
+            search.resolveBehavior(c);
+
+            result = search.toJson();
+            message = search.getMessage();
+            tx.success();
+        }
+
+        assertNotNull(result);
+        assertNotNull(message);
     }
 
     @Test

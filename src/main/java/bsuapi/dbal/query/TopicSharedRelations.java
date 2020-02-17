@@ -4,6 +4,7 @@ import bsuapi.dbal.NodeType;
 import bsuapi.dbal.Topic;
 
 public class TopicSharedRelations extends CypherQuery
+implements QueryResultSingleColumn
 {
     /**
      * 1: Topic label cypher match
@@ -13,19 +14,19 @@ public class TopicSharedRelations extends CypherQuery
      */
     protected static String query =
         "MATCH (a%1$s) " +
-        "MATCH (a)-[r:%2$s]->("+ CypherQuery.resultColumn +":%3$s) " +
-        "MATCH p=(a)-[]->(:Topic)-[:%2$s]->("+ CypherQuery.resultColumn +") " +
-        "WITH a, "+ CypherQuery.resultColumn +", count(p) as n " +
-        "RETURN "+ CypherQuery.resultColumn +", n " +
+        "MATCH (a)-[r:%2$s]->("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
+        "MATCH p=(a)-[]->(:Topic)-[:%2$s]->("+ QueryResultSingleColumn.resultColumn +") " +
+        "WITH a, "+ QueryResultSingleColumn.resultColumn +", count(p) as n " +
+        "RETURN "+ QueryResultSingleColumn.resultColumn +", n " +
         "ORDER BY n DESC "
         ;
 
     protected static String querySameTopic =
         "MATCH (a%1$s) " +
-        "MATCH p=(a)-[]->(:Topic)-[:%2$s]->("+ CypherQuery.resultColumn +":%3$s) " +
-        "WHERE "+ CypherQuery.resultColumn +" <> a " +
-        "WITH a, "+ CypherQuery.resultColumn +", count(p) as n " +
-        "RETURN "+ CypherQuery.resultColumn +", n " +
+        "MATCH p=(a)-[]->(:Topic)-[:%2$s]->("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
+        "WHERE "+ QueryResultSingleColumn.resultColumn +" <> a " +
+        "WITH a, "+ QueryResultSingleColumn.resultColumn +", count(p) as n " +
+        "RETURN "+ QueryResultSingleColumn.resultColumn +", n " +
         "ORDER BY n DESC "
         ;
 

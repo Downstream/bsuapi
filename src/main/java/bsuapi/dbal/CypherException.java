@@ -6,4 +6,9 @@ public class CypherException extends Exception
     {
         super(message, cause);
     }
+
+    public CypherException(String message)
+    {
+        super(message);
+    }
 }

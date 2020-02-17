@@ -4,6 +4,7 @@ import bsuapi.dbal.NodeType;
 import bsuapi.dbal.Topic;
 
 public class TopicAssets extends CypherQuery
+implements QueryResultSingleColumn
 {
     /**
      * 1: Topic label cypher match
@@ -12,9 +13,9 @@ public class TopicAssets extends CypherQuery
      * 4: max # of matches
      */
     protected static String query =
-        "MATCH (%1$s)<-[:%2$s]-("+ CypherQuery.resultColumn +":%3$s) " +
-        "RETURN "+ CypherQuery.resultColumn +" " +
-        "ORDER BY "+ CypherQuery.resultColumn +".objectID ASC "
+        "MATCH (%1$s)<-[:%2$s]-("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
+        "RETURN "+ QueryResultSingleColumn.resultColumn +" " +
+        "ORDER BY "+ QueryResultSingleColumn.resultColumn +".objectID ASC "
         ;
 
     protected Topic topic;

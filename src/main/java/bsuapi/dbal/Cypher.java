@@ -1,6 +1,9 @@
 package bsuapi.dbal;
 
 import bsuapi.dbal.query.CypherQuery;
+import bsuapi.dbal.query.QueryResultAggregator;
+import bsuapi.dbal.query.QueryResultSingleColumn;
+import org.json.JSONObject;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Result;
@@ -9,6 +12,7 @@ import org.neo4j.helpers.collection.Iterators;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 public class Cypher implements AutoCloseable
 {
@@ -63,31 +67,47 @@ public class Cypher implements AutoCloseable
         }
     }
 
-    public void query (CypherQuery query)
+    public void query (QueryResultAggregator query)
     throws CypherException
     {
         try (
                 Transaction tx = db.beginTx();
                 Result result = db.execute(query.getCommand())
         ) {
-
-            Iterator<Object> resultIterator = result.columnAs(CypherQuery.resultColumn);
-            for (Object entry : Iterators.asIterable(resultIterator)) {
-                if (entry instanceof org.neo4j.graphdb.Node) {
-                    query.addResultEntry(query.entryHandler((org.neo4j.graphdb.Node) entry));
-                } else {
-                    query.addResultEntry(query.entryHandler(entry));
-                }
+            while ( result.hasNext()) {
+                Map<String,Object> row = result.next();
+                query.rowHandler(row);
             }
 
             tx.success();
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            throw new CypherException("Cypher.query failed: "+query, e);
+        }
+    }
+
+    public void query (QueryResultSingleColumn query)
+            throws CypherException
+    {
+        try (
+                Transaction tx = db.beginTx();
+                Result result = db.execute(query.getCommand())
+        ) {
+
+            // much faster, but single-column results ONLY
+            Iterator<Object> resultIterator = result.columnAs(QueryResultSingleColumn.resultColumn);
+            for (Object entry : Iterators.asIterable(resultIterator)) {
+                query.entryHandler(entry);
+            }
+
+            tx.success();
+        } catch (Throwable e) {
             throw new CypherException("Cypher.query failed: "+query, e);
         }
     }
 
     // !IMPORTANT: Requires a cypher.db transaction
     public Result execute (String command)
+    throws Throwable // "requires a transaction" exceptions sometimes are instances of Error. CATCH ALL THE THINGS!
     {
         return db.execute(command);
     }

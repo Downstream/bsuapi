@@ -15,7 +15,6 @@ abstract public class CypherQuery
     public int limit = 20;
     public int page = 0;
     public NodeType target;
-    public static String resultColumn = "t"; // target
 
     public static final String limitParam = "limit";
     public static final String pageParam = "page";
@@ -83,17 +82,16 @@ abstract public class CypherQuery
         return this.getClass().getSimpleName() +": \""+ this.initQuery +"\"";
     }
 
-    public Node entryHandler(org.neo4j.graphdb.Node neoNode)
-    {
-        return new Node(neoNode);
+    public void entryHandler(String entry) {
+        this.addResultEntry(entry);
     }
 
-    public String entryHandler(String entry) {
-        return entry;
-    }
-
-    public String entryHandler(Object entry) {
-        return entry.toString();
+    public void entryHandler(Object entry) {
+        if (entry instanceof org.neo4j.graphdb.Node) {
+            this.addResultEntry(new Node((org.neo4j.graphdb.Node) entry));
+        } else {
+            this.addResultEntry(entry.toString());
+        }
     }
 
     public void addResultEntry(Node entry)
@@ -121,7 +119,14 @@ abstract public class CypherQuery
     public JSONArray exec(Cypher c)
     throws CypherException
     {
-        c.query(this);
+        if (this instanceof QueryResultAggregator) {
+            c.query((QueryResultAggregator) this);
+        } else if (this instanceof QueryResultSingleColumn) {
+            c.query((QueryResultSingleColumn) this);
+        } else {
+            throw new CypherException(this.getClass().getSimpleName() +" CypherQuery does not implement a result collector.");
+        }
+
         return this.results;
     }
 }

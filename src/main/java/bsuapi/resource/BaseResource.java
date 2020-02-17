@@ -4,7 +4,6 @@ import bsuapi.behavior.BehaviorException;
 import bsuapi.behavior.BehaviorType;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
-import bsuapi.dbal.Topic;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.logging.Log;
 
@@ -32,7 +31,7 @@ abstract public class BaseResource
         {
             return response.badRequest(e.getMessage());
         }
-        catch (Exception e)
+        catch (CypherException e)
         {
             return response.exception(e);
         }
