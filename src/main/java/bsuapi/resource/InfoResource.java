@@ -1,5 +1,6 @@
 package bsuapi.resource;
 
+import bsuapi.behavior.BehaviorDescribe;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.InfoCards;
@@ -76,5 +77,16 @@ public class InfoResource extends BaseResource
     private static String nameString()
     {
         return Config.getDefault("name", "Boise State World Museum Graph Archive") + " " + Config.getDefault("version", "0.1");
+    }
+
+    public static BehaviorDescribe describe()
+    {
+        BehaviorDescribe desc = BehaviorDescribe.resource("/info/{CARD}",
+    "Return an 'infoCard' describing this project and how it works, along with related infoCards."
+        );
+
+        desc.arg("CARD", "name of card to return. default: Info");
+
+        return desc;
     }
 }

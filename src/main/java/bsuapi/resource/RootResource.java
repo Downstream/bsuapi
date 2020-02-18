@@ -59,6 +59,7 @@ public class RootResource extends BaseResource
         methods.put("topic-assets", Assets.describe());
         methods.put("search", Search.describe());
         methods.put("search/completion", Search.describeCompletion());
+        methods.put("info", InfoResource.describe());
 
         return methods;
     }
