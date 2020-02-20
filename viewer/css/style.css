@@ -40,35 +40,3 @@ section#viewer h2, section#viewer h3, section#viewer p {
     color: #fff;
     font-size: 1vw;
 }
-
-/* assets */
-.topic-assets .gallery {
-    column-count: 4;
-    column-gap: 1vw;
-}
-
-.topic-assets .gallery .asset-small {
-    height: 10vw;
-    display: inline-block;
-    margin: 0 0 1em;
-    width: 100%;
-    position: relative;
-    padding-left: 8.5vw;
-}
-
-.asset-small img {
-    max-width: 8vw;
-    max-height: 8vw;
-    position: absolute;
-    left: 0;
-}
-
-.asset-small span, .asset-small p {
-    display: block;
-    width: 100%;
-}
-
-section#viewer .asset-small p {
-    margin-left: 1vw;
-    margin-bottom: 0;
-}

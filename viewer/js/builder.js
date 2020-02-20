@@ -1,6 +1,7 @@
 import RootView from "./render/view/root.js";
 import RelatedView from "./render/view/related.js";
 import ErrorView from "./render/view/error.js";
+import {append} from "./util.js";
 
 export default class Builder {
     $root;
@@ -18,17 +19,7 @@ export default class Builder {
             view = new RelatedView(data)
         }
 
-        view.build().forEach(this.addElement.bind(this))
-    }
-
-    addElement(element) {
-        if (element instanceof jQuery && element[0] instanceof HTMLElement) {
-            element.appendTo(this.$root)
-        } else if (element instanceof HTMLElement) {
-            this.$root.appendChild(element)
-        } else {
-            console.log(element);
-            throw TypeError(`Builder addElement of type ${typeof element} is not an HTML element`)
-        }
+        const root = this.$root
+        view.build().forEach((el) => {append(el).to(root)})
     }
 }

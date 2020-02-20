@@ -35,7 +35,7 @@ export default class RelatedView {
         for (let assetKey in this.data.assets) {
             let assetData = this.data.assets[assetKey];
             if (Asset.validData(assetData)) {
-                Asset.small(assetData).appendTo(group)
+                Asset.small(assetData).withModal().appendTo(group)
             }
         }
 

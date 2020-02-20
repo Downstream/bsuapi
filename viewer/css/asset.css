@@ -1,0 +1,69 @@
+.topic-assets .gallery {
+    column-count: 4;
+    column-gap: 1vw;
+}
+
+.topic-assets .gallery .asset-small {
+    height: 10vw;
+    display: inline-block;
+    margin: 0 0 1em;
+    width: 100%;
+    position: relative;
+    padding-left: 8.5vw;
+}
+
+/* ASSET SMALL */
+
+.asset-small .assetImage, .asset-small .assetImage img {
+    max-width: 8vw;
+    max-height: 8vw;
+    position: absolute;
+    left: 0;
+}
+
+.asset-small span, .asset-small p {
+    display: block;
+    width: 100%;
+}
+
+section#viewer .asset-small p {
+    margin-left: 1vw;
+    margin-bottom: 0;
+}
+
+/* ASSET LARGE */
+.asset-large{
+    display: flex;
+    height: 92%;
+}
+
+.asset-large .assetImage {
+    position: unset;
+    flex-grow: 0;
+    align-items: stretch;
+    max-height: unset;
+    max-width: unset;
+    padding:20px;
+}
+
+.asset-large .assetImage img {
+    position: unset;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.asset-large .assetInfo {
+    flex-grow: 1;
+    overflow-y: scroll;
+    padding-top: 20px;
+}
+
+.asset-large .assetInfo td {
+    font-size: 0.86em;
+}
+
+.asset-large .assetInfo tr td:first-child {
+    font-weight: bold;
+    padding: 0 20px;
+    text-align: right;
+}

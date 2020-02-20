@@ -1,3 +1,5 @@
+import {isAppendable, append} from "../util.js";
+
 export default class Element {
     static plain(type, content, classname) {
         let el = $(`<${type}>${content}</{$type}>`);
@@ -12,19 +14,38 @@ export default class Element {
         return Element.plain(type, '', classname)
     }
 
-    static link(url, content, classname) {
-        let link;
+    static link(action, content, classname) {
+        let link = Element.create('a',classname)
 
-        if (content instanceof jQuery && content[0] instanceof HTMLElement) {
-            link = Element.create('a',classname);
-            link.attr('href',url);
-            content.appendTo(link);
-            return link
+        if (typeof action === 'string' || action instanceof String) {
+            link.attr('href',action)
+        } else if (typeof action === "function")  {
+            link.on('click', action)
         }
 
-        link = Element.plain('a',content, classname);
-        link.attr('href',url);
+        if (isAppendable(content)) {
+            append(content).to(link)
+        }
+
         return link
+    }
+
+    static button(action, icon, text) {
+        let but = Element.link(action,null, 'button')
+
+        if (icon) {
+            Element.icon(icon).appendTo(but)
+        }
+
+        if (text) {
+            but.append(' ' + text)
+        }
+
+        return but
+    }
+
+    static icon(type) {
+        return Element.create('i', 'fa fa-'+type)
     }
 
     static label(str, classname) {
@@ -53,5 +74,20 @@ export default class Element {
 
     static column(classname) {
         return Element.create('div', 'flex-fill '+ classname)
+    }
+
+    static modal(content, title) {
+        let box = Element.create('div','modal');
+        Element.button(()=>{ box.remove() }).addClass('modalClose').appendTo(box)
+
+        if (title) {
+            Element.plain('h4', title).appendTo(box)
+        }
+
+        if (isAppendable(content)) {
+            append(content).to(box)
+        }
+
+        return box
     }
 }
