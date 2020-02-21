@@ -9,7 +9,7 @@ section#viewer {
 }
 
 .topic {
-    width: 10vw;
+    width: auto;
     height: 11vw;
     position: relative;
     margin: auto;
@@ -20,4 +20,8 @@ section#viewer {
     position: absolute;
     top: 8vw;
     width: 100%;
+    white-space: nowrap;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

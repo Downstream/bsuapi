@@ -30,8 +30,9 @@ export default class Element {
         return link
     }
 
-    static button(action, icon, text) {
-        let but = Element.link(action,null, 'button')
+    static button(action, icon, text, classname) {
+        let but = Element.link(action,null)
+        but.addClass(classname || 'button')
 
         if (icon) {
             Element.icon(icon).appendTo(but)
@@ -42,6 +43,12 @@ export default class Element {
         }
 
         return but
+    }
+
+    static navItem(action, icon, text) {
+        let li = Element.plain('li', '', 'nav-item')
+        Element.button(action, icon, text, 'nav-link' ).appendTo(li)
+        return li
     }
 
     static icon(type) {

@@ -34,10 +34,10 @@ export default class Asset {
             Element.label(a.data.title, 'asset-label').appendTo(a.el)
         }
 
-        Element.text(`${a.assetName} - ${a.data.objecDate}` ).appendTo(a.el)
-        Element.text(`${a.data.artistDisplayName}` ).appendTo(a.el)
-        Element.text(`${a.data.artistDisplayBio}` ).appendTo(a.el)
-        Element.text(`${a.data.dimensions}` ).appendTo(a.el)
+        Element.label(`${a.assetName} - ${a.data.objecDate}` ).appendTo(a.el)
+        Element.label(`${a.data.artistDisplayName}` ).appendTo(a.el)
+        Element.label(`${a.data.artistDisplayBio}` ).appendTo(a.el)
+        Element.label(`${a.data.dimensions}` ).appendTo(a.el)
 
         return a
     }

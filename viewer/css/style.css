@@ -25,7 +25,7 @@ section#viewer h2, section#viewer h3, section#viewer p {
 .topic-column > h4 {
     margin-bottom: 2vw;
     font-weight: bold;
-    font-size: 1.5vw;
+    font-size: max(1.5vw, 16px);
 }
 
 .topic img, .topic-card img {
@@ -38,5 +38,5 @@ section#viewer h2, section#viewer h3, section#viewer p {
 
 .topic .topic-label {
     color: #fff;
-    font-size: 1vw;
+    font-size: max(1vw, 12px);
 }
