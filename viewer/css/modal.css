@@ -1,4 +1,5 @@
 .modal {
+    background-color: #222;
     position: fixed;
     display: block;
     top: 30vh;
@@ -7,29 +8,12 @@
     width: 90vw;
     border: 5px solid #777;
     border-radius: 5px;
-    background-color: #222;
     z-index: 10;
 }
 
 .modal h4 {
-    background-color: #333;
     padding: 4px 40px 4px 12px;
-}
-
-.withModal:hover, .modal .modalClose {
-    cursor: pointer;
-}
-
-.withModal {
-    position: relative;
-}
-
-.withModal:hover:after {
-    content: "\f065";
-}
-
-.modal .modalClose:after {
-    content: "\f066";
+    background-color: #333;
 }
 
 .withModal:hover:after, .modal .modalClose {
@@ -49,10 +33,26 @@
     text-shadow: 1px 1px #fff, -1px -1px #fff, -1px 1px #fff, 1px -1px #fff;
 }
 
+/* img.withModal click to open modal */
+.withModal {
+    cursor: pointer;
+    position: relative;
+}
+
+.withModal:hover:after {
+    content: "\f065";
+}
+
+/* modal close icon */
 .modal .modalClose {
+    cursor: pointer;
     right: 5px;
     top: 2px;;
     left: auto;
     font-size: 2.2vh;
     text-shadow: none;
+}
+
+.modal .modalClose:after {
+    content: "\f066";
 }

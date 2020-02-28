@@ -1,0 +1,74 @@
+@media all and (max-width: 799px), (min-resolution: 1dppx) {
+    nav .navbar-brand {
+        max-width:40vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    nav .nav-item .nav-link {
+        position: relative;
+        text-indent: 100px;
+        white-space: nowrap;
+        overflow: hidden;
+        height: 50px;
+        width: 50px;
+        padding: 0;
+        margin: -20px 4px;
+        font-size: 30px;
+    }
+
+    nav .nav-item .nav-link i {
+        position: absolute;
+        top:10px;
+        left: -94px;
+        display: block;
+    }
+
+    nav .form-inline {
+        display: none; /* todo: mobile search */
+    }
+
+    .topic-assets .gallery {
+        column-count: 2;
+    }
+
+    .topic-assets .gallery .asset-small {
+        height: 20vw;
+        padding-left: 18vw;
+    }
+
+    .asset-small .assetImage, .asset-small .assetImage img {
+        max-width: 18vw;
+        max-height: 18vw;
+    }
+
+    .asset-small span, .asset-small span.asset-label {
+        font-size: 2.2vw;
+    }
+
+    .modal {
+        top: 10vh;
+        left: 2vw;
+        height: 87vh;
+        width: 94vw;
+    }
+
+    .modal .asset-large {
+        display: block;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+
+    .modal .asset-large .assetImage, .modal .asset-large .assetImage img {
+        max-width: 80vw;
+        max-height: 80vw;
+        text-align: center;
+    }
+
+    .modal .asset-large .assetInfo {
+        overflow-y:unset;
+        overflow-x:hidden;
+        margin-bottom: 5vh;
+        margin-top: 3vh;
+    }
+}
