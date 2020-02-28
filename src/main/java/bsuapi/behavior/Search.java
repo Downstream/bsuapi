@@ -79,7 +79,7 @@ public class Search extends Behavior
 
     public static BehaviorDescribe describeCompletion()
     {
-        BehaviorDescribe desc = BehaviorDescribe.resource("/search_completion/{QUERY}",
+        BehaviorDescribe desc = BehaviorDescribe.resource("/search/completion/{QUERY}",
                 "Return a list of strings of most like Topic matches for QUERY."
         );
 
