@@ -7,6 +7,7 @@ const selector = '#viewer'
 
 export default class Loader {
     static singleInit
+    static viewerApi
 
     $viewer
     builder
@@ -15,13 +16,34 @@ export default class Loader {
 
     constructor(containerSelector) {
         this.$viewer = $(document).find(containerSelector).first()
+        Loader.viewerApi = this.$viewer.data('api')
+        Loader.viewerApi = (Loader.viewerApi) ? Loader.viewerApi : 'bsu.downstreamlabs.com'
         this.load()
     }
 
     buildApiUrl() {
+        /*
+            href: "http://boise-viewer.local/viewer/index.html"
+            origin: "http://boise-viewer.local"
+            protocol: "http:"
+            username: ""
+            password: ""
+            host: "boise-viewer.local"
+            hostname: "boise-viewer.local"
+            port: ""
+            pathname: "/viewer/index.html"
+         */
         let url = new URL(window.location.href)
-        let path = url.pathname
-        url.pathname = path.replace("/viewer/","/bsuapi/")
+        url.host=Loader.viewerApi
+        url.protocol='https'
+        url.pathname = url.pathname.replace('/viewer/','/bsuapi/')
+        return url
+    }
+
+    static urlApiToViewer(apiUrl) {
+        let url = new URL(window.location.href)
+        let api = new URL(apiUrl)
+        url.pathname = api.pathname.replace('/bsuapi/','/viewer/')
         return url
     }
 

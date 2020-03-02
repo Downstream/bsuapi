@@ -1,4 +1,5 @@
 import Element from "./element.js"
+import Loader from "../loader.js";
 
 export default class Topic {
     data;
@@ -33,7 +34,7 @@ export default class Topic {
 
     build() {
         let el = Element.create('div', 'topic');
-        let urlRelated = Topic.urlApiToViewer(this.data.linkRelated);
+        let urlRelated = Loader.urlApiToViewer(this.data.linkRelated);
 
         Element.label(this.data.name, 'topic-label').appendTo(el);
         Element.img(this.data.smallImage)
@@ -41,9 +42,5 @@ export default class Topic {
             .appendTo(el);
 
         return Element.link(urlRelated, el, 'w-100')
-    }
-
-    static urlApiToViewer(apiUrl) {
-        return apiUrl.replace('/bsuapi/','/viewer/')
     }
 }

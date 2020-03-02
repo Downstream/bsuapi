@@ -1,4 +1,4 @@
-@media all and (max-width: 799px), (min-resolution: 1dppx) {
+@media all and (max-width: 799px), (min-resolution: 2dppx) {
     nav .navbar-brand {
         max-width:40vw;
         overflow: hidden;
