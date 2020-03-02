@@ -4,6 +4,7 @@ Intended to be included as a Neo4j plugin, on Ubuntu 18, with Nginx control of a
 ### Latest [bsuapi-0.2.0.jar](releases/bsuapi-0.2.0.jar)
 * Access the API [bsuapi/](bsuapi)
 * All Releases [releases/](releases)
+* [Simple Viewer](viewer) from [Downstream:bsu_viewer.git](https://github.com/Downstream/bsu_viewer)
 
 ### Sample GraphDB
 * [Graph The MET](pages/Graph-The-MET.md)
