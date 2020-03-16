@@ -53,14 +53,17 @@ public class ListCleanFunction
     private List cleanTheList(List listToClean, List invalid, boolean nullify)
     {
         ArrayList<Object> cleanList = new ArrayList<>();
-        List removeList = this.buildInvalidList(invalid);
 
-        for (Object entry : listToClean) {
-            if (entry == null || removeList.contains(entry) || (entry instanceof List && ((List) entry).isEmpty())) {
-                continue; // skip invalid (more efficient than inverting the above conditional)
+        if (null != listToClean) {
+            List removeList = this.buildInvalidList(invalid);
+
+            for (Object entry : listToClean) {
+                if (entry == null || removeList.contains(entry) || (entry instanceof List && ((List) entry).isEmpty())) {
+                    continue; // skip invalid (more efficient than inverting the above conditional)
+                }
+
+                cleanList.add(entry);
             }
-
-            cleanList.add(entry);
         }
 
         if (nullify && cleanList.isEmpty()) {

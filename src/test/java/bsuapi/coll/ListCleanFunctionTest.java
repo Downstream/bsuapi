@@ -1,6 +1,5 @@
 package bsuapi.coll;
 
-import bsuapi.coll.ListCleanFunction;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -79,6 +78,30 @@ public class ListCleanFunctionTest
         assertEquals(this.list(), result);
     }
 
+    @Test
+    public void cleanOfListNullList()
+    {
+        List listToClean = null;
+        List invalid = this.list("aaa");
+
+        ListCleanFunction c = new ListCleanFunction();
+        List result = c.cleanOfList(listToClean, invalid, true);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void cleanOfListNullListReturnList()
+    {
+        List listToClean = null;
+        List invalid = this.list("aaa");
+
+        ListCleanFunction c = new ListCleanFunction();
+        List result = c.cleanOfList(listToClean, invalid,  false);
+
+        assertEquals(this.list(), result);
+    }
+
     // List listToClean - String invalid
 
     @Test
@@ -125,6 +148,28 @@ public class ListCleanFunctionTest
         assertEquals(this.list(), result);
     }
 
+    @Test
+    public void cleanOfNullList()
+    {
+        List listToClean = null;
+
+        ListCleanFunction c = new ListCleanFunction();
+        List result = c.cleanOf(listToClean, "aaa", true);
+
+        assertNull( result);
+    }
+
+    @Test
+    public void cleanOfNullListReturnList()
+    {
+        List listToClean = null;
+
+        ListCleanFunction c = new ListCleanFunction();
+        List result = c.cleanOf(listToClean, "aaa",  false);
+
+        assertEquals(this.list(), result);
+    }
+
     // List listToClean - no args
 
     @Test
@@ -164,6 +209,28 @@ public class ListCleanFunctionTest
     public void cleanAllEmptiesResultEmptyList()
     {
         ArrayList listToClean = this.list(null,"");
+
+        ListCleanFunction c = new ListCleanFunction();
+        List result = c.clean(listToClean,  false);
+
+        assertEquals(this.list(), result);
+    }
+
+    @Test
+    public void cleanNullList()
+    {
+        List listToClean = null;
+
+        ListCleanFunction c = new ListCleanFunction();
+        List result = c.clean(listToClean,  true);
+
+        assertNull( result);
+    }
+
+    @Test
+    public void cleanNullListReturnList()
+    {
+        List listToClean = null;
 
         ListCleanFunction c = new ListCleanFunction();
         List result = c.clean(listToClean,  false);

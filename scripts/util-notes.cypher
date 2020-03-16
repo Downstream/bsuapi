@@ -61,6 +61,10 @@ MATCH (a:Culture)<-[:ART_CULTURE]-(x:Artwork)-[:ART_TAG]->(b:Tag)
   WHERE
   a.name = 'Greek' and b.name = 'Men'
 WITH a,b,x
-MATCH (c:Classification)<-[:ART_CLASS]-(x:Artwork)
+MATCH (c:Classification)<-[r:ART_CLASS]-(x:Artwork)
   WHERE c.name CONTAINS 'Sculpture'
-RETURN a,b,c,x
+RETURN a,b,c,x,r
+
+
+WITH [1,2,3] as l
+RETURN substring(reduce(listStr = '', x in l | listStr +', '+ x), 2) as s;

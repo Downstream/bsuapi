@@ -49,6 +49,10 @@ public class ListSingleFunction
 
     private Object singleFromList(List listToClean, List invalid)
     {
+        if (null == listToClean) {
+            return null;
+        }
+
         List removeList = this.buildInvalidList(invalid);
 
         for (Object entry : listToClean) {

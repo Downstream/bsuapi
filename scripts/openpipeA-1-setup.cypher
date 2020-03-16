@@ -35,3 +35,6 @@ CREATE INDEX ON :Tag(name);
 //CALL db.index.fulltext.createNodeIndex("nameIndex",["Artist","Classification","Culture","Nation","Tag","Artwork","Genre","Medium"],["name"]);
 CALL db.index.fulltext.createNodeIndex("topicNameIndex",["Artist","Culture","Classification","Genre","Medium","Nation","City","Tag"],["name"]);
 CALL db.index.fulltext.createNodeIndex("assetNameIndex",["Asset"],["name"]);
+
+MATCH (a:Topic) DETACH DELETE a;
+MATCH (a:Asset) DETACH DELETE a;

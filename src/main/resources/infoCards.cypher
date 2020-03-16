@@ -1,3 +1,7 @@
+MATCH (info:Info)
+DETACH DELETE info
+RETURN "DELETED " + count(info) + " :Info nodes." as t;
+
 CREATE (start:Info {
   title: "How does this work?",
   name: "Info",

@@ -79,6 +79,18 @@ public class ListSingleFunctionTest
         assertNull( result);
     }
 
+    @Test
+    public void cleanOfNullListNull()
+    {
+        List listToClean = null;
+        List invalid = this.list("aaa");
+
+        ListSingleFunction c = new ListSingleFunction();
+        Object result = c.singleCleanList(listToClean, invalid);
+
+        assertNull( result);
+    }
+
     // List listToClean - String invalid
 
     @Test
@@ -125,6 +137,17 @@ public class ListSingleFunctionTest
         assertNull( result);
     }
 
+    @Test
+    public void cleanOfListNull()
+    {
+        List listToClean = null;
+
+        ListSingleFunction c = new ListSingleFunction();
+        Object result = c.singleCleanOf(listToClean, "aaa");
+
+        assertNull( result);
+    }
+
     // List listToClean - no args
 
     @Test
@@ -164,6 +187,17 @@ public class ListSingleFunctionTest
     public void cleanAllEmptiesResultEmptyList()
     {
         ArrayList listToClean = this.list(null,"");
+
+        ListSingleFunction c = new ListSingleFunction();
+        Object result = c.singleClean(listToClean);
+
+        assertNull( result);
+    }
+
+    @Test
+    public void cleanListNull()
+    {
+        ArrayList listToClean = null;
 
         ListSingleFunction c = new ListSingleFunction();
         Object result = c.singleClean(listToClean);

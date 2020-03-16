@@ -1,21 +1,26 @@
 package bsuapi.resource;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.neo4j.logging.Log;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.time.Duration;
+import java.util.Iterator;
 import java.util.Scanner;
 
 public class Util
 {
     // RESOURCE FILES
     public static String readResourceFile(String filename)
+    throws Exception
     {
         return Util.scanner(Util.getResourceFileStream(filename));
     }
 
     public static JSONObject readResourceJSON(String filename)
+    throws Exception
     {
         return new JSONObject(Util.readResourceFile(filename+".json"));
     }
@@ -26,7 +31,11 @@ public class Util
     }
 
     private static String scanner(InputStream stream)
+    throws Exception
     {
+        if (null == stream) {
+            throw new Exception("Stream empty. Most likely cause: file not found.");
+        }
         return (new Scanner(stream)).useDelimiter("\\Z").next();
     }
 
@@ -64,5 +73,24 @@ public class Util
             : ""
             ;
         return "\n" + indent + message;
+    }
+
+
+    // convenience methods
+    public static Object jsonArrayFirst(JSONArray j)
+    {
+        Iterator i = j.iterator();
+        if (!i.hasNext()) { return null; }
+        return i.next();
+    }
+
+    public static String durationDisplayFormat(Duration d)
+    {
+        long hours = d.toHours();
+        long minutes = d.minusHours(hours).toMinutes();
+        long millis = d.minusHours(hours).minusMinutes(minutes).toMillis();
+        long seconds = millis / 1000;
+        millis = millis % 1000;
+        return String.format("%d:%02d:%02d:%03d",hours,minutes,seconds,millis);
     }
 }
