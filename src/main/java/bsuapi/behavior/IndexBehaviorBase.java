@@ -95,7 +95,7 @@ abstract public class IndexBehaviorBase extends Behavior
 
         desc.arg("query", "url-encoded lucene search. simplest example: greek");
 
-        desc.put("syntax",Util.readResourceJSON("searchDescribe"));
+        desc.put("syntax",Util.resourceJSON("searchDescribe"));
 
         return desc;
     }

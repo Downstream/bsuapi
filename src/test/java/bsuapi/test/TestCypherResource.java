@@ -14,6 +14,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -47,10 +48,11 @@ public class TestCypherResource implements AutoCloseable
 
     private void loadFileResource(String filename)
     {
-        String cypherScript = Util.readResourceFile(filename+".cypher");
         try (Transaction tx = db.beginTx()) {
-            db.execute(cypherScript);
+            db.execute(Util.readResourceFile(filename+".cypher"));
             tx.success();
+        } catch (Exception e) {
+            fail("Couldn't load "+filename+".cypher: "+e.getMessage());
         }
     }
 

@@ -25,6 +25,30 @@ public class Util
         return new JSONObject(Util.readResourceFile(filename+".json"));
     }
 
+    public static String resourceFile(String filename)
+    {
+        try {
+            return Util.readResourceFile(filename);
+        } catch (Exception e) {
+            return "Error reading file: "+e.getMessage();
+        }
+    }
+
+    public static JSONObject resourceJSON(String filename)
+    {
+        try {
+            return Util.readResourceJSON(filename);
+        } catch (Exception e) {
+            JSONObject result = new JSONObject();
+            result.put("error", true);
+            result.put("file", filename+".json");
+            result.put("summary", "File missing or malformed.");
+            result.put("message", e.getMessage());
+            result.put("exception", e);
+            return result;
+        }
+    }
+
     private static InputStream getResourceFileStream(String filename)
     {
         return Util.class.getClassLoader().getResourceAsStream(filename);

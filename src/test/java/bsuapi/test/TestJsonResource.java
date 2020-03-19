@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -21,7 +22,11 @@ public class TestJsonResource implements AutoCloseable
 
     public TestJsonResource (String filename)
     {
-        this.j = new JSONObject(Util.readResourceFile(filename+".json"));
+        try {
+            this.j = Util.readResourceJSON(filename);
+        } catch (Exception e) {
+            fail("Couldn't load "+filename+".json: "+e.getMessage());
+        }
     }
 
     public Object query(String jsonPointer)
