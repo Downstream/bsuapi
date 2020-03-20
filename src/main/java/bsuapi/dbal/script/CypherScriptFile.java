@@ -13,20 +13,17 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 
-public class CypherScriptFile implements GenerationStatus
+public class CypherScriptFile implements Runnable, GenerationStatus
 {
     private static final int COMPLETED_LOCK_TIME = 60000;
     private Instant startTime;
+    private Instant completeTime;
     private int countCompleted;
     private String sourceFilename;
     private ArrayList<CypherQuery> commands;
     private JSONArray results;
-
-    public static CypherScriptFile go(CypherScript scriptFile)
-    throws Exception
-    {
-        return CypherScriptFile.go(scriptFile.filename());
-    }
+    private Cypher c;
+    private Thread thread;
 
     public static CypherScriptFile go(String filename)
     throws Exception
@@ -39,7 +36,7 @@ public class CypherScriptFile implements GenerationStatus
         return new CypherScriptFile(filename);
     }
 
-    public CypherScriptFile(String filename)
+    private CypherScriptFile(String filename)
     throws Exception
     {
         this.countCompleted = 0;
@@ -50,31 +47,69 @@ public class CypherScriptFile implements GenerationStatus
         this.results = new JSONArray();
 
         for (String cmd : sourceFileData.trim().split(";")) {
-            cmd = cmd.trim();
-            if (cmd.length() < 5) {continue;}
+            if (cmd.trim().length() < 5) {continue;}
             this.commands.add(new CypherScriptFileCommand(cmd));
         }
+
+        GenerationOverseer.start(this.sourceFilename, this);
     }
 
-    public JSONObject exec(Cypher c)
-    throws CypherException
+    public void start(Cypher c)
+    throws CypherException, RuntimeException
     {
-        this.startTime = Instant.now();
-        GenerationOverseer.start(this.sourceFilename, this);
-
-        for (CypherQuery command : this.commands) {
-            this.results.put(Util.jsonArrayFirst(command.exec(c)));
-            this.countCompleted++;
+        if (this.thread != null && this.thread.isAlive()) {
+            throw new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" while a matching Thread was still active.");
         }
 
-        GenerationOverseer.endIn(this.sourceFilename, CypherScriptFile.COMPLETED_LOCK_TIME);
+        if (c != null) {
+            this.c = c;
+        }
 
-        return this.statusReport();
+        if (this.c == null) {
+            throw new CypherException("Missing Cypher context in "+ this.toString());
+        }
+
+        this.thread = new Thread(this);
+        this.thread.start();
+    }
+
+    @Override
+    public void run() {
+        this.startTime = Instant.now();
+
+        for (CypherQuery command : this.commands) {
+            try {
+                this.results.put(Util.jsonArrayFirst(command.exec(this.c)));
+                this.countCompleted++;
+            } catch (CypherException e) {
+                this.results.put(e);
+                return;
+            }
+        }
+
+        this.completeTime = Instant.now();
+        GenerationOverseer.endIn(this.sourceFilename, CypherScriptFile.COMPLETED_LOCK_TIME);
+    }
+
+    public void exec(Cypher c)
+    throws CypherException
+    {
+        this.start(c);
+    }
+
+    @Override
+    public boolean isReady() {
+        return (this.thread == null || !this.thread.isAlive());
     }
 
     @Override
     public boolean isRunning() {
-        return (null != this.startTime);
+        return (null != this.startTime && this.thread.isAlive());
+    }
+
+    @Override
+    public boolean isComplete() {
+        return (null != this.startTime && null != this.completeTime);
     }
 
     @Override
@@ -89,6 +124,14 @@ public class CypherScriptFile implements GenerationStatus
 
     @Override
     public Duration runtime() {
+        if (this.startTime == null) {
+            return null;
+        }
+
+        if (this.completeTime != null) {
+            return Duration.between(this.startTime, this.completeTime);
+        }
+
         return Duration.between(this.startTime, Instant.now());
     }
 
@@ -106,16 +149,25 @@ public class CypherScriptFile implements GenerationStatus
         status.put("results", this.results);
 
         if (this.isRunning()) {
-            status.put("runTime", this.runtime());
-            if (this.countActionsComplete() < this.countActionsTotal()) {
-                status.put("action", "running");
-            } else {
-                status.put("action", "completed");
-                status.put("next", "Command available again "+ (CypherScriptFile.COMPLETED_LOCK_TIME/1000) +" seconds after it completed.");
-            }
-        } else {
-            status.put("runTime", 0);
+            status.put("runTime", Util.durationDisplayFormat(this.runtime()));
+            status.put("action", "running");
+        }
+
+        if (this.isComplete()) {
+            status.put("runTime", Util.durationDisplayFormat(this.runtime()));
+            status.put("action", "completed");
+            status.put("next", "Command available again "+ (CypherScriptFile.COMPLETED_LOCK_TIME/1000) +" seconds after it completed.");
+        }
+
+        if (this.isReady()) {
+            status.put("runTime", Util.durationDisplayFormat(Duration.ofMillis(0)));
             status.put("action", "starting");
+        }
+
+        if (this.startTime != null && !this.isComplete() && (this.thread == null || !this.thread.isAlive())) {
+            status.put("error", "An error occurred during execution. Check the results list for a detailed error message.");
+            status.put("action", "failed");
+            status.put("runTime", Util.durationDisplayFormat(GenerationOverseer.end(this.sourceFilename)));
         }
 
         return status;

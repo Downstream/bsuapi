@@ -1,7 +1,6 @@
 package bsuapi.resource;
 
 import bsuapi.dbal.Cypher;
-import bsuapi.dbal.script.CypherScript;
 import bsuapi.dbal.script.CypherScriptFile;
 
 import javax.ws.rs.GET;
@@ -24,34 +23,38 @@ public class GenerationResource extends BaseResource
     {
         Response response = this.prepareResponse(uriInfo);
 
-        return this.doScript(response, CypherScript.INFO);
+        return this.doScript(response, "infoCards.cypher");
     }
 
-    @Path("/openpipe/rebuild")
+    @Path("/openpipe")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response openpipe(@Context UriInfo uriInfo)
     {
         Response response = this.prepareResponse(uriInfo);
 
-        return this.doScript(response, CypherScript.OPENPIPE_REBUILD);
+        return this.doScript(response, "openpipe.cypher");
     }
 
-    private javax.ws.rs.core.Response doScript(Response response, CypherScript scriptFile)
+    private javax.ws.rs.core.Response doScript(Response response, String filename)
     {
         CypherScriptFile script;
 
         try {
-            script = CypherScriptFile.go(scriptFile);
+            script = CypherScriptFile.go(filename);
         } catch (Exception e) {
             return response.exception(e);
         }
 
-        if (!script.isRunning()) {
+        if (script.isRunning() || script.isComplete()) {
+            return response.data(script.statusReport(), script.toString());
+        }
+
+        if (script.isReady()) {
             try (
                 Cypher c = new Cypher(db)
             ) {
-                return response.data(script.exec(c), script.toString() + " completed.");
+                script.exec(c);
             }
             catch (Exception e)
             {
@@ -59,6 +62,6 @@ public class GenerationResource extends BaseResource
             }
         }
 
-        return response.data(script.statusReport(), script.toString() + " already running.");
+        return response.data(script.statusReport(), script.toString());
     }
 }
