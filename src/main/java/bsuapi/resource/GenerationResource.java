@@ -1,6 +1,7 @@
 package bsuapi.resource;
 
 import bsuapi.dbal.Cypher;
+import bsuapi.dbal.script.CypherScript;
 import bsuapi.dbal.script.CypherScriptFile;
 
 import javax.ws.rs.GET;
@@ -23,25 +24,25 @@ public class GenerationResource extends BaseResource
     {
         Response response = this.prepareResponse(uriInfo);
 
-        return this.doScript(response, "infoCards.cypher");
+        return this.doScript(response, CypherScript.INFO);
     }
 
-    @Path("/openpipe")
+    @Path("/openpipe/rebuild")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response openpipe(@Context UriInfo uriInfo)
     {
         Response response = this.prepareResponse(uriInfo);
 
-        return this.doScript(response, "openpipe.cypher");
+        return this.doScript(response, CypherScript.OPENPIPE_REBUILD);
     }
 
-    private javax.ws.rs.core.Response doScript(Response response, String filename)
+    private javax.ws.rs.core.Response doScript(Response response, CypherScript file)
     {
         CypherScriptFile script;
 
         try {
-            script = CypherScriptFile.go(filename);
+            script = CypherScriptFile.go(file);
         } catch (Exception e) {
             return response.exception(e);
         }
