@@ -72,13 +72,19 @@ public class ScriptOverseer
         ScriptOverseer.singleton().readyCommand(key, command);
     }
 
+    public static void clear(String key)
+    {
+        // @WARN not thread safe
+        ScriptOverseer.singleton().runningCommands.remove(key);
+    }
+
     public static Duration end(String key)
     throws IllegalStateException
     {
         return ScriptOverseer.singleton().endCommand(key);
     }
 
-    public static Duration endIn(String key, int wait)
+    public static Duration endIn(String key, long wait)
     throws IllegalStateException
     {
         Duration runtime = ScriptOverseer.singleton().getCommandRuntime(key);

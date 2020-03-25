@@ -15,11 +15,11 @@ public enum CypherScript
             case INFO:
                 return "infoCards.cypher";
             case OPENPIPE_REBUILD:
-                return "openpipe-rebuild.cypher";
+                return "openPipe-rebuild.cypher";
             case OPENPIPE_SYNC:
-                return "openpipe-sync.cypher";
+                return "openPipe-sync.cypher";
             case OPENPIPE_TOPICIMG:
-                return "openpipe-topicImg.cypher";
+                return "openPipe-topicImg.cypher";
             default:
                 throw new IllegalStateException( "Unknown CypherScript " + this );
         }

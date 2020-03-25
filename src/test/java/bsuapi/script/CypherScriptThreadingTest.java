@@ -2,6 +2,7 @@ package bsuapi.script;
 
 import bsuapi.dbal.script.CypherScript;
 import bsuapi.dbal.script.CypherScriptFile;
+import bsuapi.service.ScriptOverseer;
 import bsuapi.test.TestCypherResource;
 import net.jodah.concurrentunit.Waiter;
 import org.json.JSONObject;
@@ -32,11 +33,13 @@ public class CypherScriptThreadingTest
     public void scriptReady()
     throws Exception
     {
+        ScriptOverseer.clear(CypherScript.INFO.filename());
         CypherScriptFile script = CypherScriptFile.go(CypherScript.INFO);
 
         assertTrue(script.isReady());
         assertFalse(script.isRunning());
         assertFalse(script.isComplete());
+        assertFalse(script.isFailed());
         JSONObject result = script.statusReport();
         assertEquals("starting", result.get("action"));
         assertEquals("0:00:00:000", result.get("runTime"));
@@ -44,23 +47,17 @@ public class CypherScriptThreadingTest
 
     @Test
     public void scriptRunning()
-            throws Exception
+    throws Exception
     {
-        CypherScriptFile script = CypherScriptFile.go(CypherScript.INFO);
+        ScriptOverseer.clear(CypherScript.INFO.filename());
         Waiter waiter = new Waiter();
 
-        this.checkState(waiter, CypherScriptFile::isRunning,
+        CypherScriptFile script = this.checkState(CypherScript.INFO.filename(), waiter, CypherScriptFile::isRunning,
             (script2) -> {
                 waiter.assertFalse(script2.isReady());
-                waiter.assertTrue(script2.isRunning());
-                waiter.assertFalse(script2.isComplete());
                 return true;
             }
         );
-
-        script.exec(db.createCypher());
-
-        waiter.await(2000);
 
         JSONObject result = script.statusReport();
         assertEquals("running", result.get("action"));
@@ -69,42 +66,69 @@ public class CypherScriptThreadingTest
 
     @Test
     public void scriptComplete()
-            throws Exception
+    throws Exception
     {
-        CypherScriptFile script = CypherScriptFile.go(CypherScript.INFO);
+        ScriptOverseer.clear(CypherScript.INFO.filename());
         Waiter waiter = new Waiter();
 
-        this.checkState(waiter, CypherScriptFile::isComplete,
+        CypherScriptFile script = this.checkState(CypherScript.INFO.filename(), waiter, CypherScriptFile::isComplete,
             (script2) -> {
                 waiter.assertFalse(script2.isReady());
-                waiter.assertTrue(script2.isComplete());
                 return true;
             }
         );
-
-        script.exec(db.createCypher());
-
-        waiter.await(2000);
 
         JSONObject result = script.statusReport();
         assertEquals("completed", result.get("action"));
         assertTrue(1 < script.runtime().toMillis());
     }
 
-    private void checkState(Waiter waiter, Function<CypherScriptFile, Boolean> stateTest, Function<CypherScriptFile,Boolean> threadTest)
+    @Test
+    public void scriptFailed()
+    throws Exception
     {
+        ScriptOverseer.clear("badScript.cypher");
+        Waiter waiter = new Waiter();
+
+        CypherScriptFile script = this.checkState("badScript.cypher", waiter, CypherScriptFile::isFailed,
+            (script2) -> {
+                waiter.assertFalse(script2.isComplete());
+                return true;
+            }
+        );
+
+        JSONObject result = script.statusReport();
+        assertEquals("failed", result.get("action"));
+        assertTrue(1 < script.runtime().toMillis());
+    }
+
+    private CypherScriptFile checkState(String filename, Waiter waiter, Function<CypherScriptFile, Boolean> stateTest, Function<CypherScriptFile,Boolean> threadTest)
+    throws Exception
+    {
+        CypherScriptFile scriptRef1 = CypherScriptFile.go(filename);
+
         new Thread(() -> {
+            int attempts = 0;
             try {
-                CypherScriptFile script = CypherScriptFile.go(CypherScript.INFO);
-                while (!stateTest.apply(script)) {
-                    sleep(10);
+                CypherScriptFile scriptRef2 = CypherScriptFile.go(filename);
+                boolean inExpectedState = stateTest.apply(scriptRef2);
+                while (!inExpectedState && attempts++ < 40) {
+                    sleep(50); // 2000 ms total
+                    inExpectedState = stateTest.apply(scriptRef2);
                 }
-                waiter.assertTrue(threadTest.apply(script));
+                waiter.assertTrue(inExpectedState);
             } catch (Exception e) {
                 waiter.fail(e);
+            } finally {
+                waiter.resume();
             }
-            waiter.resume();
         }).start();
+
+        scriptRef1.exec(db.createCypher());
+
+        waiter.await(3000);
+
+        return scriptRef1;
     }
 
     // @todo collisions
