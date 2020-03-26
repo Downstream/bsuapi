@@ -1,4 +1,7 @@
-package bsuapi.dbal.query;
+package bsuapi.dbal.script;
+
+import bsuapi.dbal.query.CypherQuery;
+import bsuapi.dbal.query.QueryResultSingleColumn;
 
 public class CypherScriptFileCommand extends CypherQuery
 implements QueryResultSingleColumn

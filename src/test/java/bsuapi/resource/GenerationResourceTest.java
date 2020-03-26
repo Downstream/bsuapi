@@ -41,8 +41,7 @@ public class GenerationResourceTest
         JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
 
         assertTrue((Boolean) responseData.query("/success"));
-        assertEquals("infoCards.cypher graph generated", responseData.query("/message").toString());
-        assertNotNull(responseData.query("/data/clear/0"));
-        assertNotNull(responseData.query("/data/create/0"));
+        assertEquals("CypherScriptFile: infoCards.cypher completed.", responseData.query("/message").toString());
+        assertNotNull(responseData.query("/data/results/0"));
     }
 }

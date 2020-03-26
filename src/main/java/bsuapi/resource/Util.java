@@ -16,7 +16,11 @@ public class Util
     public static String readResourceFile(String filename)
     throws Exception
     {
-        return Util.scanner(Util.getResourceFileStream(filename));
+        try {
+            return Util.scanner(Util.getResourceFileStream(filename));
+        } catch (Exception e) {
+            throw new Exception("Could not read resource file: "+ filename, e);
+        }
     }
 
     public static JSONObject readResourceJSON(String filename)

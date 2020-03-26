@@ -1,7 +1,9 @@
-package bsuapi.dbal.query;
+package bsuapi.dbal.script;
 
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
+import bsuapi.dbal.query.CypherQuery;
+import bsuapi.dbal.query.GenerationStatus;
 import bsuapi.resource.Util;
 import bsuapi.service.GenerationOverseer;
 import org.json.JSONArray;
@@ -20,6 +22,12 @@ public class CypherScriptFile implements GenerationStatus
     private ArrayList<CypherQuery> commands;
     private JSONArray results;
 
+    public static CypherScriptFile go(CypherScript scriptFile)
+    throws Exception
+    {
+        return CypherScriptFile.go(scriptFile.filename());
+    }
+
     public static CypherScriptFile go(String filename)
     throws Exception
     {
@@ -34,7 +42,6 @@ public class CypherScriptFile implements GenerationStatus
     public CypherScriptFile(String filename)
     throws Exception
     {
-        this.startTime = Instant.now();
         this.countCompleted = 0;
         this.sourceFilename = filename;
         String sourceFileData = Util.readResourceFile(this.sourceFilename);
@@ -43,14 +50,16 @@ public class CypherScriptFile implements GenerationStatus
         this.results = new JSONArray();
 
         for (String cmd : sourceFileData.trim().split(";")) {
-            if (cmd.trim().length() < 5) {continue;}
+            cmd = cmd.trim();
+            if (cmd.length() < 5) {continue;}
             this.commands.add(new CypherScriptFileCommand(cmd));
         }
     }
 
-    public void exec(Cypher c)
+    public JSONObject exec(Cypher c)
     throws CypherException
     {
+        this.startTime = Instant.now();
         GenerationOverseer.start(this.sourceFilename, this);
 
         for (CypherQuery command : this.commands) {
@@ -59,6 +68,8 @@ public class CypherScriptFile implements GenerationStatus
         }
 
         GenerationOverseer.endIn(this.sourceFilename, CypherScriptFile.COMPLETED_LOCK_TIME);
+
+        return this.statusReport();
     }
 
     @Override
