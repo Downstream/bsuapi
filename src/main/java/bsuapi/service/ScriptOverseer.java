@@ -10,6 +10,7 @@ public class ScriptOverseer
 
     private ScriptOverseer() //singleton
     {
+        //@todo convert to ExecutorService with CypherScriptFiles as Tasks
         this.runningCommands = new HashMap<>();
     }
 

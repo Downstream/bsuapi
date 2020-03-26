@@ -14,7 +14,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-public class CypherScriptFile implements Runnable, ScriptStatus
+public class CypherScriptFile implements Runnable, ScriptStatus, Thread.UncaughtExceptionHandler
 {
     private static final long COMPLETED_LOCK_TIME = TimeUnit.MINUTES.toMillis(10);
     private Instant startTime;
@@ -31,24 +31,20 @@ public class CypherScriptFile implements Runnable, ScriptStatus
     public static CypherScriptFile go(CypherScript scriptFile)
     throws Exception
     {
-        String filename = scriptFile.filename();
-        ScriptStatus existing = ScriptOverseer.get(filename);
-        if (existing instanceof CypherScriptFile) {
-            return (CypherScriptFile) existing;
-        }
-
-        return new CypherScriptFile(scriptFile.filename());
+        return CypherScriptFile.go(scriptFile.filename());
     }
 
     public static CypherScriptFile go(String filename)
-            throws Exception
+    throws Exception
     {
         ScriptStatus existing = ScriptOverseer.get(filename);
         if (existing instanceof CypherScriptFile) {
             return (CypherScriptFile) existing;
         }
 
-        return new CypherScriptFile(filename);
+        CypherScriptFile newScript = new CypherScriptFile(filename);
+        ScriptOverseer.ready(filename, newScript);
+        return newScript;
     }
 
     private CypherScriptFile(String filename)
@@ -68,8 +64,20 @@ public class CypherScriptFile implements Runnable, ScriptStatus
             if (cmd.length() < 5) {continue;}
             this.commands.add(new CypherScriptFileCommand(cmd));
         }
+    }
 
-        ScriptOverseer.ready(this.filename, this);
+    // @todo temporary long response until ScriptOverseer is an ExecutorService
+    public JSONObject execNow(Cypher c)
+    throws CypherException, RuntimeException
+    {
+        this.start(c);
+        try {
+            this.thread.join();
+        } catch (InterruptedException e) {
+            JSONObject result = this.statusReport();
+            result.put("warning", "thread interrupted");
+        }
+        return this.statusReport();
     }
 
     public void exec(Cypher c)
@@ -82,11 +90,15 @@ public class CypherScriptFile implements Runnable, ScriptStatus
     throws CypherException, RuntimeException
     {
         if (!this.isReady()) {
-            throw new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" not in ready state. "+ this.stateHash());
+            RuntimeException e = new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" not in ready state. "+ this.stateHash());
+            this.results.put(e);
+            throw e;
         }
 
         if (this.isRunning()) {
-            throw new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" while a matching Thread was still active. "+ this.stateHash());
+            RuntimeException e = new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" while a matching Thread was still active. "+ this.stateHash());
+            this.results.put(e);
+            throw e;
         }
 
         if (c != null) {
@@ -94,28 +106,36 @@ public class CypherScriptFile implements Runnable, ScriptStatus
         }
 
         if (this.c == null) {
-            throw new CypherException("Missing Cypher context in "+ this.toString());
+            CypherException e = new CypherException("Missing Cypher context in "+ this.toString());
+            this.results.put(e);
+            throw e;
         }
 
         this.booting = true;
         this.thread = new Thread(this);
-        this.thread.start();
+        this.thread.setUncaughtExceptionHandler(this);
+
+        try {
+            this.thread.start();
+        } catch (Exception e) {
+            this.results.put(e);
+            throw e;
+        }
     }
 
     @Override
     public void run()
-    throws RuntimeException
     {
         if (!this.booting && !this.isReady()) {
             RuntimeException e = new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" not in ready state. "+ this.stateHash());
             this.results.put(e);
-            throw e;
+            return;
         }
 
         if (!this.booting && this.isRunning()) {
             RuntimeException e = new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" while a matching Thread was still active. "+ this.stateHash());
             this.results.put(e);
-            throw e;
+            return;
         }
 
         this.booting = false;
@@ -143,9 +163,19 @@ public class CypherScriptFile implements Runnable, ScriptStatus
         ScriptOverseer.endIn(this.filename, CypherScriptFile.COMPLETED_LOCK_TIME);
     }
 
-    public String getFilename()
-    {
-        return this.filename;
+    @Override
+    public void uncaughtException(Thread t, Throwable e) {
+        this.results.put(e.getCause().getMessage());
+        this.results.put(e);
+    }
+
+    public String stateHash() {
+        StringBuilder b = new StringBuilder();
+        b.append(this.isReady() ? '1' : '0');
+        b.append(this.isRunning() ? '1' : '0');
+        b.append(this.isComplete() ? '1' : '0');
+        b.append(this.isFailed() ? '1' : '0');
+        return b.toString();
     }
 
     @Override
@@ -164,15 +194,6 @@ public class CypherScriptFile implements Runnable, ScriptStatus
     public boolean isComplete()
     {
         return (null != this.startTime && null != this.completeTime);
-    }
-
-    public String stateHash() {
-        StringBuilder b = new StringBuilder();
-        b.append(this.isReady() ? '1' : '0');
-        b.append(this.isRunning() ? '1' : '0');
-        b.append(this.isComplete() ? '1' : '0');
-        b.append(this.isFailed() ? '1' : '0');
-        return b.toString();
     }
 
     public boolean isFailed()
@@ -254,8 +275,12 @@ public class CypherScriptFile implements Runnable, ScriptStatus
         }
 
         if (this.isFailed()) {
-            status.put("error", "An error occurred during execution. Check the results list for a detailed error message.");
+            status.put("error", "An error occurred during execution. Check the results list for a detailed error message. "+ this.stateHash());
             status.put("action", "failed");
+            if (null != this.thread) {
+                status.put("threadState", this.thread.getState());
+                status.put("threadTrace", this.thread.getStackTrace());
+            }
             status.put("runTime", Util.durationDisplayFormat(ScriptOverseer.endIn(this.filename,CypherScriptFile.COMPLETED_LOCK_TIME)));
         }
 
