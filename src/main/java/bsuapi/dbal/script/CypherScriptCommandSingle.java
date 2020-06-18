@@ -3,10 +3,10 @@ package bsuapi.dbal.script;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.QueryResultSingleColumn;
 
-public class CypherScriptFileCommand extends CypherQuery
+public class CypherScriptCommandSingle extends CypherQuery
 implements QueryResultSingleColumn
 {
-    public CypherScriptFileCommand(String command) {
+    public CypherScriptCommandSingle(String command) {
         super(command);
     }
 

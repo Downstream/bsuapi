@@ -2,7 +2,7 @@ package bsuapi.resource;
 
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.script.CypherScript;
-import bsuapi.dbal.script.CypherScriptFile;
+import bsuapi.dbal.script.CypherScriptAbstract;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -10,8 +10,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Path("/generate")
 public class GenerationResource extends BaseResource
@@ -36,57 +34,26 @@ public class GenerationResource extends BaseResource
         return this.doScript(response, CypherScript.OPENPIPE_REBUILD);
     }
 
-    private javax.ws.rs.core.Response doScript(Response response, CypherScript file)
+    private javax.ws.rs.core.Response doScript(Response response, CypherScript script)
     {
-        CypherScriptFile script;
+        CypherScriptAbstract runner;
 
         try {
-            this.log.info("Starting CypherScript "+file.filename());
-            script = CypherScriptFile.go(file);
+            this.log.info("Starting CypherScript "+script);
         } catch (Exception e) {
-            this.log.error("Could not load CypherScript "+file.filename(), e);
+            this.log.error("Could not load CypherScript "+script, e);
             return response.exception(e);
         }
 
         try (
-                Cypher c = new Cypher(db)
+            Cypher c = new Cypher(db)
         ) {
-            return response.data(script.execNow(c), script.toString());
+            runner = script.getRunner(c);
+            return response.data(runner.statusReport(), script.toString());
         }
         catch (Exception e)
         {
             return response.exception(e);
         }
-    }
-
-    private javax.ws.rs.core.Response doScriptAsync(Response response, CypherScript file)
-    {
-        CypherScriptFile script;
-
-        try {
-            this.log.info("Starting CypherScript "+file.filename());
-            script = CypherScriptFile.go(file);
-        } catch (Exception e) {
-            this.log.error("Exception while running CypherScript "+file.filename(), e);
-            return response.exception(e);
-        }
-
-        if (script.isRunning() || script.isComplete()) {
-            return response.data(script.statusReport(), script.toString());
-        }
-
-        if (script.isReady()) {
-            try (
-                Cypher c = new Cypher(db)
-            ) {
-                script.exec(c);
-            }
-            catch (Exception e)
-            {
-                return response.exception(e);
-            }
-        }
-
-        return response.data(script.statusReport(), script.toString());
     }
 }
