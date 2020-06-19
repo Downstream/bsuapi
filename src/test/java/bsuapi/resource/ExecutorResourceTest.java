@@ -1,5 +1,6 @@
 package bsuapi.resource;
 
+import bsuapi.dbal.script.CypherScript;
 import bsuapi.test.TestCypherResource;
 import bsuapi.test.TestJsonResource;
 import org.json.JSONObject;
@@ -12,7 +13,7 @@ import javax.ws.rs.core.UriInfo;
 
 import static org.junit.Assert.*;
 
-public class GenerationResourceTest
+public class ExecutorResourceTest
 {
     protected static TestJsonResource j;
     protected static TestCypherResource db;
@@ -32,16 +33,15 @@ public class GenerationResourceTest
     @Test
     public void infoCardGeneration() {
         UriInfo uriInfo = j.mockUriInfo("empty");
-        GenerationResource resource = new GenerationResource();
+        ExecutorResource resource = new ExecutorResource();
         db.baseResourceInjection(resource);
-        javax.ws.rs.core.Response result = resource.info(uriInfo);
+        javax.ws.rs.core.Response result = resource.start(CypherScript.INFO.name(), uriInfo);
 
         assertEquals(result.getStatus(), 200);
 
         JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
 
         assertTrue((Boolean) responseData.query("/success"));
-        assertEquals("CypherScriptFile: infoCards.cypher completed.", responseData.query("/message").toString());
-        assertNotNull(responseData.query("/data/results/0"));
+        assertEquals("Starting or checking CypherScript: INFO", responseData.query("/message").toString());
     }
 }

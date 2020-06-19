@@ -1,37 +1,41 @@
 package bsuapi.service;
 
-import bsuapi.dbal.query.GenerationStatus;
-
 import java.time.Duration;
 import java.util.HashMap;
 
-public class GenerationOverseer
+public class ScriptOverseer
 {
-    private static GenerationOverseer instance;
-    private HashMap<String, GenerationStatus> runningCommands;
+    private static ScriptOverseer instance;
+    private HashMap<String, ScriptStatus> runningCommands;
 
-    private GenerationOverseer() //singleton
+    private ScriptOverseer() //singleton
     {
+        //@todo convert to ExecutorService with CypherScriptFiles as Tasks
         this.runningCommands = new HashMap<>();
     }
 
-    private static GenerationOverseer singleton()
+    private static ScriptOverseer singleton()
     {
-        if (null == GenerationOverseer.instance) {
-            GenerationOverseer.instance = new GenerationOverseer();
+        if (null == ScriptOverseer.instance) {
+            ScriptOverseer.instance = new ScriptOverseer();
         }
 
-        return GenerationOverseer.instance;
+        return ScriptOverseer.instance;
     }
 
-    private GenerationStatus getCommand(String key)
+    private ScriptStatus getCommand(String key)
     {
         return this.runningCommands.get(key);
     }
 
+    private boolean hasCommand(String key)
+    {
+        return this.runningCommands.containsKey(key);
+    }
+
     private Duration getCommandRuntime(String key)
     {
-        GenerationStatus command = this.getCommand(key);
+        ScriptStatus command = this.getCommand(key);
         if (null == command) {
             return null;
         }
@@ -39,7 +43,7 @@ public class GenerationOverseer
         return command.runtime();
     }
 
-    private void startCommand(String key, GenerationStatus command)
+    private void readyCommand(String key, ScriptStatus command)
     throws IllegalStateException
     {
         if (null != this.getCommand(key)) {
@@ -52,7 +56,7 @@ public class GenerationOverseer
     private Duration endCommand(String key)
     throws IllegalStateException
     {
-        GenerationStatus command = this.getCommand(key);
+        ScriptStatus command = this.getCommand(key);
         if (null == command) {
             throw new IllegalStateException("Generation attempted end on a command not currently running '"+ key +"'.");
         }
@@ -63,33 +67,44 @@ public class GenerationOverseer
 
 
     // PUBLIC ACCESSORS
-    public static GenerationStatus get(String key)
+    public static ScriptStatus get(String key)
     {
-        return GenerationOverseer.singleton().getCommand(key);
+        return ScriptOverseer.singleton().getCommand(key);
     }
 
-    public static void start(String key, GenerationStatus command)
+    public static boolean has(String key)
+    {
+        return ScriptOverseer.singleton().hasCommand(key);
+    }
+
+    public static void ready(String key, ScriptStatus command)
     throws IllegalStateException
     {
-        GenerationOverseer.singleton().startCommand(key, command);
+        ScriptOverseer.singleton().readyCommand(key, command);
+    }
+
+    public static void clear(String key)
+    {
+        // @WARN not thread safe
+        ScriptOverseer.singleton().runningCommands.remove(key);
     }
 
     public static Duration end(String key)
     throws IllegalStateException
     {
-        return GenerationOverseer.singleton().endCommand(key);
+        return ScriptOverseer.singleton().endCommand(key);
     }
 
-    public static Duration endIn(String key, int wait)
+    public static Duration endIn(String key, long wait)
     throws IllegalStateException
     {
-        Duration runtime = GenerationOverseer.singleton().getCommandRuntime(key);
+        Duration runtime = ScriptOverseer.singleton().getCommandRuntime(key);
 
         new java.util.Timer().schedule(
             new java.util.TimerTask() {
                 @Override
                 public void run() {
-                    GenerationOverseer.singleton().endCommand(key);
+                    ScriptOverseer.end(key);
                 }
             },
             wait

@@ -11,7 +11,7 @@
 
   <groupId>edu.boisestate.bsuapi</groupId>
   <artifactId>bsuapi</artifactId>
-  <version>0.2.4</version>
+  <version>0.3.0</version>
 
   <packaging>jar</packaging>
   <name>Neo4j JSON API Resolver</name>
@@ -80,6 +80,12 @@
       <groupId>org.valid4j</groupId>
       <artifactId>http-matchers</artifactId>
       <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.jodah</groupId>
+      <artifactId>concurrentunit</artifactId>
+      <version>0.4.6</version>
     </dependency>
   </dependencies>
 
