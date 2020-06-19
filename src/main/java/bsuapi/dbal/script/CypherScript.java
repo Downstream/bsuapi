@@ -64,4 +64,30 @@ public enum CypherScript
     {
         return CypherScriptAbstract.getStoredStatus(c, this);
     }
+
+    public String describe()
+    {
+        switch ( this )
+        {
+            case INFO:
+                return "Regenerate :Info nodes, predefined in script.";
+            case OPENPIPE_REBUILD:
+                return "Clear Assets and Topics, and re-import all from OpenPipe.";
+            case OPENPIPE_SYNC:
+                return "Retrieve Assets modified since last sync, and adjust the graph.";
+            case OPENPIPE_TOPICIMG:
+                return "Reassess Assets selected as representative of Topics.";
+            default:
+                throw new IllegalStateException( "Unknown CypherScript " + this );
+        }
+    }
+
+    public static JSONObject describeAll()
+    {
+        JSONObject result = new JSONObject();
+        for(CypherScript script : CypherScript.values()) {
+            result.put(script.name(), script.describe());
+        }
+        return result;
+    }
 }

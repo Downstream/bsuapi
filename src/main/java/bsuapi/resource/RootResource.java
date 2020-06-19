@@ -60,6 +60,7 @@ public class RootResource extends BaseResource
         methods.put("search", Search.describe());
         methods.put("search/completion", Search.describeCompletion());
         methods.put("info", InfoResource.describe());
+        methods.put("execute", ExecutorResource.describe());
 
         return methods;
     }

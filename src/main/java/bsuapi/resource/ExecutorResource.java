@@ -1,5 +1,6 @@
 package bsuapi.resource;
 
+import bsuapi.behavior.BehaviorDescribe;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.script.CypherScript;
 import bsuapi.service.ScriptExecutor;
@@ -77,5 +78,18 @@ public class ExecutorResource extends BaseResource
         } else {
             return script.getStoredReport(c);
         }
+    }
+
+    public static BehaviorDescribe describe()
+    {
+        BehaviorDescribe desc = BehaviorDescribe.resource("/execute/{SCRIPT}",
+            "Retrieve the status of, or start, pre-defined long-running cypher scripts."
+        );
+
+        desc.arg("SCRIPT", "name of script to run.");
+        desc.put("args", CypherScript.describeAll());
+        desc.put("uri-start", "/execute/{SCRIPT}/start");
+
+        return desc;
     }
 }
