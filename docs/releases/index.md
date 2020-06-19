@@ -1,6 +1,12 @@
 # Releases
 
 ## Dev
+* [`0.3.1`](bsuapi-0.3.1.jar) Async generation: web-triggered long-running cypher-scripts.
+   * `/execute/{SCRIPT}` Shows results of previous run of specified scripts.
+   * `/execute/{SCRIPT}/start` Starts running that script, or returns current status and progress if already running.
+   * Added functions and procedures for ingesting OpenPipe data.
+   * Minor refactor of Cypher db abstraction.
+   * Improvements and additions to execution and retrieval of cypher commands.  
 * [`0.2.0`](bsuapi-0.2.0.jar) Grouped search results and search-completion.
    * `/search/{QUERY}` now groups results by Assets/Topics.
    * `/search/completion/{QUERY}` will return a flat array of strings of best-match topics.
