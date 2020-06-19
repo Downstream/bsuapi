@@ -86,11 +86,15 @@ public class Cypher implements AutoCloseable
         }
     }
 
-    // !IMPORTANT: Requires a cypher.db transaction
-    public Result execute (String command)
-    throws Throwable // "requires a transaction" exceptions sometimes are instances of Error. CATCH ALL THE THINGS!
+    public void execute (String command)
+    throws Throwable
     {
-        return db.execute(command);
+        try (
+            Transaction tx = db.beginTx();
+        ) {
+            db.execute(command);
+            tx.success();
+        }
     }
 
     @Override

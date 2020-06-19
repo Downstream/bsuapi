@@ -3,6 +3,7 @@ package bsuapi.dbal.script;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
 import bsuapi.dbal.query.CypherQuery;
+import bsuapi.dbal.query.QueryResultCollector;
 import bsuapi.resource.Util;
 import bsuapi.service.ScriptOverseer;
 import bsuapi.service.ScriptStatus;
@@ -11,12 +12,16 @@ import org.json.JSONObject;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
 {
     protected static final long COMPLETED_LOCK_TIME = TimeUnit.MINUTES.toMillis(10);
+    protected static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime( FormatStyle.SHORT ).withZone( ZoneId.systemDefault() );
     protected Instant startTime;
     protected Instant completeTime;
     protected CypherScript script;
@@ -52,14 +57,12 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         if (!this.booting && !this.isReady()) {
             RuntimeException e = new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" not in ready state. "+ this.stateHash());
             this.results.put(e);
-            this.failed = true;
             return;
         }
 
         if (!this.booting && this.isRunning()) {
             RuntimeException e = new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" while a matching Thread was still active. "+ this.stateHash());
             this.results.put(e);
-            this.failed = true;
             return;
         }
 
@@ -84,6 +87,7 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         }
 
         this.completeTime = Instant.now();
+        this.storeStatus();
         ScriptOverseer.endIn(this.script.name(), CypherScriptFile.COMPLETED_LOCK_TIME);
     }
 
@@ -99,7 +103,7 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
 
     public int countActionsComplete() { return this.countCompleted; }
 
-    public String toString() { return "CypherScriptFile: " + this.script.name(); }
+    public String toString() { return this.getClass().getSimpleName() + ": " + this.script.name(); }
 
     public CypherScript getScript() { return this.script; }
 
@@ -131,6 +135,36 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         this.completeTime = null;
     }
 
+    public void storeStatus()
+    {
+        JSONObject report = this.statusReport();
+        report.put("name", this.script.name());
+
+
+        String command =
+            "MERGE (s:Script {name:'" + this.script.name() + "'}) \n" +
+            "SET s = " + report.toString(2)
+            ;
+
+        try {
+            c.execute(command);
+        } catch (Throwable ignored) {}
+    }
+
+    public static JSONObject getStoredStatus(Cypher c, CypherScript script)
+    {
+        bsuapi.dbal.query.ScriptStatus status = new bsuapi.dbal.query.ScriptStatus();
+        try {
+            Object result = Util.jsonArrayFirst(status.exec(c));
+            if (null == result) {
+                throw new Error("No stored record found for CypherScript: "+ script.name());
+            }
+            return new JSONObject(result);
+        } catch (Throwable e) {
+            return new JSONObject(e);
+        }
+    }
+
     public JSONObject statusReport()
     {
         JSONObject status = new JSONObject();
@@ -142,6 +176,10 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         status.put("ready", this.isReady());
         status.put("running", this.isRunning());
         status.put("complete", this.isComplete());
+        
+        if (null != this.startTime) {
+            status.put("startTime", TIME_FORMATTER.format(this.startTime));
+        }
 
         if (this.isRunning()) {
             status.put("runTime", Util.durationDisplayFormat(this.runtime()));
@@ -151,6 +189,7 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         if (this.isComplete()) {
             status.put("runTime", Util.durationDisplayFormat(this.runtime()));
             status.put("action", "completed");
+            status.put("completeTime", TIME_FORMATTER.format(this.completeTime));
             status.put("next", "Command available again "+ (CypherScriptAbstract.COMPLETED_LOCK_TIME/1000) +" seconds after it completed.");
         }
 

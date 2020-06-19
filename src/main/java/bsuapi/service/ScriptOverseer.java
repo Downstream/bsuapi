@@ -28,6 +28,11 @@ public class ScriptOverseer
         return this.runningCommands.get(key);
     }
 
+    private boolean hasCommand(String key)
+    {
+        return this.runningCommands.containsKey(key);
+    }
+
     private Duration getCommandRuntime(String key)
     {
         ScriptStatus command = this.getCommand(key);
@@ -65,6 +70,11 @@ public class ScriptOverseer
     public static ScriptStatus get(String key)
     {
         return ScriptOverseer.singleton().getCommand(key);
+    }
+
+    public static boolean has(String key)
+    {
+        return ScriptOverseer.singleton().hasCommand(key);
     }
 
     public static void ready(String key, ScriptStatus command)

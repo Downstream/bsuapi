@@ -1,6 +1,7 @@
 package bsuapi.dbal.script;
 
 import bsuapi.dbal.Cypher;
+import org.json.JSONObject;
 
 public enum CypherScript
 {
@@ -57,5 +58,10 @@ public enum CypherScript
             default:
                 throw new IllegalStateException( "Unknown CypherScript " + this );
         }
+    }
+
+    public JSONObject getStoredReport(Cypher c)
+    {
+        return CypherScriptAbstract.getStoredStatus(c, this);
     }
 }

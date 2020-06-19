@@ -2,42 +2,80 @@ package bsuapi.resource;
 
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.script.CypherScript;
-import bsuapi.dbal.script.CypherScriptAbstract;
 import bsuapi.service.ScriptExecutor;
+import bsuapi.service.ScriptOverseer;
 import org.json.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import java.util.concurrent.Executors;
 
 @Path("/execute")
 public class ExecutorResource extends BaseResource
 {
-    //@Path("/script/{filename: [a-z]*}")
-    @Path("/test1")
+    @Path("/{scriptName: [A-Za-z]*}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response openpipe(
+    public javax.ws.rs.core.Response report(
+        @PathParam("scriptName") String scriptName,
         @Context UriInfo uriInfo
     )
     {
-        CypherScriptAbstract script;
         Response response = this.prepareResponse(uriInfo);
 
         try (
                 Cypher c = new Cypher(db)
         ) {
-            script = ScriptExecutor.exec(c, CypherScript.INFO);
+            CypherScript script = CypherScript.valueOf(scriptName.toUpperCase());
+            JSONObject data = this.scriptReport(c, script);
+
+            return response.data(data, "Report of last run of CypherScript: "+ script.name());
         }
         catch (Exception e)
         {
             return response.exception(e);
         }
+    }
 
-        return response.data(script.statusReport(), "test complete");
+    @Path("/{scriptName: [A-Za-z]*}/start")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public javax.ws.rs.core.Response start(
+            @PathParam("scriptName") String scriptName,
+            @Context UriInfo uriInfo
+    )
+    {
+        Response response = this.prepareResponse(uriInfo);
+
+        try (
+                Cypher c = new Cypher(db)
+        ) {
+            CypherScript script = CypherScript.valueOf(scriptName.toUpperCase());
+            JSONObject data = this.scriptStart(c, script);
+
+            return response.data(data, "Starting or checking CypherScript: "+ script.name());
+        }
+        catch (Exception e)
+        {
+            return response.exception(e);
+        }
+    }
+
+    private JSONObject scriptStart(Cypher c, CypherScript script)
+    {
+        return ScriptExecutor.exec(c, script).statusReport();
+    }
+
+    private JSONObject scriptReport(Cypher c, CypherScript script)
+    {
+        if (ScriptOverseer.has(script.name())) {
+            return script.getRunner(c).statusReport();
+        } else {
+            return script.getStoredReport(c);
+        }
     }
 }
