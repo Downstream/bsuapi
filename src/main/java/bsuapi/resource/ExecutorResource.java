@@ -18,7 +18,7 @@ import javax.ws.rs.core.UriInfo;
 @Path("/execute")
 public class ExecutorResource extends BaseResource
 {
-    @Path("/{scriptName: [A-Za-z]*}")
+    @Path("/{scriptName: [A-Za-z_]*}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response report(
@@ -42,7 +42,7 @@ public class ExecutorResource extends BaseResource
         }
     }
 
-    @Path("/{scriptName: [A-Za-z]*}/start")
+    @Path("/{scriptName: [A-Za-z_]*}/start")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response start(
