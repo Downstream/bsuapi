@@ -1,6 +1,13 @@
 # Releases
 
 ## Dev
+* [`0.3.2`](bsuapi-0.3.2.jar) OpenPipe Integration.
+   * Added openpipe sync scripts:
+      * `INFO` regenerates :Info cards.
+      * `OPENPIPE_RESET` clears data, and rebuilds config and indices.
+      * `OPENPIPE_SYNC` pulls new Assets from OpenPipe which have changed since last sync, updates graph.
+      * `OPENPIPE_TOPICIMG` attempts to select an Asset as "representative" for each Topic, so the Topics all have images.
+   * Improvement to aync generation. Running script also stores status report in DB, for retrieval after Thread is shutdown. 
 * [`0.3.1`](bsuapi-0.3.1.jar) Async generation: web-triggered long-running cypher-scripts.
    * `/execute/{SCRIPT}` Shows results of previous run of specified scripts.
    * `/execute/{SCRIPT}/start` Starts running that script, or returns current status and progress if already running.
