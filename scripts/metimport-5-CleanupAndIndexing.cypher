@@ -1,2 +1,0 @@
-CALL db.index.fulltext.createNodeIndex("topicNameIndex",["Artist","Classification","Culture","Nation","Tag"],["name","title"]);
-CALL db.index.fulltext.createNodeIndex("assetNameIndex",["Artwork"],["name","title"]);

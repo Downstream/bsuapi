@@ -6,7 +6,7 @@ import org.json.JSONObject;
 public enum CypherScript
 {
     INFO,
-    OPENPIPE_REBUILD,
+    OPENPIPE_RESET,
     OPENPIPE_TOPICIMG,
     OPENPIPE_SYNC;
 
@@ -21,12 +21,12 @@ public enum CypherScript
         {
             case INFO:
                 return "infoCards.cypher";
-            case OPENPIPE_REBUILD:
-                return "openPipe-rebuild.cypher";
+            case OPENPIPE_RESET:
+                return "openPipe-reset.cypher";
             case OPENPIPE_SYNC:
                 return "openPipe-sync.cypher";
             case OPENPIPE_TOPICIMG:
-                return "openPipe-topicImg.cypher";
+                return "openPipe-topicImage.cypher";
             default:
                 throw new IllegalStateException( "Unknown CypherScript " + this );
         }
@@ -37,7 +37,7 @@ public enum CypherScript
         switch ( this )
         {
             case INFO:
-            case OPENPIPE_REBUILD:
+            case OPENPIPE_RESET:
             case OPENPIPE_SYNC:
             case OPENPIPE_TOPICIMG:
                 return TYPE_FILE_INCLUDED;
@@ -71,7 +71,7 @@ public enum CypherScript
         {
             case INFO:
                 return "Regenerate :Info nodes, predefined in script.";
-            case OPENPIPE_REBUILD:
+            case OPENPIPE_RESET:
                 return "Clear Assets and Topics, and re-import all from OpenPipe.";
             case OPENPIPE_SYNC:
                 return "Retrieve Assets modified since last sync, and adjust the graph.";

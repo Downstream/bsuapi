@@ -48,7 +48,7 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         } catch (Exception e) {
             this.booting = false;
             this.failed = true;
-            this.results.put(e);
+            this.results.put(e.getMessage());
         }
     }
 
@@ -56,13 +56,13 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
     {
         if (!this.booting && !this.isReady()) {
             RuntimeException e = new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" not in ready state. "+ this.stateHash());
-            this.results.put(e);
+            this.results.put(e.getMessage());
             return;
         }
 
         if (!this.booting && this.isRunning()) {
             RuntimeException e = new RuntimeException("Attempted to start a new Thread for "+ this.toString() +" while a matching Thread was still active. "+ this.stateHash());
-            this.results.put(e);
+            this.results.put(e.getMessage());
             return;
         }
 
@@ -81,7 +81,6 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
                 this.handleCommandResult(command);
             } catch (CypherException e) {
                 this.results.put(e.getCause().getMessage());
-                this.results.put(e);
                 this.failed = true;
             }
         }
@@ -141,13 +140,24 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         report.put("name", this.script.name());
 
 
-        String command =
-            "MERGE (s:Script {name:'" + this.script.name() + "'}) \n" +
-            "SET s = " + report.toString(2)
-            ;
+        StringBuilder buildCommand = new StringBuilder("MERGE (s:Script {name:'" + this.script.name() + "'}) \n");
+
+        for (String key : report.keySet()) {
+            Object val = report.get(key);
+
+            if (val instanceof Number) {
+                buildCommand.append(String.format("SET s.%s = %s %n", key, val));
+            } else if (val instanceof String) {
+                buildCommand.append(String.format("SET s.%s = '%s' %n", key, val));
+            } else if (val instanceof JSONArray) {
+                buildCommand.append(String.format("SET s.%s = %s %n", key, val.toString()));
+            }
+        }
+
+        buildCommand.append(";");
 
         try {
-            c.execute(command);
+            c.execute(buildCommand.toString());
         } catch (Throwable ignored) {}
     }
 
@@ -176,7 +186,7 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         status.put("ready", this.isReady());
         status.put("running", this.isRunning());
         status.put("complete", this.isComplete());
-        
+
         if (null != this.startTime) {
             status.put("startTime", TIME_FORMATTER.format(this.startTime));
         }

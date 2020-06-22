@@ -1,7 +1,8 @@
 MERGE (x:OpenPipeConfig {name: 'api'})
 SET x.canonical='http://mec402.boisestate.edu/cgi-bin/dataAccess/getCanonicalMetaTags.py'
-SET x.allAssets='file:///openpipeSingle.json'
-SET x.changedAssets='file:///openpipeChanged.json';
+SET x.allAssets='http://mec402.boisestate.edu/cgi-bin/dataAccess/getAllAssetsWithGUID.py'
+SET x.changedAssets='http://mec402.boisestate.edu/cgi-bin/dataAccess/getAllAssetsWithGUID.py'
+SET x.lastRun = '2020-01-01';
 
 MATCH (api:OpenPipeConfig {name: 'api'})
 MERGE (x:OpenPipeConfig {name: 'canonical'})
