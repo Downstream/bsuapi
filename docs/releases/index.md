@@ -1,4 +1,5 @@
 # Releases
+* [`1.0.0`](bsuapi-0.3.2.jar) First production release.
 
 ## Dev
 * [`0.3.2`](bsuapi-0.3.2.jar) OpenPipe Integration.
