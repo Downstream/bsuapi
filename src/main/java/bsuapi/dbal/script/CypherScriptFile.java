@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public class CypherScriptFile extends CypherScriptAbstract
 {
@@ -36,7 +37,11 @@ public class CypherScriptFile extends CypherScriptAbstract
         for (String cmd : sourceFileData.trim().split(";")) {
             cmd = cmd.trim();
             if (cmd.length() < 5) {continue;}
-            commands.add(new CypherScriptCommandSingle(cmd));
+            if (Pattern.matches(".*\\sRETURN\\s.*",cmd)) {
+                commands.add(new CypherScriptCommandSingle(cmd));
+            } else {
+                commands.add(new CypherScriptCommandEmpty(cmd));
+            }
         }
 
         return commands;
@@ -47,10 +52,9 @@ public class CypherScriptFile extends CypherScriptAbstract
         this.boot(c, script);
     }
 
-    public void handleCommandResult(CypherQuery command)
-    throws CypherException
+    public void handleCommandResult(JSONArray result)
     {
-        this.results.put(Util.jsonArrayFirst(command.exec(this.c)));
+        this.results.put(Util.jsonArrayFirstString(result));
         this.countCompleted++;
     }
 }

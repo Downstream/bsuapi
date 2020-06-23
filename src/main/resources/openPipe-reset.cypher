@@ -2,7 +2,10 @@ MERGE (x:OpenPipeConfig {name: 'api'})
 SET x.canonical='http://mec402.boisestate.edu/cgi-bin/dataAccess/getCanonicalMetaTags.py'
 SET x.allAssets='http://mec402.boisestate.edu/cgi-bin/dataAccess/getAllAssetsWithGUID.py'
 SET x.changedAssets='http://mec402.boisestate.edu/cgi-bin/dataAccess/getAllAssetsWithGUID.py'
-SET x.lastRun = '2020-01-01';
+SET x.lastRun = '2020-01-01'
+RETURN "RESET OpenPipeConfig api settings" as t
+;
+
 
 MATCH (api:OpenPipeConfig {name: 'api'})
 MERGE (x:OpenPipeConfig {name: 'canonical'})
@@ -11,7 +14,8 @@ CALL apoc.load.json(api.canonical) YIELD value
 WITH x, value, keys(value) as props
 UNWIND props AS prop
 CALL apoc.create.setProperty(x, prop, head(value[prop])) yield node
-RETURN x;
+RETURN "LOADED OpenPipeConfig canonical values" as t
+;
 
 MERGE (x:OpenPipeConfig {name: 'topicFields'})
 SET x.openpipe_artist = 'openpipe_canonical_artist'
@@ -21,7 +25,9 @@ SET x.openpipe_genre = 'openpipe_canonical_genre'
 SET x.openpipe_medium = 'openpipe_canonical_medium'
 SET x.openpipe_nation = 'openpipe_canonical_nation'
 SET x.openpipe_city = 'openpipe_canonical_city'
-SET x.openpipe_tags = 'openpipe_canonical_tags';
+SET x.openpipe_tags = 'openpipe_canonical_tags'
+RETURN "RESET OpenPipeConfig topicFields" as t
+;
 
 CREATE INDEX ON :Asset(id);
 CREATE INDEX ON :Artist(name);
@@ -33,9 +39,10 @@ CREATE INDEX ON :Classification(name);
 CREATE INDEX ON :City(name);
 CREATE INDEX ON :Tag(name);
 
-//CALL db.index.fulltext.createNodeIndex("nameIndex",["Artist","Classification","Culture","Nation","Tag","Artwork","Genre","Medium"],["name"]);
-CALL db.index.fulltext.createNodeIndex("topicNameIndex",["Artist","Culture","Classification","Genre","Medium","Nation","City","Tag"],["name"]);
-CALL db.index.fulltext.createNodeIndex("assetNameIndex",["Asset"],["name"]);
+CALL db.index.fulltext.createNodeIndex("topicNameIndex",["Artist","Culture","Classification","Genre","Medium","Nation","City","Tag"],["name"])
+RETURN "CREATED full-text-index topicNameIndex" as t;
+CALL db.index.fulltext.createNodeIndex("assetNameIndex",["Asset"],["name"])
+RETURN "CREATED full-text-index assetNameIndex" as t;
 
 MATCH (a:Topic) DETACH DELETE a;
 MATCH (a:Asset) DETACH DELETE a;

@@ -112,6 +112,15 @@ public class Util
         return i.next();
     }
 
+    public static String jsonArrayFirstString(JSONArray j)
+    {
+        Object val = Util.jsonArrayFirst(j);
+        if (null == val) {
+            return "null";
+        }
+        return val.toString();
+    }
+
     public static String durationDisplayFormat(Duration d)
     {
         long hours = d.toHours();

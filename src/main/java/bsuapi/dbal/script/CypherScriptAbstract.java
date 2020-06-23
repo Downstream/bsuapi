@@ -33,7 +33,7 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
     protected boolean booting = true;
     protected boolean failed = false;
 
-    abstract public void handleCommandResult(CypherQuery command) throws CypherException;
+    abstract public void handleCommandResult(JSONArray result);
     abstract protected ArrayList<CypherQuery> commandLoader() throws Exception;
 
     protected void boot(Cypher c, CypherScript script)
@@ -70,7 +70,10 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
 
         this.startTime = Instant.now();
 
+        this.putScriptDb("SET s.stage = 1");
+
         for (CypherQuery command : this.commands) {
+            this.putScriptDb("SET s.stage = 2");
             if (this.halt) {
                 this.results.put("HALTED");
                 ScriptOverseer.endIn(this.script.name(), CypherScriptFile.COMPLETED_LOCK_TIME);
@@ -78,13 +81,14 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
             }
 
             try {
-                this.handleCommandResult(command);
+                this.handleCommandResult(command.exec(this.c));
             } catch (CypherException e) {
                 this.results.put(e.getCause().getMessage());
                 this.failed = true;
             }
         }
 
+        this.putScriptDb("SET s.stage = 3");
         this.completeTime = Instant.now();
         this.storeStatus();
         ScriptOverseer.endIn(this.script.name(), CypherScriptFile.COMPLETED_LOCK_TIME);
@@ -134,13 +138,21 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         this.completeTime = null;
     }
 
+    public void putScriptDb(String setCommands)
+    {
+        StringBuilder buildCommand = new StringBuilder("MERGE (s:Script {name:'" + this.script.name() + "'}) \n");
+        buildCommand.append(setCommands);
+        buildCommand.append(";");
+
+        try {
+            c.execute(buildCommand.toString());
+        } catch (Throwable ignored) {}
+    }
+
     public void storeStatus()
     {
         JSONObject report = this.statusReport();
-        report.put("name", this.script.name());
-
-
-        StringBuilder buildCommand = new StringBuilder("MERGE (s:Script {name:'" + this.script.name() + "'}) \n");
+        StringBuilder buildCommand = new StringBuilder();
 
         for (String key : report.keySet()) {
             Object val = report.get(key);
@@ -154,16 +166,12 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
             }
         }
 
-        buildCommand.append(";");
-
-        try {
-            c.execute(buildCommand.toString());
-        } catch (Throwable ignored) {}
+        this.putScriptDb(buildCommand.toString());
     }
 
     public static JSONObject getStoredStatus(Cypher c, CypherScript script)
     {
-        bsuapi.dbal.query.ScriptStatus status = new bsuapi.dbal.query.ScriptStatus();
+        bsuapi.dbal.query.ScriptStatus status = new bsuapi.dbal.query.ScriptStatus(script);
         try {
             Object result = Util.jsonArrayFirst(status.exec(c));
             if (null == result) {

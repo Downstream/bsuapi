@@ -12,7 +12,7 @@ public class ObjectSingleFunction
 {
     @UserFunction
     @Description("bsuapi.obj.singleCleanObj({object-to-clean},[list-invalid-entries]) get first or null from object property values not in list of invalid entries. ")
-    public Object singleCleanList(
+    public Object singleCleanObj(
         @Name("objToClean") Map objToClean,
         @Name("invalid") List invalid
     )

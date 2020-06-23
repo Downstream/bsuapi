@@ -1,25 +1,29 @@
-// START BUILD
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.assetPage = 0
-SET api.thisRun = date();
+SET api.thisRun = date()
+RETURN "RESET api counts to prepare for new sync." as t
+;
 
 CALL apoc.periodic.commit("
+MATCH (script:Script {name: 'OPENPIPE_SYNC'})
 MATCH (canon:OpenPipeConfig {name: 'canonical'})
 MATCH (fields:OpenPipeConfig {name: 'topicFields'})
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.assetPage = (api.assetPage + 1)
+SET script.page = api.assetPage
 WITH canon, fields, api.allAssets + '?changeStart=' + api.lastRun + '&ps=20&p=' + api.assetPage as url
 CALL apoc.load.json(url) YIELD value
 UNWIND value.data AS asset
 
 WITH
   canon, fields, asset, value.total as pageAssetsCount
+  LIMIT {limit}
   WHERE
   asset.name <> ''
 
 MERGE (x:Asset {id: bsuapi.coll.singleClean(asset.metaDataId)})
 
-SET x.name = asset.name
+SET x.name = bsuapi.coll.singleClean(asset.name)
 SET x.openpipe_id = bsuapi.coll.singleClean(asset.id)
 SET x.primaryImageSmall = bsuapi.obj.singleClean(asset.openpipe_canonical.smallImage)
 SET x.primaryImageSmallDimensions = bsuapi.obj.singleClean(asset.openpipe_canonical.smallImageDimensions)
@@ -31,7 +35,7 @@ SET x.primaryImageFullDimensions = bsuapi.obj.singleClean(asset.openpipe_canonic
 SET x.openpipe_latitude = bsuapi.obj.singleClean(asset.openpipe_canonical.latitude)
 SET x.openpipe_longitude = bsuapi.obj.singleClean(asset.openpipe_canonical.longitude)
 SET x.hasGeo = EXISTS(x.openpipe_latitude) AND EXISTS(x.openpipe.longitude)
-SET x.openpipe_date = bsuapi.obj.singleCleanList(asset.openpipe_canonical.date,[canon.openpipe_canonical_date])
+SET x.openpipe_date = bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date])
 
 SET x.import = 0
 
@@ -100,14 +104,14 @@ SET t :Topic
 SET t.name = asset.openpipe_canonical.tags[guid]
 MERGE (x)-[:ASSET_TAG]->(t)
 
-RETURN pageAssetsCount;
+RETURN pageAssetsCount
 "
 ,{limit: 1000}
-);
+) YIELD updates, batches, failedBatches
 
-// INITIAL IMPORT COMPLETE
-
-// BRIDGE TOPICS
+MATCH (api:OpenPipeConfig {name: 'api'})
+RETURN "COMPLETED IMPORT apoc.periodic.commit(apoc.load.json( "+ api.allAssets +" )) updates:" + updates + " batches:" + batches + " failedBatches:" + failedBatches as t
+;
 
 CALL apoc.periodic.iterate(
 "
@@ -118,7 +122,9 @@ CALL apoc.periodic.iterate(
       ON CREATE SET r.strength = 1
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
-);
+) YIELD operations
+RETURN "BUILDING Topic MetaGraph, ARTIST relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
 
 CALL apoc.periodic.iterate(
 "
@@ -129,7 +135,9 @@ CALL apoc.periodic.iterate(
       ON CREATE SET r.strength = 1
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
-);
+) YIELD operations
+RETURN "BUILDING Topic MetaGraph, CULTURE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
 
 CALL apoc.periodic.iterate(
 "
@@ -140,7 +148,9 @@ CALL apoc.periodic.iterate(
       ON CREATE SET r.strength = 1
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
-);
+) YIELD operations
+RETURN "BUILDING Topic MetaGraph, GENRE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
 
 CALL apoc.periodic.iterate(
 "
@@ -151,7 +161,9 @@ CALL apoc.periodic.iterate(
       ON CREATE SET r.strength = 1
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
-);
+) YIELD operations
+RETURN "BUILDING Topic MetaGraph, MEDIUM relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
 
 CALL apoc.periodic.iterate(
 "
@@ -162,7 +174,9 @@ CALL apoc.periodic.iterate(
       ON CREATE SET r.strength = 1
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
-);
+) YIELD operations
+RETURN "BUILDING Topic MetaGraph, NATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
 
 
 CALL apoc.periodic.iterate(
@@ -174,7 +188,9 @@ CALL apoc.periodic.iterate(
       ON CREATE SET r.strength = 1
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
-);
+) YIELD operations
+RETURN "BUILDING Topic MetaGraph, CLASSIFICATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
 
 
 CALL apoc.periodic.iterate(
@@ -186,7 +202,9 @@ CALL apoc.periodic.iterate(
       ON CREATE SET r.strength = 1
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
-);
+) YIELD operations
+RETURN "BUILDING Topic MetaGraph, CITY relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
 
 CALL apoc.periodic.iterate(
 "
@@ -197,16 +215,34 @@ CALL apoc.periodic.iterate(
       ON CREATE SET r.strength = 1
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
-);
+) YIELD operations
+RETURN "BUILDING Topic MetaGraph, TAG relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
 
-MATCH (a:Artist)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
-MATCH (a:Culture)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
-MATCH (a:Genre)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
-MATCH (a:Medium)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
-MATCH (a:Nation)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
-MATCH (a:Classification)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
-MATCH (a:City)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
-MATCH (a:Tag)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c;
+MATCH (a:Artist)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+RETURN "SET artCount for ARTIST" as t;
+
+MATCH (a:Culture)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+RETURN "SET artCount for CULTURE" as t;
+
+MATCH (a:Genre)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+RETURN "SET artCount for GENRE" as t;
+
+MATCH (a:Medium)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+RETURN "SET artCount for MEDIUM" as t;
+
+MATCH (a:Nation)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+RETURN "SET artCount for NATION" as t;
+
+MATCH (a:Classification)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+RETURN "SET artCount for CLASSIFICATION" as t;
+
+MATCH (a:City)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+RETURN "SET artCount for CITY" as t;
+
+MATCH (a:Tag)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+RETURN "SET artCount for TAG" as t;
 
 MATCH (api:OpenPipeConfig {name: 'api'})
-SET api.lastRun = api.thisRun;
+SET api.lastRun = api.thisRun
+RETURN "Sync COMPLETE" as t;
