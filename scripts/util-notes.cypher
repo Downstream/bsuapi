@@ -5,23 +5,23 @@ CALL apoc.meta.graph()
 
 // all properties for a label
 CALL apoc.meta.data() YIELD label, property
-WHERE label = 'Artwork'
+WHERE label = 'Asset'
 RETURN property
 
 // all distinct values of a property
-MATCH (x:Artwork {import:2})
+MATCH (x:Asset {import:2})
 RETURN DISTINCT x.classification;
 
 // count occurrences of each property
 CALL apoc.meta.data() YIELD label, property
-WHERE label = 'Artwork'
+WHERE label = 'Asset'
 WITH property
-MATCH (x:Artwork {import:2})
+MATCH (x:Asset {import:2})
 RETURN property, count(x[property])
 
 // count occurrences of each value in of property
 // this one is important, it shows how dirty the data is
-MATCH (x:Artwork {import:2})
+MATCH (x:Asset {import:2})
 WHERE x.period IS NOT null
 WITH DISTINCT x.period as p, count(x) as c
 WHERE c > 2 AND (p CONTAINS 'Edo' OR p CONTAINS 'Qing')
@@ -34,7 +34,7 @@ ORDER BY c DESC
 
 
 // periods and counts
-MATCH (x:Artwork)
+MATCH (x:Asset)
 WITH DISTINCT x.period as period, coalesce(x.artistEndDate) as artDate, count(x) as cnt
 WITH DISTINCT period, head(collect(artDate)) as randDate, sum(cnt) as s
 RETURN period, randDate, s ORDER BY s DESC
@@ -57,14 +57,16 @@ MATCH (c:Classification)-[]->(x)
   WHERE c.name = 'Sculpture'
 RETURN filter(l in labels(x) WHERE l<>'Topic')[0], x.name, x.smallImage
 
-MATCH (a:Culture)<-[:ART_CULTURE]-(x:Artwork)-[:ART_TAG]->(b:Tag)
+MATCH (a:Culture)<-[:ART_CULTURE]-(x:Asset)-[:ART_TAG]->(b:Tag)
   WHERE
   a.name = 'Greek' and b.name = 'Men'
 WITH a,b,x
-MATCH (c:Classification)<-[r:ART_CLASS]-(x:Artwork)
+MATCH (c:Classification)<-[r:ART_CLASS]-(x:Asset)
   WHERE c.name CONTAINS 'Sculpture'
 RETURN a,b,c,x,r
 
 
-WITH [1,2,3] as l
-RETURN substring(reduce(listStr = '', x in l | listStr +', '+ x), 2) as s;
+// TopicAssets Query
+MATCH (a:Artist {name: 'Edgar Degas'})<-[:BY]-(x:Asset)
+RETURN x.name
+ORDER BY x.score_generated DESC, x.openpipe_id ASC

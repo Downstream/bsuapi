@@ -13,6 +13,7 @@ public class Assets extends Behavior
     private JSONArray assets;
     public Topic topic;
     public Node node;
+    public String query;
 
     public Assets(Map<String, String> config)
     throws BehaviorException
@@ -62,6 +63,7 @@ public class Assets extends Behavior
         CypherQuery query = new TopicAssets(this.topic);
         this.setQueryConfig(query);
         this.assets = query.exec(cypher);
+        this.query = query.getCommand();
         super.resolveBehavior(cypher);
     }
 
@@ -70,6 +72,7 @@ public class Assets extends Behavior
     {
         JSONObject data = super.toJson();
         data.put("node", this.topic.toJson());
+        data.put("query", this.query);
         return data;
     }
 

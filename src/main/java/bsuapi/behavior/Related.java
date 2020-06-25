@@ -86,7 +86,7 @@ public class Related extends Behavior
     {
         BehaviorDescribe desc = BehaviorDescribe.resource("/related/{TOPIC}/{VALUE}",
             "Find all (TOPIC)s with an indexed value matching (VALUE), along with a" +
-            "collection of closely related Topics, and a collection of Artwork which references that Topic. "
+            "collection of closely related Topics, and a collection of Assets which references that Topic. "
         );
 
         desc.arg("topic", "All lowercase, a-z. Search all topics: 'topic'");

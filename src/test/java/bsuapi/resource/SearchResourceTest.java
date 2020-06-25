@@ -30,7 +30,7 @@ public class SearchResourceTest
         j = new TestJsonResource("requestTestParams");
         try (Transaction tx = db.beginTx()) {
             TestCypherResource.db.execute("CALL db.index.fulltext.createNodeIndex(\"topicNameIndex\",[\"Artist\",\"Classification\",\"Culture\",\"Nation\",\"Tag\"],[\"name\"])");
-            TestCypherResource.db.execute("CALL db.index.fulltext.createNodeIndex(\"assetNameIndex\",[\"Artwork\"],[\"name\",\"title\"])");
+            TestCypherResource.db.execute("CALL db.index.fulltext.createNodeIndex(\"assetNameIndex\",[\"Asset\"],[\"name\",\"title\"])");
             tx.success();
         }
     }

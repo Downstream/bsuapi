@@ -38,6 +38,7 @@ SET x.hasGeo = EXISTS(x.openpipe_latitude) AND EXISTS(x.openpipe.longitude)
 SET x.openpipe_date = bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date])
 
 SET x.import = 0
+SET x.score_generated = 0
 
 SET x.openpipe_artist = [k IN KEYS(asset.openpipe_canonical.artist) | asset.openpipe_canonical.artist[k]]
 SET x.openpipe_culture = [k IN KEYS(asset.openpipe_canonical.culture) | asset.openpipe_canonical.culture[k]]
@@ -219,28 +220,28 @@ CALL apoc.periodic.iterate(
 RETURN "BUILDING Topic MetaGraph, TAG relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
 ;
 
-MATCH (a:Artist)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+MATCH (a:Artist)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for ARTIST" as t;
 
-MATCH (a:Culture)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+MATCH (a:Culture)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for CULTURE" as t;
 
-MATCH (a:Genre)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+MATCH (a:Genre)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for GENRE" as t;
 
-MATCH (a:Medium)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+MATCH (a:Medium)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for MEDIUM" as t;
 
-MATCH (a:Nation)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+MATCH (a:Nation)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for NATION" as t;
 
-MATCH (a:Classification)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+MATCH (a:Classification)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for CLASSIFICATION" as t;
 
-MATCH (a:City)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+MATCH (a:City)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for CITY" as t;
 
-MATCH (a:Tag)<-[r]-(:Artwork) WITH a, count(r) as c SET a.artCount = c
+MATCH (a:Tag)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for TAG" as t;
 
 MATCH (api:OpenPipeConfig {name: 'api'})

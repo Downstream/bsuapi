@@ -1,4 +1,4 @@
-CREATE (art:Artwork {
+CREATE (art:Asset {
   artistDisplayName: "Edgar Degas",
   artistAlphaSort: "Degas, Edgar",
   country: "France",

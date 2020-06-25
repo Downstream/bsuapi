@@ -9,13 +9,13 @@ implements QueryResultSingleColumn
     /**
      * 1: Topic label cypher match
      * 2: relation name (topic)<-[:REL]-(asset)
-     * 3: Asset label "Artwork"
+     * 3: Asset label "Asset"
      * 4: max # of matches
      */
     protected static String query =
         "MATCH (%1$s)<-[:%2$s]-("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
         "RETURN "+ QueryResultSingleColumn.resultColumn +" " +
-        "ORDER BY "+ QueryResultSingleColumn.resultColumn +".objectID ASC "
+        "ORDER BY "+ QueryResultSingleColumn.resultColumn +".score_generated DESC ,"+ QueryResultSingleColumn.resultColumn +".openpipe_id ASC "
         ;
 
     protected Topic topic;
@@ -23,7 +23,7 @@ implements QueryResultSingleColumn
     public TopicAssets(Topic topic)
     {
         super(TopicAssets.query);
-        this.target = NodeType.ARTWORK;
+        this.target = NodeType.ASSET;
         this.topic = topic;
     }
 

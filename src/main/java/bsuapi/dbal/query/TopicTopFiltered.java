@@ -11,11 +11,11 @@ implements QueryResultSingleColumn
     /**
      * 1: Topic label
      * 2: label to use for rel count ":Topic"
-     * 3: artwork filter field
+     * 3: asset filter field
      * 4:         filter field value
      */
     protected static String query =
-        "MATCH (x:Artwork) WHERE x.%3$s=\"%4$s\" " +
+        "MATCH (x:Asset) WHERE x.%3$s=\"%4$s\" " +
         "MATCH p=(x)-[]->("+ QueryResultSingleColumn.resultColumn +":%1$s)-[]->(:%2$s) " +
         "WITH "+ QueryResultSingleColumn.resultColumn +", count(p) as n " +
         "RETURN "+ QueryResultSingleColumn.resultColumn +" ORDER BY n DESC "
