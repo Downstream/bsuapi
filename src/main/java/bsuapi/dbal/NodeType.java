@@ -3,12 +3,15 @@ import org.neo4j.graphdb.Label;
 
 public enum NodeType
 {
-    ARTWORK,
+    ASSET,
     ARTIST,
     CLASS,
     CULTURE,
     NATION,
     TAG,
+    GENRE,
+    MEDIUM,
+    CITY,
     TOPIC;
 
     public Label label()
@@ -21,8 +24,8 @@ public enum NodeType
     {
         switch ( this )
         {
-            case ARTWORK:
-                return "Artwork";
+            case ASSET:
+                return "Asset";
             case ARTIST:
                 return "Artist";
             case CLASS:
@@ -35,6 +38,12 @@ public enum NodeType
                 return "Tag";
             case TOPIC:
                 return "Topic";
+            case GENRE:
+                return "Genre";
+            case MEDIUM:
+                return "Medium";
+            case CITY:
+                return "City";
             default:
                 throw new IllegalStateException( "Unknown Node Type enum: " + this );
         }
@@ -55,9 +64,15 @@ public enum NodeType
                 return "NATION";
             case TAG:
                 return "TAG";
+            case GENRE:
+                return "GENRE";
+            case MEDIUM:
+                return "MEDIUM";
+            case CITY:
+                return "CITY";
             case TOPIC:
                 throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
-            case ARTWORK:
+            case ASSET:
                 throw new IllegalArgumentException( "Assets do not have relationships from Topics. e.g.: (:Topic)-[X]->(:Asset) X does not exist.");
             default:
                 throw new IllegalStateException( "Unknown Node Type enum: " + this );
@@ -79,9 +94,15 @@ public enum NodeType
                 return "ART_NATION";
             case TAG:
                 return "ART_TAG";
+            case GENRE:
+                return "ART_GENRE";
+            case MEDIUM:
+                return "ART_MEDIUM";
+            case CITY:
+                return "ART_CITY";
             case TOPIC:
                 throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
-            case ARTWORK:
+            case ASSET:
                 throw new IllegalArgumentException( "Assets do not have direct relationships with eachother. e.g.: (:Asset)<-[X]->(:Asset) X does not exist.");
             default:
                 throw new IllegalStateException( "Unknown Node Type enum: " + this );
@@ -116,6 +137,9 @@ public enum NodeType
             case CULTURE:
             case NATION:
             case TAG:
+            case GENRE:
+            case MEDIUM:
+            case CITY:
                 return true;
             default:
                 return false;
@@ -127,12 +151,15 @@ public enum NodeType
         for (Label l : node.getLabels()) {
             String lName = l.name();
             if (lName.equals("Topic")) continue;
-            if (lName.equals("Artwork")) return ARTWORK;
+            if (lName.equals("Asset")) return ASSET;
             if (lName.equals("Artist")) return ARTIST;
             if (lName.equals("Tag")) return TAG;
             if (lName.equals("Culture")) return CULTURE;
             if (lName.equals("Nation")) return NATION;
             if (lName.equals("Classification")) return CLASS;
+            if (lName.equals("Genre")) return GENRE;
+            if (lName.equals("Medium")) return MEDIUM;
+            if (lName.equals("City")) return CITY;
         }
 
         return null;
