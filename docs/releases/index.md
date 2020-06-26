@@ -1,5 +1,7 @@
 # Releases
-* [`1.0.0`](bsuapi-0.3.2.jar) First production release.
+* [`1.0.1`](bsuapi-1.0.1.jar) Adds TopicTypes: Genre, Medium, City.
+   * Bugfix: API not returning topic assets.
+* [`1.0.0`](bsuapi-1.0.0.jar) First production release.
 
 ## Dev
 * [`0.3.2`](bsuapi-0.3.2.jar) OpenPipe Integration.
