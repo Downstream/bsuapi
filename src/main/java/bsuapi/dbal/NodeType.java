@@ -87,19 +87,19 @@ public enum NodeType
             case ARTIST:
                 return "BY";
             case CLASS:
-                return "ART_CLASS";
+                return "ASSET_CLASS";
             case CULTURE:
-                return "ART_CULTURE";
+                return "ASSET_CULTURE";
             case NATION:
-                return "ART_NATION";
+                return "ASSET_NATION";
             case TAG:
-                return "ART_TAG";
+                return "ASSET_TAG";
             case GENRE:
-                return "ART_GENRE";
+                return "ASSET_GENRE";
             case MEDIUM:
-                return "ART_MEDIUM";
+                return "ASSET_MEDIUM";
             case CITY:
-                return "ART_CITY";
+                return "ASSET_CITY";
             case TOPIC:
                 throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
             case ASSET:
