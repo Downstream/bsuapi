@@ -8,7 +8,8 @@ public enum CypherScript
     INFO,
     OPENPIPE_RESET,
     OPENPIPE_TOPICIMG,
-    OPENPIPE_SYNC;
+    OPENPIPE_SYNC,
+    OPENPIPE_FOLDERS;
 
     static final int TYPE_FILE_INCLUDED = 1;  // included in the jar
     static final int TYPE_FILESYSTEM = 2;     // accessible in the filesystem
@@ -27,6 +28,8 @@ public enum CypherScript
                 return "openPipe-sync.cypher";
             case OPENPIPE_TOPICIMG:
                 return "openPipe-topicImage.cypher";
+            case OPENPIPE_FOLDERS:
+                return "openPipe-folders.cypher";
             default:
                 throw new IllegalStateException( "Unknown CypherScript " + this );
         }
@@ -40,6 +43,7 @@ public enum CypherScript
             case OPENPIPE_RESET:
             case OPENPIPE_SYNC:
             case OPENPIPE_TOPICIMG:
+            case OPENPIPE_FOLDERS:
                 return TYPE_FILE_INCLUDED;
             default:
                 return 0;
@@ -77,6 +81,8 @@ public enum CypherScript
                 return "Retrieve Assets modified since last sync, and adjust the graph.";
             case OPENPIPE_TOPICIMG:
                 return "Reassess Assets selected as representative of Topics.";
+            case OPENPIPE_FOLDERS:
+                return "Retrieve Folders and Templates, and updating those Folders' list of Assets.";
             default:
                 throw new IllegalStateException( "Unknown CypherScript " + this );
         }

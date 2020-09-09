@@ -11,20 +11,29 @@ MATCH (fields:OpenPipeConfig {name: 'topicFields'})
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.assetPage = (api.assetPage + 1)
 SET script.page = api.assetPage
-WITH canon, fields, api.allAssets + '?changeStart=' + api.lastRun + '&ps=20&p=' + api.assetPage as url
+WITH canon, fields, api.singleAsset as assetGuidBase, api.allAssets + '?changeStart=' + api.lastRun + '&ps=20&p=' + api.assetPage as url
 CALL apoc.load.json(url) YIELD value
 UNWIND value.data AS asset
 
 WITH
-  canon, fields, asset, value.total as pageAssetsCount
+  asset, canon, value.total as pageAssetsCount, assetGuidBase
   LIMIT {limit}
   WHERE
   asset.name <> ''
 
-MERGE (x:Asset {id: bsuapi.coll.singleClean(asset.metaDataId)})
+WITH asset, pageAssetsCount, assetGuidBase,
+	bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS openpipe_id,
+	assetGuidBase + bsuapi.coll.singleClean(asset.openpipe_canonical.id) AS guid,
+	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date]) AS openpipe_date,
+	bsuapi.obj.singleClean(asset.openpipe_canonical.latitude) AS openpipe_latitude,
+	bsuapi.obj.singleClean(asset.openpipe_canonical.longitude) AS openpipe_longitude
+
+MERGE (x:Asset {id: openpipe_id})
 
 SET x.name = bsuapi.coll.singleClean(asset.name)
-SET x.openpipe_id = bsuapi.coll.singleClean(asset.id)
+SET x.openpipe_id = bsuapi.coll.singleClean(asset.openpipe_canonical.id)
+SET x.metaDataId = bsuapi.coll.singleClean(asset.metaDataId)
+SET x.guid = guid
 SET x.primaryImageSmall = bsuapi.obj.singleClean(asset.openpipe_canonical.smallImage)
 SET x.primaryImageSmallDimensions = bsuapi.obj.singleClean(asset.openpipe_canonical.smallImageDimensions)
 SET x.primaryImageLarge = bsuapi.obj.singleClean(asset.openpipe_canonical.largeImage)
@@ -32,22 +41,31 @@ SET x.primaryImageLargeDimensions = bsuapi.obj.singleClean(asset.openpipe_canoni
 SET x.primaryImageFull = bsuapi.obj.singleClean(asset.openpipe_canonical.fullImage)
 SET x.primaryImageFullDimensions = bsuapi.obj.singleClean(asset.openpipe_canonical.fullImageDimensions)
 
-SET x.openpipe_latitude = bsuapi.obj.singleClean(asset.openpipe_canonical.latitude)
-SET x.openpipe_longitude = bsuapi.obj.singleClean(asset.openpipe_canonical.longitude)
-SET x.hasGeo = EXISTS(x.openpipe_latitude) AND EXISTS(x.openpipe.longitude)
+SET x.openpipe_latitude = openpipe_latitude
+SET x.openpipe_longitude = openpipe_longitude
+SET x.hasGeo = (openpipe_latitude IS NOT NULL AND openpipe_longitude IS NOT NULL)
 SET x.openpipe_date = bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date])
 
 SET x.import = 0
 SET x.score_generated = 0
 
-SET x.openpipe_artist = [k IN KEYS(asset.openpipe_canonical.artist) | asset.openpipe_canonical.artist[k]]
-SET x.openpipe_culture = [k IN KEYS(asset.openpipe_canonical.culture) | asset.openpipe_canonical.culture[k]]
-SET x.openpipe_classification = [k IN KEYS(asset.openpipe_canonical.classification) | asset.openpipe_canonical.classification[k]]
-SET x.openpipe_genre = [k IN KEYS(asset.openpipe_canonical.genre) | asset.openpipe_canonical.genre[k]]
-SET x.openpipe_medium = [k IN KEYS(asset.openpipe_canonical.medium) | asset.openpipe_canonical.medium[k]]
-SET x.openpipe_nation = [k IN KEYS(asset.openpipe_canonical.nation) | asset.openpipe_canonical.nation[k]]
-SET x.openpipe_city = [k IN KEYS(asset.openpipe_canonical.city) | asset.openpipe_canonical.city[k]]
-SET x.openpipe_tags = [k IN KEYS(asset.openpipe_canonical.tags) | asset.openpipe_canonical.tags[k]]
+SET x.openpipe_artist = [k IN KEYS(asset.openpipe_canonical.artist) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.artist[k]]
+SET x.openpipe_culture = [k IN KEYS(asset.openpipe_canonical.culture) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.culture[k]]
+SET x.openpipe_classification = [k IN KEYS(asset.openpipe_canonical.classification) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.classification[k]]
+SET x.openpipe_genre = [k IN KEYS(asset.openpipe_canonical.genre) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.genre[k]]
+SET x.openpipe_medium = [k IN KEYS(asset.openpipe_canonical.medium) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.medium[k]]
+SET x.openpipe_nation = [k IN KEYS(asset.openpipe_canonical.nation) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.nation[k]]
+SET x.openpipe_city = [k IN KEYS(asset.openpipe_canonical.city) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.city[k]]
+SET x.openpipe_tags = [k IN KEYS(asset.openpipe_canonical.tags) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.tags[k]]
+
+SET x.openpipe_guid_artist = [k IN KEYS(asset.openpipe_canonical.artist) WHERE right(k, 2) <> '-1']
+SET x.openpipe_guid_culture = [k IN KEYS(asset.openpipe_canonical.culture) WHERE right(k, 2) <> '-1']
+SET x.openpipe_guid_classification = [k IN KEYS(asset.openpipe_canonical.classification) WHERE right(k, 2) <> '-1']
+SET x.openpipe_guid_genre = [k IN KEYS(asset.openpipe_canonical.genre) WHERE right(k, 2) <> '-1']
+SET x.openpipe_guid_medium = [k IN KEYS(asset.openpipe_canonical.medium) WHERE right(k, 2) <> '-1']
+SET x.openpipe_guid_nation = [k IN KEYS(asset.openpipe_canonical.nation) WHERE right(k, 2) <> '-1']
+SET x.openpipe_guid_city = [k IN KEYS(asset.openpipe_canonical.city) WHERE right(k, 2) <> '-1']
+SET x.openpipe_guid_tags = [k IN KEYS(asset.openpipe_canonical.tags) WHERE right(k, 2) <> '-1']
 
 WITH x, asset, pageAssetsCount
 UNWIND KEYS(asset.openpipe_canonical.artist) as guid

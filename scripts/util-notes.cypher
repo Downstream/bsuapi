@@ -70,3 +70,15 @@ RETURN a,b,c,x,r
 MATCH (a:Artist {name: 'Edgar Degas'})<-[:BY]-(x:Asset)
 RETURN x.name
 ORDER BY x.score_generated DESC, x.openpipe_id ASC
+
+
+MATCH p=(:Nation {name:"France"})<-[]-(t:Asset)
+RETURN p LIMIT 20;
+//RETURN t
+//ORDER BY t.score_generated DESC , t.openpipe_id ASC
+//LIMIT 20
+
+
+MERGE (x:OpenPipeConfig {name: 'api'})
+SET x.folders='http://mec402.boisestate.edu/cgi-bin/dataAccess/getCollections.py'
+;
