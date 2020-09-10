@@ -22,16 +22,26 @@ WITH
   asset.name <> ''
 
 WITH asset, pageAssetsCount, assetGuidBase,
+  bsuapi.coll.singleClean(asset.name) AS nane
 	bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS openpipe_id,
 	assetGuidBase + bsuapi.coll.singleClean(asset.openpipe_canonical.id) AS guid,
 	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date]) AS openpipe_date,
 	bsuapi.obj.singleClean(asset.openpipe_canonical.latitude) AS openpipe_latitude,
-	bsuapi.obj.singleClean(asset.openpipe_canonical.longitude) AS openpipe_longitude
+	bsuapi.obj.singleClean(asset.openpipe_canonical.longitude) AS openpipe_longitude,
+
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.artist, [canon.artist, ""]) AS openpipe_artist,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.classification, [canon.classification, ""]) AS openpipe_classification,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.culture, [canon.culture, ""]) AS openpipe_culture,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.genre, [canon.genre, ""]) AS openpipe_genre,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.medium, [canon.medium, ""]) AS openpipe_medium,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.nation, [canon.nation, ""]) AS openpipe_nation,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.city, [canon.city, ""]) AS openpipe_city,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.tags, [canon.tags, ""]) AS openpipe_tags
 
 MERGE (x:Asset {id: openpipe_id})
 
-SET x.name = bsuapi.coll.singleClean(asset.name)
-SET x.openpipe_id = bsuapi.coll.singleClean(asset.openpipe_canonical.id)
+SET x.name = name
+SET x.openpipe_id = openpipe_id
 SET x.metaDataId = bsuapi.coll.singleClean(asset.metaDataId)
 SET x.guid = guid
 SET x.primaryImageSmall = bsuapi.obj.singleClean(asset.openpipe_canonical.smallImage)
@@ -49,23 +59,25 @@ SET x.openpipe_date = bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[c
 SET x.import = 0
 SET x.score_generated = 0
 
-SET x.openpipe_artist = [k IN KEYS(asset.openpipe_canonical.artist) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.artist[k]]
-SET x.openpipe_culture = [k IN KEYS(asset.openpipe_canonical.culture) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.culture[k]]
-SET x.openpipe_classification = [k IN KEYS(asset.openpipe_canonical.classification) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.classification[k]]
-SET x.openpipe_genre = [k IN KEYS(asset.openpipe_canonical.genre) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.genre[k]]
-SET x.openpipe_medium = [k IN KEYS(asset.openpipe_canonical.medium) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.medium[k]]
-SET x.openpipe_nation = [k IN KEYS(asset.openpipe_canonical.nation) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.nation[k]]
-SET x.openpipe_city = [k IN KEYS(asset.openpipe_canonical.city) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.city[k]]
-SET x.openpipe_tags = [k IN KEYS(asset.openpipe_canonical.tags) WHERE right(k, 2) <> '-1' | asset.openpipe_canonical.tags[k]]
+SET x.openpipe_artist = [k IN KEYS(openpipe_artist) | openpipe_artist[k]]
+SET x.openpipe_culture = [k IN KEYS(openpipe_culture) | openpipe_culture[k]]
+SET x.openpipe_classification = [k IN KEYS(openpipe_classification) | openpipe_classification[k]]
+SET x.openpipe_genre = [k IN KEYS(openpipe_genre) | openpipe_genre[k]]
+SET x.openpipe_medium = [k IN KEYS(openpipe_medium) | openpipe_medium[k]]
+SET x.openpipe_city = [k IN KEYS(openpipe_city) | openpipe_city[k]]
+SET x.openpipe_nation = [k IN KEYS(openpipe_nation) | openpipe_nation[k]]
+SET x.openpipe_tags = [k IN KEYS(openpipe_tags) | openpipe_tags[k]]
 
-SET x.openpipe_guid_artist = [k IN KEYS(asset.openpipe_canonical.artist) WHERE right(k, 2) <> '-1']
-SET x.openpipe_guid_culture = [k IN KEYS(asset.openpipe_canonical.culture) WHERE right(k, 2) <> '-1']
-SET x.openpipe_guid_classification = [k IN KEYS(asset.openpipe_canonical.classification) WHERE right(k, 2) <> '-1']
-SET x.openpipe_guid_genre = [k IN KEYS(asset.openpipe_canonical.genre) WHERE right(k, 2) <> '-1']
-SET x.openpipe_guid_medium = [k IN KEYS(asset.openpipe_canonical.medium) WHERE right(k, 2) <> '-1']
-SET x.openpipe_guid_nation = [k IN KEYS(asset.openpipe_canonical.nation) WHERE right(k, 2) <> '-1']
-SET x.openpipe_guid_city = [k IN KEYS(asset.openpipe_canonical.city) WHERE right(k, 2) <> '-1']
-SET x.openpipe_guid_tags = [k IN KEYS(asset.openpipe_canonical.tags) WHERE right(k, 2) <> '-1']
+SET x.openpipe_guid_artist = KEYS(openpipe_artist)
+SET x.openpipe_guid_culture = KEYS(openpipe_culture)
+SET x.openpipe_guid_classification = KEYS(openpipe_classification)
+SET x.openpipe_guid_genre = KEYS(openpipe_genre)
+SET x.openpipe_guid_medium = KEYS(openpipe_medium)
+SET x.openpipe_guid_nation = KEYS(openpipe_nation)
+SET x.openpipe_guid_city = KEYS(openpipe_city)
+SET x.openpipe_guid_tags = KEYS(openpipe_tags)
+
+// @Todo: use  openPipeCleanObj generated maps [guid:value] instead of extrapolating from assets.
 
 WITH x, asset, pageAssetsCount
 UNWIND KEYS(asset.openpipe_canonical.artist) as guid
