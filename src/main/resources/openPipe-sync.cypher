@@ -22,9 +22,9 @@ WITH
   asset.name <> ''
 
 WITH asset, pageAssetsCount, assetGuidBase,
-  bsuapi.coll.singleClean(asset.name) AS nane
-	bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS openpipe_id,
-	assetGuidBase + bsuapi.coll.singleClean(asset.openpipe_canonical.id) AS guid,
+  bsuapi.coll.singleClean(asset.name) AS name,
+  bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS openpipe_id,
+	assetGuidBase + bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS guid,
 	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date]) AS openpipe_date,
 	bsuapi.obj.singleClean(asset.openpipe_canonical.latitude) AS openpipe_latitude,
 	bsuapi.obj.singleClean(asset.openpipe_canonical.longitude) AS openpipe_longitude,
@@ -37,6 +37,8 @@ WITH asset, pageAssetsCount, assetGuidBase,
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.nation, [canon.nation, ""]) AS openpipe_nation,
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.city, [canon.city, ""]) AS openpipe_city,
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.tags, [canon.tags, ""]) AS openpipe_tags
+
+WHERE openpipe_id IS NOT NULL
 
 MERGE (x:Asset {id: openpipe_id})
 
@@ -54,7 +56,7 @@ SET x.primaryImageFullDimensions = bsuapi.obj.singleClean(asset.openpipe_canonic
 SET x.openpipe_latitude = openpipe_latitude
 SET x.openpipe_longitude = openpipe_longitude
 SET x.hasGeo = (openpipe_latitude IS NOT NULL AND openpipe_longitude IS NOT NULL)
-SET x.openpipe_date = bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date])
+SET x.openpipe_date = openpipe_date
 
 SET x.import = 0
 SET x.score_generated = 0
@@ -77,62 +79,60 @@ SET x.openpipe_guid_nation = KEYS(openpipe_nation)
 SET x.openpipe_guid_city = KEYS(openpipe_city)
 SET x.openpipe_guid_tags = KEYS(openpipe_tags)
 
-// @Todo: use  openPipeCleanObj generated maps [guid:value] instead of extrapolating from assets.
-
-WITH x, asset, pageAssetsCount
-UNWIND KEYS(asset.openpipe_canonical.artist) as guid
+WITH x, pageAssetsCount, openpipe_artist, openpipe_culture, openpipe_classification, openpipe_genre, openpipe_medium, openpipe_nation, openpipe_city, openpipe_tags
+UNWIND KEYS(openpipe_artist) as guid
 MERGE (t:Artist {guid: guid})
 SET t :Topic
-SET t.name = asset.openpipe_canonical.artist[guid]
+SET t.name = openpipe_artist[guid]
 MERGE (x)-[:BY]->(t)
 
-WITH x, asset, pageAssetsCount
-UNWIND KEYS(asset.openpipe_canonical.culture) as guid
+WITH x, pageAssetsCount, openpipe_culture, openpipe_classification, openpipe_genre, openpipe_medium, openpipe_nation, openpipe_city, openpipe_tags
+UNWIND KEYS(openpipe_culture) as guid
 MERGE (t:Culture {guid: guid})
 SET t :Topic
-SET t.name = asset.openpipe_canonical.culture[guid]
+SET t.name = openpipe_culture[guid]
 MERGE (x)-[:ASSET_CULTURE]->(t)
 
-WITH x, asset, pageAssetsCount
-UNWIND KEYS(asset.openpipe_canonical.classification) as guid
+WITH x, pageAssetsCount, openpipe_classification, openpipe_genre, openpipe_medium, openpipe_nation, openpipe_city, openpipe_tags
+UNWIND KEYS(openpipe_classification) as guid
 MERGE (t:Classification {guid: guid})
 SET t :Topic
-SET t.name = asset.openpipe_canonical.classification[guid]
+SET t.name = openpipe_classification[guid]
 MERGE (x)-[:ASSET_CLASS]->(t)
 
-WITH x, asset, pageAssetsCount
-UNWIND KEYS(asset.openpipe_canonical.genre) as guid
+WITH x, pageAssetsCount, openpipe_genre, openpipe_medium, openpipe_nation, openpipe_city, openpipe_tags
+UNWIND KEYS(openpipe_genre) as guid
 MERGE (t:Genre {guid: guid})
 SET t :Topic
-SET t.name = asset.openpipe_canonical.genre[guid]
+SET t.name = openpipe_genre[guid]
 MERGE (x)-[:ASSET_GENRE]->(t)
 
-WITH x, asset, pageAssetsCount
-UNWIND KEYS(asset.openpipe_canonical.medium) as guid
+WITH x, pageAssetsCount, openpipe_medium, openpipe_nation, openpipe_city, openpipe_tags
+UNWIND KEYS(openpipe_medium) as guid
 MERGE (t:Medium {guid: guid})
 SET t :Topic
-SET t.name = asset.openpipe_canonical.medium[guid]
+SET t.name = openpipe_medium[guid]
 MERGE (x)-[:ASSET_MEDIUM]->(t)
 
-WITH x, asset, pageAssetsCount
-UNWIND KEYS(asset.openpipe_canonical.nation) as guid
+WITH x, pageAssetsCount, openpipe_nation, openpipe_city, openpipe_tags
+UNWIND KEYS(openpipe_nation) as guid
 MERGE (t:Nation {guid: guid})
 SET t :Topic
-SET t.name = asset.openpipe_canonical.nation[guid]
+SET t.name = openpipe_nation[guid]
 MERGE (x)-[:ASSET_NATION]->(t)
 
-WITH x, asset, pageAssetsCount
-UNWIND KEYS(asset.openpipe_canonical.city) as guid
+WITH x, pageAssetsCount, openpipe_city, openpipe_tags
+UNWIND KEYS(openpipe_city) as guid
 MERGE (t:City {guid: guid})
 SET t :Topic
-SET t.name = asset.openpipe_canonical.city[guid]
+SET t.name = openpipe_city[guid]
 MERGE (x)-[:ASSET_CITY]->(t)
 
-WITH x, asset, pageAssetsCount
-UNWIND KEYS(asset.openpipe_canonical.tags) as guid
+WITH x, pageAssetsCount, openpipe_tags
+UNWIND KEYS(openpipe_tags) as guid
 MERGE (t:Tag {guid: guid})
 SET t :Topic
-SET t.name = asset.openpipe_canonical.tags[guid]
+SET t.name = openpipe_tags[guid]
 MERGE (x)-[:ASSET_TAG]->(t)
 
 RETURN pageAssetsCount
