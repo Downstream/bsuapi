@@ -25,7 +25,7 @@ public class ObjectOpenPipeFunction
     private Map cleanObj(Map objToClean, List invalid)
     {
         if (null == objToClean) {
-            return null;
+            return new HashMap<>();
         }
 
         List removeList = this.buildInvalidObj(invalid);
@@ -42,7 +42,7 @@ public class ObjectOpenPipeFunction
             return result;
         }
 
-        return null;
+        return new HashMap<>();
     }
 
     private boolean isValid(Object key, Object entry)

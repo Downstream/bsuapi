@@ -15,13 +15,7 @@ WITH canon, fields, api.singleAsset as assetGuidBase, api.allAssets + '?changeSt
 CALL apoc.load.json(url) YIELD value
 UNWIND value.data AS asset
 
-WITH
-  asset, canon, value.total as pageAssetsCount, assetGuidBase
-  LIMIT {limit}
-  WHERE
-  asset.name <> ''
-
-WITH asset, pageAssetsCount, assetGuidBase,
+WITH asset, canon, assetGuidBase, value.total as pageAssetsCount,
   bsuapi.coll.singleClean(asset.name) AS name,
   bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS openpipe_id,
 	assetGuidBase + bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS guid,
@@ -29,19 +23,38 @@ WITH asset, pageAssetsCount, assetGuidBase,
 	bsuapi.obj.singleClean(asset.openpipe_canonical.latitude) AS openpipe_latitude,
 	bsuapi.obj.singleClean(asset.openpipe_canonical.longitude) AS openpipe_longitude,
 
-	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.artist, [canon.artist, ""]) AS openpipe_artist,
-	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.classification, [canon.classification, ""]) AS openpipe_classification,
-	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.culture, [canon.culture, ""]) AS openpipe_culture,
-	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.genre, [canon.genre, ""]) AS openpipe_genre,
-	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.medium, [canon.medium, ""]) AS openpipe_medium,
-	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.nation, [canon.nation, ""]) AS openpipe_nation,
-	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.city, [canon.city, ""]) AS openpipe_city,
-	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.tags, [canon.tags, ""]) AS openpipe_tags
-
-WHERE openpipe_id IS NOT NULL
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.artist, [canon.artist, '']) AS openpipe_artist,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.classification, [canon.classification, '']) AS openpipe_classification,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.culture, [canon.culture, '']) AS openpipe_culture,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.genre, [canon.genre, '']) AS openpipe_genre,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.medium, [canon.medium, '']) AS openpipe_medium,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.nation, [canon.nation, '']) AS openpipe_nation,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.city, [canon.city, '']) AS openpipe_city,
+	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.tags, [canon.tags, '']) AS openpipe_tags
+    LIMIT {limit}
+WHERE (asset.name <> '' AND openpipe_id IS NOT NULL)
 
 MERGE (x:Asset {id: openpipe_id})
+MERGE (artists:TopicList {type: 'Artist'})
+MERGE (classifications:TopicList {type: 'Classification'})
+MERGE (cultures:TopicList {type: 'Culture'})
+MERGE (genres:TopicList {type: 'Genre'})
+MERGE (mediums:TopicList {type: 'Medium'})
+MERGE (nations:TopicList {type: 'Nation'})
+MERGE (cities:TopicList {type: 'City'})
+MERGE (tags:TopicList {type: 'Tag'})
 
+SET artists += openpipe_artist
+SET classifications += openpipe_classification
+SET cultures += openpipe_culture
+SET genres += openpipe_genre
+SET mediums += openpipe_medium
+SET nations += openpipe_nation
+SET cities += openpipe_city
+SET tags += openpipe_tags
+
+SET x.import = 0
+SET x.score_generated = 0
 SET x.name = name
 SET x.openpipe_id = openpipe_id
 SET x.metaDataId = bsuapi.coll.singleClean(asset.metaDataId)
@@ -58,9 +71,6 @@ SET x.openpipe_longitude = openpipe_longitude
 SET x.hasGeo = (openpipe_latitude IS NOT NULL AND openpipe_longitude IS NOT NULL)
 SET x.openpipe_date = openpipe_date
 
-SET x.import = 0
-SET x.score_generated = 0
-
 SET x.openpipe_artist = [k IN KEYS(openpipe_artist) | openpipe_artist[k]]
 SET x.openpipe_culture = [k IN KEYS(openpipe_culture) | openpipe_culture[k]]
 SET x.openpipe_classification = [k IN KEYS(openpipe_classification) | openpipe_classification[k]]
@@ -69,7 +79,6 @@ SET x.openpipe_medium = [k IN KEYS(openpipe_medium) | openpipe_medium[k]]
 SET x.openpipe_city = [k IN KEYS(openpipe_city) | openpipe_city[k]]
 SET x.openpipe_nation = [k IN KEYS(openpipe_nation) | openpipe_nation[k]]
 SET x.openpipe_tags = [k IN KEYS(openpipe_tags) | openpipe_tags[k]]
-
 SET x.openpipe_guid_artist = KEYS(openpipe_artist)
 SET x.openpipe_guid_culture = KEYS(openpipe_culture)
 SET x.openpipe_guid_classification = KEYS(openpipe_classification)
@@ -79,63 +88,7 @@ SET x.openpipe_guid_nation = KEYS(openpipe_nation)
 SET x.openpipe_guid_city = KEYS(openpipe_city)
 SET x.openpipe_guid_tags = KEYS(openpipe_tags)
 
-WITH x, pageAssetsCount, openpipe_artist, openpipe_culture, openpipe_classification, openpipe_genre, openpipe_medium, openpipe_nation, openpipe_city, openpipe_tags
-UNWIND KEYS(openpipe_artist) as guid
-MERGE (t:Artist {guid: guid})
-SET t :Topic
-SET t.name = openpipe_artist[guid]
-MERGE (x)-[:BY]->(t)
-
-WITH x, pageAssetsCount, openpipe_culture, openpipe_classification, openpipe_genre, openpipe_medium, openpipe_nation, openpipe_city, openpipe_tags
-UNWIND KEYS(openpipe_culture) as guid
-MERGE (t:Culture {guid: guid})
-SET t :Topic
-SET t.name = openpipe_culture[guid]
-MERGE (x)-[:ASSET_CULTURE]->(t)
-
-WITH x, pageAssetsCount, openpipe_classification, openpipe_genre, openpipe_medium, openpipe_nation, openpipe_city, openpipe_tags
-UNWIND KEYS(openpipe_classification) as guid
-MERGE (t:Classification {guid: guid})
-SET t :Topic
-SET t.name = openpipe_classification[guid]
-MERGE (x)-[:ASSET_CLASS]->(t)
-
-WITH x, pageAssetsCount, openpipe_genre, openpipe_medium, openpipe_nation, openpipe_city, openpipe_tags
-UNWIND KEYS(openpipe_genre) as guid
-MERGE (t:Genre {guid: guid})
-SET t :Topic
-SET t.name = openpipe_genre[guid]
-MERGE (x)-[:ASSET_GENRE]->(t)
-
-WITH x, pageAssetsCount, openpipe_medium, openpipe_nation, openpipe_city, openpipe_tags
-UNWIND KEYS(openpipe_medium) as guid
-MERGE (t:Medium {guid: guid})
-SET t :Topic
-SET t.name = openpipe_medium[guid]
-MERGE (x)-[:ASSET_MEDIUM]->(t)
-
-WITH x, pageAssetsCount, openpipe_nation, openpipe_city, openpipe_tags
-UNWIND KEYS(openpipe_nation) as guid
-MERGE (t:Nation {guid: guid})
-SET t :Topic
-SET t.name = openpipe_nation[guid]
-MERGE (x)-[:ASSET_NATION]->(t)
-
-WITH x, pageAssetsCount, openpipe_city, openpipe_tags
-UNWIND KEYS(openpipe_city) as guid
-MERGE (t:City {guid: guid})
-SET t :Topic
-SET t.name = openpipe_city[guid]
-MERGE (x)-[:ASSET_CITY]->(t)
-
-WITH x, pageAssetsCount, openpipe_tags
-UNWIND KEYS(openpipe_tags) as guid
-MERGE (t:Tag {guid: guid})
-SET t :Topic
-SET t.name = openpipe_tags[guid]
-MERGE (x)-[:ASSET_TAG]->(t)
-
-RETURN pageAssetsCount
+RETURN max(pageAssetsCount)
 "
 ,{limit: 1000}
 ) YIELD updates, batches, failedBatches
@@ -143,6 +96,94 @@ RETURN pageAssetsCount
 MATCH (api:OpenPipeConfig {name: 'api'})
 RETURN "COMPLETED IMPORT apoc.periodic.commit(apoc.load.json( "+ api.allAssets +" )) updates:" + updates + " batches:" + batches + " failedBatches:" + failedBatches as t
 ;
+
+
+
+RETURN "STARTING Asset:Topic relationships" as t;
+
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
+  UNWIND x.openpipe_guid_artist as guid MERGE (t:Artist {guid: guid})
+  MERGE (x)-[:BY]->(t)
+  SET x.import = 1
+",
+  {batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "BUILDING Topics, ASSET:ARTIST relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
+
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
+  UNWIND x.openpipe_guid_culture as guid MERGE (t:Culture {guid: guid})
+  MERGE (x)-[:ASSET_CULTURE]->(t)
+  SET x.import = 2
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "BUILDING Topics, ASSET:CULTURE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
+
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 2}) RETURN x","
+  UNWIND x.openpipe_guid_classification as guid MERGE (t:Classification {guid: guid})
+  MERGE (x)-[:ASSET_CLASS]->(t)
+  SET x.import = 3
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "BUILDING Topics, ASSET:CLASS relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
+
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 3}) RETURN x","
+  UNWIND x.openpipe_guid_genre as guid MERGE (t:Genre {guid: guid})
+  MERGE (x)-[:ASSET_GENRE]->(t)
+  SET x.import = 4
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "BUILDING Topics, ASSET:GENRE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
+
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 4}) RETURN x","
+  UNWIND x.openpipe_guid_medium as guid MERGE (t:Medium {guid: guid})
+  MERGE (x)-[:ASSET_MEDIUM]->(t)
+  SET x.import = 5
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "BUILDING Topics, ASSET:MEDIUM relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
+
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 5}) RETURN x","
+  UNWIND x.openpipe_guid_nation as guid MERGE (t:Nation {guid: guid})
+  MERGE (x)-[:ASSET_NATION]->(t)
+  SET x.import = 6
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "BUILDING Topics, ASSET:NATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
+
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
+  UNWIND x.openpipe_guid_city as guid MERGE (t:City {guid: guid})
+  MERGE (x)-[:ASSET_CITY]->(t)
+  SET x.import = 7
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "BUILDING Topics, ASSET:CITY relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
+
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
+  UNWIND x.openpipe_guid_tags as guid MERGE (t:Tag {guid: guid})
+  MERGE (x)-[:ASSET_TAG]->(t)
+  SET x.import = null
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "BUILDING Topics, ASSET:TAG relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+;
+
+
+
+RETURN "STARTING Topic MetaGraph" as t;
 
 CALL apoc.periodic.iterate(
 "
@@ -250,8 +291,45 @@ CALL apoc.periodic.iterate(
 RETURN "BUILDING Topic MetaGraph, TAG relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
 ;
 
+// Set name values for Topics
+MATCH (l:TopicList {type: "Artist"}) UNWIND KEYS(l) as guid
+MATCH (a:Artist) WHERE a.guid = guid AND a.name <> l[guid]
+SET a.name = l[guid];
+
+MATCH (l:TopicList {type: "Classification"}) UNWIND KEYS(l) as guid
+MATCH (a:Classification) WHERE a.guid = guid AND a.name <> l[guid]
+SET a.name = l[guid];
+
+MATCH (l:TopicList {type: "Culture"}) UNWIND KEYS(l) as guid
+MATCH (a:Culture) WHERE a.guid = guid AND a.name <> l[guid]
+SET a.name = l[guid];
+
+MATCH (l:TopicList {type: "Genre"}) UNWIND KEYS(l) as guid
+MATCH (a:Genre) WHERE a.guid = guid AND a.name <> l[guid]
+SET a.name = l[guid];
+
+MATCH (l:TopicList {type: "Medium"}) UNWIND KEYS(l) as guid
+MATCH (a:Medium) WHERE a.guid = guid AND a.name <> l[guid]
+SET a.name = l[guid];
+
+MATCH (l:TopicList {type: "Nation"}) UNWIND KEYS(l) as guid
+MATCH (a:Nation) WHERE a.guid = guid AND a.name <> l[guid]
+SET a.name = l[guid];
+
+MATCH (l:TopicList {type: "City"}) UNWIND KEYS(l) as guid
+MATCH (a:City) WHERE a.guid = guid AND a.name <> l[guid]
+SET a.name = l[guid];
+
+MATCH (l:TopicList {type: "Tag"}) UNWIND KEYS(l) as guid
+MATCH (a:Tag) WHERE a.guid = guid AND a.name <> l[guid]
+SET a.name = l[guid];
+
+
 MATCH (a:Artist)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for ARTIST" as t;
+
+MATCH (a:Classification)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
+RETURN "SET artCount for CLASSIFICATION" as t;
 
 MATCH (a:Culture)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for CULTURE" as t;
@@ -264,9 +342,6 @@ RETURN "SET artCount for MEDIUM" as t;
 
 MATCH (a:Nation)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for NATION" as t;
-
-MATCH (a:Classification)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for CLASSIFICATION" as t;
 
 MATCH (a:City)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for CITY" as t;
