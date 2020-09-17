@@ -1,7 +1,7 @@
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.assetPage = 0
 SET api.thisRun = date()
-RETURN "RESET api counts to prepare for new sync." as t
+RETURN "RESET api counts to prepare for new sync." as t LIMIT 1
 ;
 
 CALL apoc.periodic.commit("
@@ -16,7 +16,7 @@ CALL apoc.load.json(url) YIELD value
 UNWIND value.data AS asset
 
 WITH asset, canon, assetGuidBase, value.total as pageAssetsCount,
-  bsuapi.coll.singleClean(asset.name) AS name,
+  bsuapi.obj.singleClean(asset.openpipe_canonical.title) AS name,
   bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS openpipe_id,
 	assetGuidBase + bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS guid,
 	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date]) AS openpipe_date,
@@ -88,97 +88,99 @@ SET x.openpipe_guid_nation = KEYS(openpipe_nation)
 SET x.openpipe_guid_city = KEYS(openpipe_city)
 SET x.openpipe_guid_tags = KEYS(openpipe_tags)
 
+MATCH (x)-[r]->() DELETE r
+
 RETURN max(pageAssetsCount)
 "
 ,{limit: 1000}
 ) YIELD updates, batches, failedBatches
 
 MATCH (api:OpenPipeConfig {name: 'api'})
-RETURN "COMPLETED IMPORT apoc.periodic.commit(apoc.load.json( "+ api.allAssets +" )) updates:" + updates + " batches:" + batches + " failedBatches:" + failedBatches as t
+RETURN "COMPLETED IMPORT apoc.periodic.commit(apoc.load.json( "+ api.allAssets +" )) updates:" + updates + " batches:" + batches + " failedBatches:" + failedBatches as t LIMIT 1
 ;
 
 
 
-RETURN "STARTING Asset:Topic relationships" as t;
+RETURN "STARTING Asset:Topic relationships" as t LIMIT 1;
 
 CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
+  SET x.import = 1 WITH x
   UNWIND x.openpipe_guid_artist as guid MERGE (t:Artist {guid: guid})
   MERGE (x)-[:BY]->(t)
-  SET x.import = 1
 ",
   {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topics, ASSET:ARTIST relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topics, ASSET:ARTIST relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
+  SET x.import = 2 WITH x
   UNWIND x.openpipe_guid_culture as guid MERGE (t:Culture {guid: guid})
   MERGE (x)-[:ASSET_CULTURE]->(t)
-  SET x.import = 2
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topics, ASSET:CULTURE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topics, ASSET:CULTURE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate("MATCH (x:Asset {import: 2}) RETURN x","
+  SET x.import = 3 WITH x
   UNWIND x.openpipe_guid_classification as guid MERGE (t:Classification {guid: guid})
   MERGE (x)-[:ASSET_CLASS]->(t)
-  SET x.import = 3
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topics, ASSET:CLASS relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topics, ASSET:CLASS relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate("MATCH (x:Asset {import: 3}) RETURN x","
+  SET x.import = 4 WITH x
   UNWIND x.openpipe_guid_genre as guid MERGE (t:Genre {guid: guid})
   MERGE (x)-[:ASSET_GENRE]->(t)
-  SET x.import = 4
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topics, ASSET:GENRE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topics, ASSET:GENRE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate("MATCH (x:Asset {import: 4}) RETURN x","
+  SET x.import = 5 WITH x
   UNWIND x.openpipe_guid_medium as guid MERGE (t:Medium {guid: guid})
   MERGE (x)-[:ASSET_MEDIUM]->(t)
-  SET x.import = 5
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topics, ASSET:MEDIUM relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topics, ASSET:MEDIUM relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate("MATCH (x:Asset {import: 5}) RETURN x","
+  SET x.import = 6 WITH x
   UNWIND x.openpipe_guid_nation as guid MERGE (t:Nation {guid: guid})
   MERGE (x)-[:ASSET_NATION]->(t)
-  SET x.import = 6
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topics, ASSET:NATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topics, ASSET:NATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
+  SET x.import = 7 WITH x
   UNWIND x.openpipe_guid_city as guid MERGE (t:City {guid: guid})
   MERGE (x)-[:ASSET_CITY]->(t)
-  SET x.import = 7
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topics, ASSET:CITY relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topics, ASSET:CITY relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
+  SET x.import = null WITH x
   UNWIND x.openpipe_guid_tags as guid MERGE (t:Tag {guid: guid})
   MERGE (x)-[:ASSET_TAG]->(t)
-  SET x.import = null
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topics, ASSET:TAG relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topics, ASSET:TAG relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 
@@ -195,7 +197,7 @@ CALL apoc.periodic.iterate(
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topic MetaGraph, ARTIST relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topic MetaGraph, ARTIST relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate(
@@ -208,7 +210,7 @@ CALL apoc.periodic.iterate(
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topic MetaGraph, CULTURE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topic MetaGraph, CULTURE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate(
@@ -221,7 +223,7 @@ CALL apoc.periodic.iterate(
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topic MetaGraph, GENRE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topic MetaGraph, GENRE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate(
@@ -234,7 +236,7 @@ CALL apoc.periodic.iterate(
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topic MetaGraph, MEDIUM relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topic MetaGraph, MEDIUM relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate(
@@ -247,7 +249,7 @@ CALL apoc.periodic.iterate(
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topic MetaGraph, NATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topic MetaGraph, NATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 
@@ -261,7 +263,7 @@ CALL apoc.periodic.iterate(
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topic MetaGraph, CLASSIFICATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topic MetaGraph, CLASSIFICATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 
@@ -275,7 +277,7 @@ CALL apoc.periodic.iterate(
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topic MetaGraph, CITY relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topic MetaGraph, CITY relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
 CALL apoc.periodic.iterate(
@@ -288,67 +290,74 @@ CALL apoc.periodic.iterate(
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "BUILDING Topic MetaGraph, TAG relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+RETURN "BUILDING Topic MetaGraph, TAG relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-// Set name values for Topics
 MATCH (l:TopicList {type: "Artist"}) UNWIND KEYS(l) as guid
 MATCH (a:Artist) WHERE a.guid = guid AND a.name <> l[guid]
-SET a.name = l[guid];
+SET a.name = l[guid]
+RETURN "Updated Artist names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Classification"}) UNWIND KEYS(l) as guid
 MATCH (a:Classification) WHERE a.guid = guid AND a.name <> l[guid]
-SET a.name = l[guid];
+SET a.name = l[guid]
+RETURN "Updated Classification names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Culture"}) UNWIND KEYS(l) as guid
 MATCH (a:Culture) WHERE a.guid = guid AND a.name <> l[guid]
-SET a.name = l[guid];
+SET a.name = l[guid]
+RETURN "Updated Culture names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Genre"}) UNWIND KEYS(l) as guid
 MATCH (a:Genre) WHERE a.guid = guid AND a.name <> l[guid]
-SET a.name = l[guid];
+SET a.name = l[guid]
+RETURN "Updated Genre names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Medium"}) UNWIND KEYS(l) as guid
 MATCH (a:Medium) WHERE a.guid = guid AND a.name <> l[guid]
-SET a.name = l[guid];
+SET a.name = l[guid]
+RETURN "Updated Medium names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Nation"}) UNWIND KEYS(l) as guid
 MATCH (a:Nation) WHERE a.guid = guid AND a.name <> l[guid]
-SET a.name = l[guid];
+SET a.name = l[guid]
+RETURN "Updated Nation names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "City"}) UNWIND KEYS(l) as guid
 MATCH (a:City) WHERE a.guid = guid AND a.name <> l[guid]
-SET a.name = l[guid];
+SET a.name = l[guid]
+RETURN "Updated City names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Tag"}) UNWIND KEYS(l) as guid
 MATCH (a:Tag) WHERE a.guid = guid AND a.name <> l[guid]
-SET a.name = l[guid];
+SET a.name = l[guid]
+RETURN "Updated Tag names" as t LIMIT 1;
 
 
 MATCH (a:Artist)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for ARTIST" as t;
+RETURN "SET artCount for ARTIST" as t LIMIT 1;
 
 MATCH (a:Classification)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for CLASSIFICATION" as t;
+RETURN "SET artCount for CLASSIFICATION" as t LIMIT 1;
 
 MATCH (a:Culture)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for CULTURE" as t;
+RETURN "SET artCount for CULTURE" as t LIMIT 1;
 
 MATCH (a:Genre)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for GENRE" as t;
+RETURN "SET artCount for GENRE" as t LIMIT 1;
 
 MATCH (a:Medium)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for MEDIUM" as t;
+RETURN "SET artCount for MEDIUM" as t LIMIT 1;
 
 MATCH (a:Nation)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for NATION" as t;
+RETURN "SET artCount for NATION" as t LIMIT 1;
 
 MATCH (a:City)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for CITY" as t;
+RETURN "SET artCount for CITY" as t LIMIT 1;
 
 MATCH (a:Tag)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for TAG" as t;
+RETURN "SET artCount for TAG" as t LIMIT 1;
 
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.lastRun = api.thisRun
-RETURN "Sync COMPLETE" as t;
+RETURN "Sync COMPLETE" as t LIMIT 1;
