@@ -2,39 +2,39 @@ package bsuapi.behavior;
 
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.CypherQuery;
-import bsuapi.dbal.query.TopicSharedRelations;
+import bsuapi.dbal.query.FolderAssets;
+import bsuapi.dbal.query.TopicAssets;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Map;
 
-public class Related extends Behavior
+public class Folder extends Behavior
 {
-    private JSONObject related;
+    private JSONArray assets;
     public Topic topic;
     public Node node;
+    public String query;
 
-    public Related(Map<String, String> config)
+    public Folder(Map<String, String> config)
     throws BehaviorException
     {
         super(config);
-
         String labelName = this.getConfigParam(Topic.labelParam);
         String keyName = this.getConfigParam(Topic.keyParam);
 
         if (null == labelName || null == keyName) {
-            throw new BehaviorException("Missing required parameters for "+ this.toString()+ ": "+ Topic.labelParam +" and "+ Topic.keyParam);
+            throw new BehaviorException("Missing required parameters for folder: "+ Topic.labelParam +" and "+ Topic.keyParam);
         }
 
         this.topic = new Topic(labelName, keyName);
     }
 
-    public org.neo4j.graphdb.Node getNeoNode() throws CypherException { return this.node.getNeoNode(); }
+    @Override
+    public String getBehaviorKey() { return "folder"; }
 
     @Override
-    public String getBehaviorKey() { return "related"; }
-
-    @Override
-    public JSONObject getBehaviorData() { return this.related; }
+    public JSONArray getBehaviorData() { return this.assets; }
 
     @Override
     public String buildMessage()
@@ -49,7 +49,7 @@ public class Related extends Behavior
     }
 
     private void resolveTopic(Cypher cypher)
-    throws CypherException
+            throws CypherException
     {
         if (!this.topic.hasMatch()) { cypher.resolveTopic(this.topic); }
         this.node = topic.getNode();
@@ -57,19 +57,14 @@ public class Related extends Behavior
 
     @Override
     public void resolveBehavior(Cypher cypher)
-    throws CypherException
+            throws CypherException
     {
         this.resolveTopic(cypher);
 
-        this.related = new JSONObject();
-        for (NodeType n : NodeType.values()) {
-            if (n.isTopic()) {
-                CypherQuery query = new TopicSharedRelations(this.topic, n);
-                this.setQueryConfig(query);
-                this.related.put(n.labelName(), query.exec(cypher));
-            }
-        }
-
+        CypherQuery query = new FolderAssets(this.topic);
+        this.setQueryConfig(query);
+        this.assets = query.exec(cypher);
+        this.query = query.getCommand();
         super.resolveBehavior(cypher);
     }
 
@@ -77,20 +72,19 @@ public class Related extends Behavior
     public JSONObject toJson()
     {
         JSONObject data = super.toJson();
-        data.put("topic", this.topic.name());
         data.put("node", this.topic.toJson());
+        data.put("query", this.query);
         return data;
     }
 
     public static BehaviorDescribe describe()
     {
-        BehaviorDescribe desc = BehaviorDescribe.resource("/related/{TOPIC}/{VALUE}",
-            "Find all (TOPIC)s with an indexed value matching (VALUE), along with a" +
-            "collection of closely related Topics, and a collection of Assets which references that Topic. "
+        BehaviorDescribe desc = BehaviorDescribe.resource("/folder/{GUID}",
+            "List all assets, with layout/positional info if available, along with any Topics included in that Folder. " +
+            "omit the GUID to get a list of folders. "
         );
 
-        desc.arg("topic", "All lowercase, a-z. Search all topics: 'topic'");
-        desc.arg("value", "URL-encoded string. Must start with a letter, a-zA-Z.");
+        desc.arg("GUID", "URL-encoded string, defined from source. Must start with a letter, a-zA-Z.");
 
         return desc;
     }

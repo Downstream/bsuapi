@@ -50,6 +50,7 @@ CREATE INDEX ON :City(name);
 CREATE INDEX ON :City(guid);
 CREATE INDEX ON :Tag(name);
 CREATE INDEX ON :Tag(guid);
+CREATE INDEX ON :Folder(guid);
 
 CALL db.index.fulltext.createNodeIndex("topicNameIndex",["Artist","Culture","Classification","Genre","Medium","Nation","City","Tag"],["name"])
 RETURN "CREATED full-text-index topicNameIndex" as t;

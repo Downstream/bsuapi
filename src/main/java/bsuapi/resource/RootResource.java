@@ -8,10 +8,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import bsuapi.behavior.Assets;
+import bsuapi.behavior.Folder;
 import bsuapi.behavior.Related;
 import bsuapi.behavior.Search;
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.CypherQuery;
+import bsuapi.dbal.query.FolderList;
 import bsuapi.dbal.query.TopicTop;
 import bsuapi.dbal.query.TopicTopFiltered;
 import org.json.JSONArray;
@@ -43,8 +45,10 @@ public class RootResource extends BaseResource
             Cypher c = new Cypher(db)
         ) {
             data.put("topics", this.topicsList(c));
+            data.put("folders", this.folderList(c));
         } catch (Exception e) {
             data.put("topics", new JSONObject());
+            data.put("folders", new JSONArray());
         }
 
         return response.plain(data);
@@ -56,6 +60,7 @@ public class RootResource extends BaseResource
 
         methods.put("root", this.youarehere());
         methods.put("related", Related.describe());
+        methods.put("folder", Folder.describe());
         methods.put("topic-assets", Assets.describe());
         methods.put("search", Search.describe());
         methods.put("search/completion", Search.describeCompletion());
@@ -126,6 +131,15 @@ public class RootResource extends BaseResource
             }
         }
         return topics;
+    }
+
+    private JSONArray folderList(Cypher c)
+    throws CypherException
+    {
+        CypherQuery query = new FolderList();
+        query.setPage(this.getParam(CypherQuery.pageParam));
+        query.setLimit(this.getParam(CypherQuery.limitParam));
+        return query.exec(c);
     }
 
     private JSONObject buildSchema(Response response)

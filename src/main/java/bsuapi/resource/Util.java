@@ -7,7 +7,9 @@ import org.neo4j.logging.Log;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Util
@@ -129,5 +131,22 @@ public class Util
         long seconds = millis / 1000;
         millis = millis % 1000;
         return String.format("%d:%02d:%02d:%03d",hours,minutes,seconds,millis);
+    }
+
+
+    // map coversion
+    public static HashMap<String, Object> mapToStringObject(Map<?,?> m)
+    {
+        HashMap<String, Object> result = new HashMap<>();
+        for (Map.Entry<?,?> entry : m.entrySet()) {
+            Object key = entry.getKey();
+            if (key instanceof String) {
+                result.put((String) entry.getKey(), entry.getValue());
+            } else {
+                result.put(key.toString(), entry.getValue());
+            }
+        }
+
+        return result;
     }
 }

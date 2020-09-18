@@ -1,15 +1,14 @@
 package bsuapi.dbal.query;
 
-import bsuapi.dbal.Cypher;
-import bsuapi.dbal.CypherException;
-import bsuapi.dbal.Node;
-import bsuapi.dbal.NodeType;
+import bsuapi.dbal.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.neo4j.graphdb.Result;
 import org.neo4j.helpers.collection.Iterators;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 abstract public class CypherQuery
 {
@@ -127,11 +126,14 @@ abstract public class CypherQuery
         this.addResultEntry(entry);
     }
 
-    public void entryHandler(Object entry) {
+    public void entryHandler(Object entry)
+    {
         if (entry instanceof org.neo4j.graphdb.Node) {
             this.addResultEntry(new Node((org.neo4j.graphdb.Node) entry));
+        } else if (entry instanceof Map) {
+            this.addResultEntry(new VirtualNode((Map) entry));
         } else {
-            this.addResultEntry(entry.toString());
+            this.addResultEntry(entry.getClass() +": "+ entry.toString());
         }
     }
 

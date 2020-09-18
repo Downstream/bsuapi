@@ -8,6 +8,7 @@ public enum BehaviorType
 {
     RELATED,
     ASSETS,
+    FOLDER,
     SEARCH,
     SEARCH_ASSETS,
     SEARCH_TOPICS;
@@ -25,6 +26,11 @@ public enum BehaviorType
 
             case ASSETS:
                 b = new Assets(config);
+                return b;
+
+            case FOLDER:
+                b = new Folder(config);
+                b.appendBehavior(new Related(config));
                 return b;
 
             case SEARCH:

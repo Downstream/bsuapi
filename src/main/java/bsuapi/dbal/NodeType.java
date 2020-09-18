@@ -12,7 +12,8 @@ public enum NodeType
     GENRE,
     MEDIUM,
     CITY,
-    TOPIC;
+    TOPIC,
+    FOLDER;
 
     public Label label()
     {
@@ -44,6 +45,8 @@ public enum NodeType
                 return "Medium";
             case CITY:
                 return "City";
+            case FOLDER:
+                return "Folder";
             default:
                 throw new IllegalStateException( "Unknown Node Type enum: " + this );
         }
@@ -70,6 +73,8 @@ public enum NodeType
                 return "MEDIUM";
             case CITY:
                 return "CITY";
+            case FOLDER:
+                return "FOLDER_TOPIC";
             case TOPIC:
                 throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
             case ASSET:
@@ -100,6 +105,8 @@ public enum NodeType
                 return "ASSET_MEDIUM";
             case CITY:
                 return "ASSET_CITY";
+            case FOLDER:
+                return "FOLDER_ASSET";
             case TOPIC:
                 throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
             case ASSET:
@@ -140,6 +147,7 @@ public enum NodeType
             case GENRE:
             case MEDIUM:
             case CITY:
+            //case FOLDER:
                 return true;
             default:
                 return false;
@@ -160,6 +168,7 @@ public enum NodeType
             if (lName.equals("Genre")) return GENRE;
             if (lName.equals("Medium")) return MEDIUM;
             if (lName.equals("City")) return CITY;
+            if (lName.equals("Folder")) return FOLDER;
         }
 
         return null;

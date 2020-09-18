@@ -30,7 +30,7 @@ CALL apoc.load.json(f.guid) YIELD value
 UNWIND value.assets as assetEntry
 MATCH (a:Asset {guid: assetEntry.guid})
 WITH f, a, assetEntry.geometry as geometry, assetEntry.wall as wall, split(assetEntry.geometry, ' ') as geoSplit
-CREATE (f)-[r:FOLDER_ASSET]->(a)
+CREATE (f)<-[r:FOLDER_ASSET]-(a)
 CALL apoc.do.when( geometry IS NOT NULL AND size(geoSplit)>6 ,
 " SET r.geometry = geometry
   SET r.wall = wall

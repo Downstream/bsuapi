@@ -11,9 +11,9 @@ import java.lang.Object;
 public class Node
 {
     private org.neo4j.graphdb.Node neoNode;
-    private Map<String, Object> properties;
-    private String keyName = "guid";
-    private String keyVal;
+    protected Map<String, Object> properties;
+    protected String keyName = "guid";
+    protected String keyVal;
     public NodeType type;
 
     public Node (org.neo4j.graphdb.Node neoNode)
@@ -31,7 +31,9 @@ public class Node
         this.keyVal = keyVal;
     }
 
-    public org.neo4j.graphdb.Node getNeoNode() { return this.neoNode; }
+    protected Node() {}
+
+    public org.neo4j.graphdb.Node getNeoNode() throws CypherException { return this.neoNode; }
 
     public String getNodeKeyField() { return this.keyName; }
 
@@ -39,9 +41,10 @@ public class Node
 
     public String getProperty(String key){ return (String) this.properties.get(key); }
 
+    /* @todo refactor this and NodeType calls - can be simplified */
     public String getUri()
     {
-        if (null == this.type || !type.isTopic()) {
+        if (null == this.type) {
             return null;
         }
 
@@ -73,11 +76,17 @@ public class Node
         if (null != type) {
             result.put("type", type.labelName());
 
+            /* @todo refactor this and NodeType calls - can be simplified */
             if (type.isTopic()) {
                 String topicPath = this.getUri();
                 result.put("linkRelated", Config.buildUri("/related" + topicPath));
                 result.put("linkAssets", Config.buildUri("/topic-assets" + topicPath));
+            } else if (type == NodeType.FOLDER) {
+                result.put("linkRelated", Config.buildUri(this.getUri()));
+                result.put("linkAssets", Config.buildUri(this.getUri()));
             }
+        } else {
+            result.put("type", "unknown");
         }
 
         return result;
