@@ -1,5 +1,6 @@
 neo4j-home
 /viewer/
+config.properties
 *~
 \#*
 target
