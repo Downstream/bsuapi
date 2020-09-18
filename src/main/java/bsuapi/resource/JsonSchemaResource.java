@@ -62,7 +62,8 @@ public class JsonSchemaResource extends BaseResource
         properties.put("keyField", this.prop("string", "Property name of this topic instance."));
         properties.put("keyEncoded", this.prop("string", "Property name of this topic instance."));
         properties.put("keyRaw", this.prop("string", "Property name of this topic instance."));
-        properties.put("name", this.prop("string", "Property name of this topic instance, currently also used as the key for all topics."));
+        properties.put("name", this.prop("string", "Property name of this topic instance."));
+        properties.put("guid", this.prop("string", "Key for all topics."));
         properties.put("linkRelated", this.prop("string", "A relative URL to this topic's 'related' dataset"));
         properties.put("linkAssets", this.prop("string", "A relative URL to an iterable collection of assets for this topic."));
 

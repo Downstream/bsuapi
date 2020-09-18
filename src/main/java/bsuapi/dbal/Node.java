@@ -12,7 +12,7 @@ public class Node
 {
     private org.neo4j.graphdb.Node neoNode;
     private Map<String, Object> properties;
-    private String keyName = "name";
+    private String keyName = "guid";
     private String keyVal;
     public NodeType type;
 

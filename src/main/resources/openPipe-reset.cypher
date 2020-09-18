@@ -35,13 +35,21 @@ RETURN "RESET OpenPipeConfig topicFields" as t
 
 CREATE INDEX ON :Asset(id);
 CREATE INDEX ON :Artist(name);
+CREATE INDEX ON :Artist(guid);
 CREATE INDEX ON :Culture(name);
+CREATE INDEX ON :Culture(guid);
 CREATE INDEX ON :Genre(name);
+CREATE INDEX ON :Genre(guid);
 CREATE INDEX ON :Medium(name);
+CREATE INDEX ON :Medium(guid);
 CREATE INDEX ON :Nation(name);
+CREATE INDEX ON :Nation(guid);
 CREATE INDEX ON :Classification(name);
+CREATE INDEX ON :Classification(guid);
 CREATE INDEX ON :City(name);
+CREATE INDEX ON :City(guid);
 CREATE INDEX ON :Tag(name);
+CREATE INDEX ON :Tag(guid);
 
 CALL db.index.fulltext.createNodeIndex("topicNameIndex",["Artist","Culture","Classification","Genre","Medium","Nation","City","Tag"],["name"])
 RETURN "CREATED full-text-index topicNameIndex" as t;

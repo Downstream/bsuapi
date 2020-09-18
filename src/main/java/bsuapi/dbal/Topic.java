@@ -39,7 +39,7 @@ public class Topic implements org.neo4j.graphdb.Label
         return this.type.label().name();
     }
 
-    public String getNodeKeyField() { return "name"; }
+    public String getNodeKeyField() { return "guid"; }
 
     public String getNodeKey() { return this.nodeKey; }
 
