@@ -70,6 +70,7 @@ SET x.openpipe_latitude = openpipe_latitude
 SET x.openpipe_longitude = openpipe_longitude
 SET x.hasGeo = (openpipe_latitude IS NOT NULL AND openpipe_longitude IS NOT NULL)
 SET x.openpipe_date = openpipe_date
+SET x.date = date(bsuapi.obj.openPipeDateMap(x.openpipe_date))
 
 SET x.openpipe_artist = [k IN KEYS(openpipe_artist) | openpipe_artist[k]]
 SET x.openpipe_culture = [k IN KEYS(openpipe_culture) | openpipe_culture[k]]
@@ -107,6 +108,10 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
   SET x.import = 1 WITH x
   UNWIND x.openpipe_guid_artist as guid MERGE (t:Artist {guid: guid})
   MERGE (x)-[:BY]->(t)
+  WITH t,
+    CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
+    CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd
 ",
   {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -117,6 +122,10 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
   SET x.import = 2 WITH x
   UNWIND x.openpipe_guid_culture as guid MERGE (t:Culture {guid: guid})
   MERGE (x)-[:ASSET_CULTURE]->(t)
+  WITH t,
+    CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
+    CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -127,6 +136,10 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 2}) RETURN x","
   SET x.import = 3 WITH x
   UNWIND x.openpipe_guid_classification as guid MERGE (t:Classification {guid: guid})
   MERGE (x)-[:ASSET_CLASS]->(t)
+  WITH t,
+    CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
+    CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -137,6 +150,10 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 3}) RETURN x","
   SET x.import = 4 WITH x
   UNWIND x.openpipe_guid_genre as guid MERGE (t:Genre {guid: guid})
   MERGE (x)-[:ASSET_GENRE]->(t)
+  WITH t,
+    CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
+    CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -147,6 +164,10 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 4}) RETURN x","
   SET x.import = 5 WITH x
   UNWIND x.openpipe_guid_medium as guid MERGE (t:Medium {guid: guid})
   MERGE (x)-[:ASSET_MEDIUM]->(t)
+  WITH t,
+    CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
+    CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -157,6 +178,10 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 5}) RETURN x","
   SET x.import = 6 WITH x
   UNWIND x.openpipe_guid_nation as guid MERGE (t:Nation {guid: guid})
   MERGE (x)-[:ASSET_NATION]->(t)
+  WITH t,
+    CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
+    CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -167,6 +192,10 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
   SET x.import = 7 WITH x
   UNWIND x.openpipe_guid_city as guid MERGE (t:City {guid: guid})
   MERGE (x)-[:ASSET_CITY]->(t)
+  WITH t,
+    CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
+    CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations

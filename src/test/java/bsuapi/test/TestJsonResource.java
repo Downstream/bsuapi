@@ -29,6 +29,11 @@ public class TestJsonResource implements AutoCloseable
         }
     }
 
+    public JSONObject getDoc()
+    {
+        return this.j;
+    }
+
     public Object query(String jsonPointer)
     {
         return j.query(jsonPointer);

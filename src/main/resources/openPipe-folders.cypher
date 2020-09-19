@@ -29,6 +29,10 @@ WHERE f.lastModified > lastRunDate
 CALL apoc.load.json(f.guid) YIELD value
 UNWIND value.assets as assetEntry
 MATCH (a:Asset {guid: assetEntry.guid})
+WITH f, a,
+     CASE WHEN f.dateStart IS NULL OR f.dateStart > a.date THEN a.date ELSE f.dateStart END AS dateStart,
+     CASE WHEN f.dateEnd IS NULL OR f.dateEnd < a.date THEN a.date ELSE f.dateEnd END AS dateEnd
+  SET f.dateStart = dateStart, f.dateEnd = dateEnd
 WITH f, a, assetEntry.geometry as geometry, assetEntry.wall as wall, split(assetEntry.geometry, ' ') as geoSplit
 CREATE (f)<-[r:FOLDER_ASSET]-(a)
 CALL apoc.do.when( geometry IS NOT NULL AND size(geoSplit)>6 ,

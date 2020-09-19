@@ -1,35 +1,51 @@
 package bsuapi.obj;
 
+import bsuapi.test.TestJsonResource;
+import org.json.JSONObject;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.neo4j.cypher.internal.v3_5.util.symbols.TemporalTypes.date;
 
 public class ObjectOpenPipeDateTest {
+    protected static TestJsonResource j;
 
-    // BC 500 JAN 01 00:00:00 --> -500-01-01 00:00:00
-    // CE 1927 JAN 01 00:00:00 --> 1927-01-01 00:00:00
+    @BeforeClass
+    public static void setUp() {
+        j = new TestJsonResource("openPipeDateTest");
+    }
+
+    @AfterClass
+    public static void tearDown()
+    {
+        j.close();
+    }
+
+    // BC 500 JAN 01 00:00:00  --> -500-01-01
+    // CE 1927 FEB 13 23:59:59 -->  001927-02-13 23:59:59
+    // Something else          -->  0-01-01
+    // null                    -->  0-01-01
 
     @Test
-    public void testOpenPipeCleanObj() {
+    public void testOpenPipeDate() {
         ObjectOpenPipeDate testMe = new ObjectOpenPipeDate();
 
-        for (Map.Entry<String,String> entry : ObjectOpenPipeDateTest.tests.entrySet()) {
-            assertEquals(entry.getValue(), testMe.openPipeDate(entry.getKey()));
+        JSONObject tests = j.getDoc();
+        for (Iterator<String> it = tests.keys(); it.hasNext(); ) {
+            String key = it.next();
+            JSONObject val = (JSONObject) tests.get(key);
+            assertEquals(val.toMap(), testMe.openPipeDateMap(key));
         }
     }
 
-    private static HashMap<String, String> tests;
-    static {
-        tests = new HashMap<>();
-        tests.put("BC 500 JAN 01 00:00:00", "-500-01-01 00:00:00");
-        tests.put("BC 50 JAN 01 00:00:00", "-50-01-01 00:00:00");
-        tests.put("BC 599 JAN 01 00:00:00", "-599-01-01 00:00:00");
-        tests.put("CE 1927 FEB 13 14:33:44", "1927-02-13 14:33:44");
-        tests.put("CE 500 DEC 31 00:00:00", "500-12-31 00:00:00");
-        tests.put("CE 2012 JUl 4 00:00:00", "2012-07-04 00:00:00");
-        tests.put("CE 1272 NOV 25 00:00:00", "1272-11-25 00:00:00");
+    @Test
+    public void testOpenPipeDateNull() {
+        ObjectOpenPipeDate testMe = new ObjectOpenPipeDate();
+        JSONObject expect = (JSONObject) j.query("/unexpected");
+        assertEquals(expect.toMap(), testMe.openPipeDateMap(null));
     }
 }

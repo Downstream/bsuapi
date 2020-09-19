@@ -1,0 +1,65 @@
+{
+  "BC 500 JAN 01 00:00:00": {
+    "year": -499,
+    "month": 1,
+    "day": 1
+  },
+  "BC 50 JAN 01 00:00:00": {
+    "year": -49,
+    "month": 1,
+    "day": 1
+  },
+  "BC 599 JUL 04 23:59:59": {
+    "year": -598,
+    "month": 7,
+    "day": 4,
+    "hour": 23,
+    "minute": 59,
+    "second": 59
+  },
+  "CE 1927 FEB 13 14:33:44": {
+    "year": 1927,
+    "month": 2,
+    "day": 13,
+    "hour": 14,
+    "minute": 33,
+    "second": 44
+  },
+  "CE 500 DEC 31 00:00:00": {
+    "year": 500,
+    "month": 12,
+    "day": 31
+  },
+  "CE 2012 JUl 4 00:00:00": {
+    "year": 2012,
+    "month": 7,
+    "day": 4
+  },
+  "CE 1272 NOV 25 00:00:00": {
+    "year": 1272,
+    "month": 11,
+    "day": 25
+  },
+  "CE 2020 SEP 19 09:03:23": {
+    "year": 2020,
+    "month": 9,
+    "day": 19,
+    "hour": 9,
+    "minute": 3,
+    "second": 23
+  },
+  "CE 2027 AUG 21 20:37:12": {
+    "year": 2027,
+    "month": 8,
+    "day": 21,
+    "hour": 20,
+    "minute": 37,
+    "second": 12
+  },
+  "": {
+    "year": 0
+  },
+  "unexpected": {
+    "year": 0
+  }
+}

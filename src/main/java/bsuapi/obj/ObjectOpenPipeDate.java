@@ -1,83 +1,94 @@
 package bsuapi.obj;
 
-import org.apache.commons.lang3.StringUtils;
-import org.neo4j.cypher.internal.frontend.v2_3.ast.functions.Str;
 import org.neo4j.procedure.Description;
 import org.neo4j.procedure.Name;
 import org.neo4j.procedure.UserFunction;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ObjectOpenPipeDate
 {
+    // BC 500 FEB 13 12:31:14
+    //     TO
+    // { year:-499, month:2, day:13, hour:12, minute:31, second:14 }
+
+    private static final HashMap<String, Integer> FALLBACK;
+    static {
+        FALLBACK = new HashMap<>();
+        FALLBACK.put("year", 0);
+    }
+
     @UserFunction
-    @Description("bsuapi.obj.openPipeDate({openpipeDate}) covert openpipe date format into alpha-sortable format. ")
-    public String openPipeDate(
+    @Description("bsuapi.obj.openPipeDateMap({openpipeDate}) covert openpipe date format into alpha-sortable format. ")
+    public Map openPipeDateMap(
         @Name("openpipeDate") String openpipeDate
     )
     {
-        return this.openPipeToSortable(openpipeDate);
+        if (openpipeDate == null) return ObjectOpenPipeDate.FALLBACK;
+        return this.openPipeToMap(openpipeDate);
     }
 
-    private String openPipeToSortable(String openpipeDate)
+    private Map openPipeToMap(String openpipeDate)
     {
-        // BC 500 JAN 01 00:00:00
-        // CE 1927 JAN 01 00:00:00
         String[] dateChunks = openpipeDate.split("\\s+");
-        if (dateChunks.length < 5 ) { return "0-01-01 00:00:00"; }
+        if (dateChunks.length < 5) { return ObjectOpenPipeDate.FALLBACK; }
 
+        HashMap<String, Integer> result = new HashMap<>();
 
-        return String.format("%1$s-%2$s-%3$s %4$s",
-            this.convertYear(dateChunks[0], dateChunks[1]),
-            this.convertMonth(dateChunks[2]),
-            this.convertDay(dateChunks[3]),
-            dateChunks[4]
-        );
+        result.put("year", this.convertYear(dateChunks[0], dateChunks[1]));
+        result.put("month", this.convertMonth(dateChunks[2]));
+        result.put("day", this.toInt(dateChunks[3]));
+
+        if (dateChunks[4].equals("00:00:00")) return result;
+
+        String[] timeChunks = dateChunks[4].split(":");
+        result.put("hour", this.toInt(timeChunks[0]));
+        result.put("minute", this.toInt(timeChunks[1]));
+        result.put("second", this.toInt(timeChunks[2]));
+
+        return result;
     }
 
-    private String convertYear(String openpipeEpoch, String openpipeYear)
+    private int convertYear(String openpipeEpoch, String openpipeYear)
     {
-        String result;
+        int result = this.toInt(openpipeYear);
         switch (openpipeEpoch) {
             case "BC":
-                result = "-";
-                break;
+                return 1 + (-1 * result);
             case "CE":
             default:
-                result = "";
+                return result;
         }
-
-        return result + openpipeYear;
     }
 
-    private String convertMonth(String openpipeMonth)
+    private int convertMonth(String openpipeMonth)
     {
         switch (openpipeMonth.toUpperCase()) {
-            case "JAN": return "01";
-            case "FEB": return "02";
-            case "MAR": return "03";
-            case "APR": return "04";
-            case "MAY": return "05";
-            case "JUN": return "06";
-            case "JUL": return "07";
-            case "AUG": return "08";
-            case "SEP": return "09";
-            case "OCT": return "10";
-            case "NOV": return "11";
-            case "DEC": return "12";
-            default:    return "00";
+            case "JAN": return 1;
+            case "FEB": return 2;
+            case "MAR": return 3;
+            case "APR": return 4;
+            case "MAY": return 5;
+            case "JUN": return 6;
+            case "JUL": return 7;
+            case "AUG": return 8;
+            case "SEP": return 9;
+            case "OCT": return 10;
+            case "NOV": return 11;
+            case "DEC": return 12;
+            default:    return 1;
         }
     }
 
-    private String convertDay(String openpipeDay)
+    private int toInt(String val)
     {
+        // using exceptions like this isn't great, but it's the only way to do so 100% reliably. Thank you Java.
+        // fortunately, we should NEVER have non-ints here, so it /should?/ be ok?
         try {
-            return String.format("%02d",Integer.parseInt(openpipeDay));
+            return Integer.parseInt(val);
         } catch(NumberFormatException e) {
-            return "00";
+            return 0;
         }
     }
 }
