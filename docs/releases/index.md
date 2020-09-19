@@ -1,4 +1,13 @@
 # Releases
+* [`1.3.0`](bsuapi-1.3.0.jar) Adds OpenPipe Integration.
+   * `/folder` returns folder list.
+   * `/folder/{guid}` returns folder assets and topics, with layout/positional data if present.
+   * API uses `GUID` for asset and topic keys instead of `name`. Guids are currently openpipe generated full-urls to source data in openpipe.
+   * Added date handling to data.
+      * Date formatting: "BC 450 JUN 7 23:59:59" = `date: -449-06-07 23:59:59` 
+      * Assets now have two date fields: `openpipe_date` containing the original date format, and `date` containing a datetime.
+      * Folders and Topics now have dateStart and dateEnd, extrapolated from the oldest and most recent dates for their respective Assets.
+   * Bugfix: some missing assets.
 * [`1.0.1`](bsuapi-1.0.1.jar) Adds TopicTypes: Genre, Medium, City.
    * Bugfix: API not returning topic assets.
 * [`1.0.0`](bsuapi-1.0.0.jar) First production release.
