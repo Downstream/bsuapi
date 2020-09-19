@@ -42,21 +42,21 @@ public class FolderResource extends BaseResource
         return response.plain(data);
     }
 
-    @Path("/{value}")
+    @Path("/{guid}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response apiRelated(
-        @PathParam("value") String value,
+    public javax.ws.rs.core.Response apiFolderData(
+        @PathParam("guid") String guid,
         @Context UriInfo uriInfo
     ){
-        if (value == null)
+        if (guid == null)
         {
             return this.apiFolders(uriInfo);
         }
 
         Response response = this.prepareResponse(uriInfo);
 
-        String searchVal = URLCoder.decode(value);
+        String searchVal = URLCoder.decode(guid);
         response.setTopic("Folder", searchVal);
 
         return this.handleBehavior(BehaviorType.FOLDER);

@@ -1,4 +1,5 @@
 # Releases
+* [`1.3.2`](bsuapi-1.3.2.jar) Bugfixes for sync and folders.
 * [`1.3.0`](bsuapi-1.3.0.jar) Adds OpenPipe Integration.
    * `/folder` returns folder list.
    * `/folder/{guid}` returns folder assets and topics, with layout/positional data if present.
