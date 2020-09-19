@@ -110,6 +110,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
   SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t :Topic
 ",
   {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -124,6 +125,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
   SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -138,6 +140,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 2}) RETURN x","
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
   SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -152,6 +155,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 3}) RETURN x","
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
   SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -166,6 +170,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 4}) RETURN x","
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
   SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -180,6 +185,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 5}) RETURN x","
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
   SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -194,6 +200,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
   SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
@@ -204,6 +211,11 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
   SET x.import = null WITH x
   UNWIND x.openpipe_guid_tags as guid MERGE (t:Tag {guid: guid})
   MERGE (x)-[:ASSET_TAG]->(t)
+  WITH t,
+    CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
+    CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
