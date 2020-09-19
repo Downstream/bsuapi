@@ -89,9 +89,7 @@ SET x.openpipe_guid_nation = KEYS(openpipe_nation)
 SET x.openpipe_guid_city = KEYS(openpipe_city)
 SET x.openpipe_guid_tags = KEYS(openpipe_tags)
 
-MATCH (x)-[r]->() DELETE r
-
-RETURN max(pageAssetsCount)
+RETURN max(pageAssetsCount) LIMIT 1
 "
 ,{limit: 1000}
 ) YIELD updates, batches, failedBatches
@@ -100,7 +98,7 @@ MATCH (api:OpenPipeConfig {name: 'api'})
 RETURN "COMPLETED IMPORT apoc.periodic.commit(apoc.load.json( "+ api.allAssets +" )) updates:" + updates + " batches:" + batches + " failedBatches:" + failedBatches as t LIMIT 1
 ;
 
-
+MATCH (x:Asset {import: 0})-[r]->() DELETE r;
 
 RETURN "STARTING Asset:Topic relationships" as t LIMIT 1;
 

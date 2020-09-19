@@ -7,7 +7,7 @@ SET x.singleAsset='http://mec402.boisestate.edu/cgi-bin/openpipe/data/asset/'
 SET x.singleFolder='http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/'
 SET x.lastRun = '2020-01-01'
 SET x.lastFolderRun = '2020-01-01'
-RETURN "RESET OpenPipeConfig api settings" as t
+RETURN "RESET OpenPipeConfig api settings" as t LIMIT 1
 ;
 
 
@@ -18,7 +18,7 @@ CALL apoc.load.json(api.canonical) YIELD value
 WITH x, value, keys(value) as props
 UNWIND props AS prop
 CALL apoc.create.setProperty(x, prop, head(value[prop])) yield node
-RETURN "LOADED OpenPipeConfig canonical values" as t
+RETURN "LOADED OpenPipeConfig canonical values" as t LIMIT 1
 ;
 
 MERGE (x:OpenPipeConfig {name: 'topicFields'})
@@ -30,7 +30,7 @@ SET x.openpipe_medium = 'openpipe_canonical_medium'
 SET x.openpipe_nation = 'openpipe_canonical_nation'
 SET x.openpipe_city = 'openpipe_canonical_city'
 SET x.openpipe_tags = 'openpipe_canonical_tags'
-RETURN "RESET OpenPipeConfig topicFields" as t
+RETURN "RESET OpenPipeConfig topicFields" as t LIMIT 1
 ;
 
 CREATE INDEX ON :Asset(id);
@@ -53,9 +53,9 @@ CREATE INDEX ON :Tag(guid);
 CREATE INDEX ON :Folder(guid);
 
 CALL db.index.fulltext.createNodeIndex("topicNameIndex",["Artist","Culture","Classification","Genre","Medium","Nation","City","Tag"],["name"])
-RETURN "CREATED full-text-index topicNameIndex" as t;
+RETURN "CREATED full-text-index topicNameIndex" as t LIMIT 1;
 CALL db.index.fulltext.createNodeIndex("assetNameIndex",["Asset"],["name"])
-RETURN "CREATED full-text-index assetNameIndex" as t;
+RETURN "CREATED full-text-index assetNameIndex" as t LIMIT 1;
 
 MATCH (a:Topic) DETACH DELETE a;
 MATCH (a:Asset) DETACH DELETE a;
