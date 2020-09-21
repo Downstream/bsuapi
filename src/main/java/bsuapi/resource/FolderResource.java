@@ -22,6 +22,26 @@ public class FolderResource extends BaseResource
 {
     private static final int TIMEOUT = 1000;
 
+    @Path("/{guid}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public javax.ws.rs.core.Response apiFolderData(
+            @PathParam("guid") String guid,
+            @Context UriInfo uriInfo
+    ){
+        if (guid == null)
+        {
+            return this.apiFolders(uriInfo);
+        }
+
+        Response response = this.prepareResponse(uriInfo);
+
+        String searchVal = URLCoder.decode(guid);
+        response.setTopic("Folder", searchVal);
+
+        return this.handleBehavior(BehaviorType.FOLDER);
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public javax.ws.rs.core.Response apiFolders(
@@ -40,26 +60,6 @@ public class FolderResource extends BaseResource
         }
 
         return response.plain(data);
-    }
-
-    @Path("/{guid}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response apiFolderData(
-        @PathParam("guid") String guid,
-        @Context UriInfo uriInfo
-    ){
-        if (guid == null)
-        {
-            return this.apiFolders(uriInfo);
-        }
-
-        Response response = this.prepareResponse(uriInfo);
-
-        String searchVal = URLCoder.decode(guid);
-        response.setTopic("Folder", searchVal);
-
-        return this.handleBehavior(BehaviorType.FOLDER);
     }
 
     public JSONArray getFolderList(Cypher c)

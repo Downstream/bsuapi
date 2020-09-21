@@ -14,6 +14,7 @@
 * [`1.0.0`](bsuapi-1.0.0.jar) First production release.
 
 ## Dev
+* [`1.3.3`](bsuapi-1.3.3.jar) WIP to workaround Jersey router bug `/folder/{guid}` 404.
 * [`0.3.2`](bsuapi-0.3.2.jar) OpenPipe Integration.
    * Added openpipe sync scripts:
       * `INFO` regenerates :Info cards.
