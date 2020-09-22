@@ -145,25 +145,25 @@ echo "server {
         try_files /index.html =404;
     }
 
-    location /bsuapi/data {
+    location $APIPATH/data {
         alias /var/www/data;
     }
 
-    location /bsuapi/releases {
+    location $APIPATH/releases {
         proxy_set_header Host downstream.github.io;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_pass https://downstream.github.io/bsuapi/releases;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
-    location /bsuapi/pages {
+    location $APIPATH/pages {
         proxy_set_header Host downstream.github.io;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_pass https://downstream.github.io/bsuapi/pages;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 
-    location /bsuapi/assets {
+    location $APIPATH/assets {
         proxy_set_header Host downstream.github.io;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_pass https://downstream.github.io/bsuapi/assets;
@@ -175,7 +175,7 @@ echo "server {
         proxy_connect_timeout 30s;
         proxy_set_header Accept-Encoding \"\";
         proxy_set_header Host \$host;
-        proxy_pass http://127.0.0.1:7474$APIPATH;
+        proxy_pass http://127.0.0.1:7474;
     }
 
     location / {

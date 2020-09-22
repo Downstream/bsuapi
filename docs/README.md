@@ -80,7 +80,7 @@ server {
         proxy_connect_timeout 30s;
         proxy_set_header Accept-Encoding "";
         proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:7474/bsuapi;
+        proxy_pass http://127.0.0.1:7474;
     }
 }
 ```
