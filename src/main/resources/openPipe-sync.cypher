@@ -69,6 +69,7 @@ SET x.primaryImageFullDimensions = bsuapi.obj.singleClean(asset.openpipe_canonic
 SET x.openpipe_latitude = openpipe_latitude
 SET x.openpipe_longitude = openpipe_longitude
 SET x.hasGeo = (openpipe_latitude IS NOT NULL AND openpipe_longitude IS NOT NULL)
+SET x.latlong = [openpipe_latitude, openpipe_longitude]
 SET x.openpipe_date = openpipe_date
 SET x.date = date(bsuapi.obj.openPipeDateMap(x.openpipe_date))
 
@@ -333,42 +334,42 @@ RETURN "BUILDING Topic MetaGraph, TAG relationships complete - committed:"+ oper
 ;
 
 MATCH (l:TopicList {type: "Artist"}) UNWIND KEYS(l) as guid
-MATCH (a:Artist) WHERE a.guid = guid AND a.name <> l[guid]
+MATCH (a:Artist) WHERE a.guid = guid
 SET a.name = l[guid]
 RETURN "Updated Artist names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Classification"}) UNWIND KEYS(l) as guid
-MATCH (a:Classification) WHERE a.guid = guid AND a.name <> l[guid]
+MATCH (a:Classification) WHERE a.guid = guid
 SET a.name = l[guid]
 RETURN "Updated Classification names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Culture"}) UNWIND KEYS(l) as guid
-MATCH (a:Culture) WHERE a.guid = guid AND a.name <> l[guid]
+MATCH (a:Culture) WHERE a.guid = guid
 SET a.name = l[guid]
 RETURN "Updated Culture names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Genre"}) UNWIND KEYS(l) as guid
-MATCH (a:Genre) WHERE a.guid = guid AND a.name <> l[guid]
+MATCH (a:Genre) WHERE a.guid = guid
 SET a.name = l[guid]
 RETURN "Updated Genre names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Medium"}) UNWIND KEYS(l) as guid
-MATCH (a:Medium) WHERE a.guid = guid AND a.name <> l[guid]
+MATCH (a:Medium) WHERE a.guid = guid
 SET a.name = l[guid]
 RETURN "Updated Medium names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Nation"}) UNWIND KEYS(l) as guid
-MATCH (a:Nation) WHERE a.guid = guid AND a.name <> l[guid]
+MATCH (a:Nation) WHERE a.guid = guid
 SET a.name = l[guid]
 RETURN "Updated Nation names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "City"}) UNWIND KEYS(l) as guid
-MATCH (a:City) WHERE a.guid = guid AND a.name <> l[guid]
+MATCH (a:City) WHERE a.guid = guid
 SET a.name = l[guid]
 RETURN "Updated City names" as t LIMIT 1;
 
 MATCH (l:TopicList {type: "Tag"}) UNWIND KEYS(l) as guid
-MATCH (a:Tag) WHERE a.guid = guid AND a.name <> l[guid]
+MATCH (a:Tag) WHERE a.guid = guid
 SET a.name = l[guid]
 RETURN "Updated Tag names" as t LIMIT 1;
 

@@ -14,7 +14,7 @@ implements QueryResultSingleColumn
      */
     protected static String query =
         "MATCH ("+ QueryResultSingleColumn.resultColumn +":%1$s) " +
-        "RETURN "+ QueryResultSingleColumn.resultColumn
+        "%2$s RETURN "+ QueryResultSingleColumn.resultColumn
         ;
 
     public FolderList()
@@ -27,7 +27,8 @@ implements QueryResultSingleColumn
     {
         return this.resultQuery = String.format(
             this.initQuery,
-            this.target.labelName()
+            this.target.labelName(),
+            this.where()
         ) + this.getPageLimitCmd();
     }
 }

@@ -47,10 +47,22 @@ CALL apoc.do.when( geometry IS NOT NULL AND size(geoSplit)>6 ,
 "",
 {f: f, r: r, geometry: geometry, wall: wall, geoSplit: geoSplit}
 ) YIELD value
-RETURN value
+RETURN "Synced folders and connected assets and positional data." as t LIMIT 1;
 
 
 
+CALL apoc.periodic.iterate(
+"
+      MATCH (f:Folder)<--(:Asset)-->(b:Topic)
+      RETURN f, b
+","
+      MERGE (f)-[r:FOLDER_TOPIC]->(b)
+      ON CREATE SET r.strength = 1
+      ON MATCH SET r.strength = r.strength + 1
+", {batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "FOLDER:TOPIC relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
+;
 
 
 

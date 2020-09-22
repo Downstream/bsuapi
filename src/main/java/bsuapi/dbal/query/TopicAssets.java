@@ -14,7 +14,7 @@ implements QueryResultSingleColumn
      */
     protected static String query =
         "MATCH (%1$s)<-[:%2$s]-("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
-        "RETURN "+ QueryResultSingleColumn.resultColumn +" " +
+        "%4$s RETURN "+ QueryResultSingleColumn.resultColumn +" " +
         "ORDER BY "+ QueryResultSingleColumn.resultColumn +".score_generated DESC ,"+ QueryResultSingleColumn.resultColumn +".openpipe_id ASC "
         ;
 
@@ -33,7 +33,8 @@ implements QueryResultSingleColumn
             this.initQuery,
             this.topic.toCypherMatch(),
             this.topic.getType().relFromAsset(),
-            this.target.labelName()
+            this.target.labelName(),
+            this.where()
         ) + this.getPageLimitCmd();
     }
 }

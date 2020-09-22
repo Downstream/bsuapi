@@ -54,7 +54,7 @@ public abstract class Behavior
             ;
 
         if (null != map) {
-            for (String key : new String[]{CypherQuery.limitParam,CypherQuery.pageParam, Topic.keyParam, Topic.labelParam, Search.searchParam}) {
+            for (String key : new String[]{CypherQuery.limitParam, CypherQuery.pageParam, CypherQuery.hasGeoParam, Topic.keyParam, Topic.labelParam, Search.searchParam}) {
                 if (map.containsKey(key)) {
                     result.put(key, map.get(key));
                 }
@@ -78,6 +78,7 @@ public abstract class Behavior
     {
         query.setLimit(this.getConfigParam(CypherQuery.limitParam));
         query.setPage(this.getConfigParam(CypherQuery.pageParam));
+        query.setHasGeo(Boolean.parseBoolean(this.getConfigParam(CypherQuery.hasGeoParam)));
     }
 
     public void putBehaviorData(JSONObject json)

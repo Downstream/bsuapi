@@ -12,7 +12,7 @@ implements QueryResultSingleColumn
     protected static String query =
         "MATCH p=("+ QueryResultSingleColumn.resultColumn +":%1$s)-[]->(:%2$s) " +
         "WITH "+ QueryResultSingleColumn.resultColumn +", count(p) as n " +
-        "RETURN "+ QueryResultSingleColumn.resultColumn +" ORDER BY n DESC "
+        "%3$s RETURN "+ QueryResultSingleColumn.resultColumn +" ORDER BY n DESC "
         ;
 
     public TopicTop(NodeType target)
@@ -26,7 +26,8 @@ implements QueryResultSingleColumn
         return this.resultQuery = String.format(
             this.initQuery,
             this.target.labelName(),
-            NodeType.TOPIC.labelName()
+            NodeType.TOPIC.labelName(),
+            this.where()
         ) + this.getPageLimitCmd();
     }
 }

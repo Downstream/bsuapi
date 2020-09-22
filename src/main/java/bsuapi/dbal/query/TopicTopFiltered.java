@@ -18,7 +18,7 @@ implements QueryResultSingleColumn
         "MATCH (x:Asset) WHERE x.%3$s=\"%4$s\" " +
         "MATCH p=(x)-[]->("+ QueryResultSingleColumn.resultColumn +":%1$s)-[]->(:%2$s) " +
         "WITH "+ QueryResultSingleColumn.resultColumn +", count(p) as n " +
-        "RETURN "+ QueryResultSingleColumn.resultColumn +" ORDER BY n DESC "
+        "%5$s RETURN "+ QueryResultSingleColumn.resultColumn +" ORDER BY n DESC "
         ;
 
     public TopicTopFiltered(NodeType target, String field, String value)
@@ -37,7 +37,8 @@ implements QueryResultSingleColumn
             this.target.labelName(),
             NodeType.TOPIC.labelName(),
             this.filterField,
-            this.filterValue
+            this.filterValue,
+            this.where()
         ) + this.getPageLimitCmd();
     }
 }

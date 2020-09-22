@@ -1,4 +1,6 @@
 # Releases
+* [`1.4.0`](bsuapi-1.4.0.jar) Added geo filter. 
+   * New Parameter `hasGeo` (bool) `hasGeo=1` will only include assets and topics with geo data.
 * [`1.3.2`](bsuapi-1.3.2.jar) Bugfixes for sync and folders.
 * [`1.3.0`](bsuapi-1.3.0.jar) Adds OpenPipe Integration.
    * `/folder` returns folder list.

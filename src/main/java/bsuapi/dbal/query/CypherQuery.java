@@ -1,6 +1,7 @@
 package bsuapi.dbal.query;
 
 import bsuapi.dbal.*;
+import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.neo4j.graphdb.Result;
@@ -17,10 +18,12 @@ abstract public class CypherQuery
     protected JSONArray results;
     public int limit = 20;
     public int page = 0;
+    public boolean hasGeo = false;
     public NodeType target;
 
     public static final String limitParam = "limit";
     public static final String pageParam = "page";
+    public static final String hasGeoParam = "hasGeo";
 
     public CypherQuery (String query)
     {
@@ -63,6 +66,30 @@ abstract public class CypherQuery
         } finally {
             this.setPage(p);
         }
+    }
+
+    public void setHasGeo() { this.setHasGeo(true); }
+    public void setHasGeo(boolean hasGeo) { this.hasGeo = hasGeo; }
+
+    public String where() {
+        if (this.hasGeo && this instanceof QueryResultSingleColumn) {
+            return " WHERE " + QueryResultSingleColumn.resultColumn +".hasGeo = true";
+        }
+
+        return "";
+    }
+
+    public String where(String[] clauses)
+    {
+        if (clauses == null) return this.where();
+
+        if (this.hasGeo && this instanceof QueryResultSingleColumn) {
+            ArrayUtils.add(clauses, QueryResultSingleColumn.resultColumn +".hasGeo = true");
+        }
+
+        if (clauses.length < 1) { return ""; }
+
+        return " WHERE " + String.join(" AND ", clauses);
     }
 
     public void setPage(int page)
