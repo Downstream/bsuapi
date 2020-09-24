@@ -69,7 +69,8 @@ SET x.primaryImageFullDimensions = bsuapi.obj.singleClean(asset.openpipe_canonic
 SET x.openpipe_latitude = openpipe_latitude
 SET x.openpipe_longitude = openpipe_longitude
 SET x.hasGeo = (openpipe_latitude IS NOT NULL AND openpipe_longitude IS NOT NULL)
-SET x.latlong = [openpipe_latitude, openpipe_longitude]
+SET x.latlong = CASE WHEN x.hasGeo THEN [toFloat(openpipe_latitude), toFloat(openpipe_longitude)] ELSE null END
+SET a.wgs = CASE WHEN x.hasGeo THEN point({x: x.latlong[0], y: x.latlong[1], crs: 'wgs-84'}) ELSE null END
 SET x.openpipe_date = openpipe_date
 SET x.date = date(bsuapi.obj.openPipeDateMap(x.openpipe_date))
 
@@ -110,7 +111,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
   WITH t,
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
-  SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd, t.hasGeo = null
   SET t :Topic
 ",
   {batchSize:10000, iterateList:true, parallel:false}
@@ -125,7 +126,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
   WITH t,
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
-  SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd, t.hasGeo = null
   SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
@@ -140,7 +141,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 2}) RETURN x","
   WITH t,
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
-  SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd, t.hasGeo = null
   SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
@@ -155,7 +156,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 3}) RETURN x","
   WITH t,
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
-  SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd, t.hasGeo = null
   SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
@@ -170,7 +171,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 4}) RETURN x","
   WITH t,
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
-  SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd, t.hasGeo = null
   SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
@@ -185,7 +186,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 5}) RETURN x","
   WITH t,
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
-  SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd, t.hasGeo = null
   SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
@@ -200,7 +201,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
   WITH t,
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
-  SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd, t.hasGeo = null
   SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
@@ -215,7 +216,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
   WITH t,
     CASE WHEN t.dateStart IS NULL OR t.dateStart > x.date THEN x.date ELSE t.dateStart END AS dateStart,
     CASE WHEN t.dateEnd IS NULL OR t.dateEnd < x.date THEN x.date ELSE t.dateEnd END AS dateEnd
-  SET t.dateStart = dateStart, t.dateEnd = dateEnd
+  SET t.dateStart = dateStart, t.dateEnd = dateEnd, t.hasGeo = null
   SET t :Topic
 ",
 {batchSize:10000, iterateList:true, parallel:false}
@@ -223,6 +224,13 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
 RETURN "BUILDING Topics, ASSET:TAG relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
+CALL apoc.periodic.iterate("MATCH (:Asset {hasGeo: true})-[]->(t:Topic) RETURN t","
+  SET t.hasGeo = true
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "SET Topic hasGeo from Assets - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
+;
 
 
 RETURN "STARTING Topic MetaGraph" as t;
