@@ -4,6 +4,7 @@ import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.QueryResultCollector;
+import bsuapi.resource.Config;
 import bsuapi.resource.Util;
 import bsuapi.service.ScriptOverseer;
 import bsuapi.service.ScriptStatus;
@@ -48,7 +49,11 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         } catch (Exception e) {
             this.booting = false;
             this.failed = true;
-            this.results.put(e.getMessage());
+            if (Config.showErrors() > 0) {
+                this.results.put(e.getMessage());
+            } else {
+                this.results.put(e.getClass().getSimpleName());
+            }
         }
     }
 
@@ -83,8 +88,12 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
             try {
                 this.handleCommandResult(command.exec(this.c));
             } catch (CypherException e) {
-                this.results.put(e.getCause().getMessage());
                 this.failed = true;
+                if (Config.showErrors() > 0) {
+                    this.results.put(e.getCause().getMessage());
+                } else {
+                    this.results.put(e.getClass().getSimpleName());
+                }
             }
         }
 

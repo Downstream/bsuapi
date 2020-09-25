@@ -76,9 +76,15 @@ public class Response
 
     public javax.ws.rs.core.Response exception (Exception e)
     {
-        JSONObject res = this.buildResponse(false, e.getMessage());
-        res.put("data", e.toString());
-        res.put("stack", JsonResponse.exceptionStack(e));
+        JSONObject res;
+        if (Config.showErrors() > 0) {
+            res = this.buildResponse(false, e.getMessage());
+            res.put("data", e.toString());
+            res.put("stack", JsonResponse.exceptionStack(e));
+        } else {
+            res = this.buildResponse(false, e.getClass().getSimpleName());
+        }
+
         return JsonResponse.SERVER_ERROR(res);
     }
 

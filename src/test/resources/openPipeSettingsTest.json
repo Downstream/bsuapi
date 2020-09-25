@@ -1,0 +1,62 @@
+{
+  "explore": {
+    "name": "explore",
+    "preset": [
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/medium/156",
+      "all",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/28",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/20",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/artist/223"
+    ]
+  },
+  "connections": {
+    "name": "connections",
+    "preset": [
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/28",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/20",
+      "all",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/artist/223",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/medium/156"
+    ]
+  },
+  "color": {
+    "name": "color",
+    "message": [
+      "Test Message"
+    ],
+    "colors": [
+      "cycle",
+      "#0C1289,#A86AB5;Midnight",
+      "#54A8D3,#F2606F;Orange and Blue",
+      "#F2215A,#FFB553;Sunset",
+      "#93BC85,#64489B;Lavender Fields",
+      "#E0168F,#390060;Pinks",
+      "#000000,#FFFFFF;Monochrome"
+    ]
+  },
+  "timeline": {
+    "name": "timeline",
+    "preset": [
+      "all",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/classification/18",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/nation/67",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/artist/223 by Tag",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/21 by Tag",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/20 by Artist",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/28",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/medium/156"
+    ]
+  },
+  "globe": {
+    "name": "globe",
+    "topic": [
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/classification/99",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/medium/156",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/nation/10",
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/artist/193"
+    ],
+    "folder": [
+      "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/28"
+    ]
+  }
+}

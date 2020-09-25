@@ -9,6 +9,7 @@ public class Config
     private String file = "config.properties";
     private static Config singleton;
     private Properties properties;
+    private int showErrors = 0;
 
     private Config()
     {
@@ -16,6 +17,7 @@ public class Config
 
         try (InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream(this.file)) {
             this.properties.load(resourceAsStream);
+            try { this.showErrors = Integer.parseInt(this.properties.getProperty("showErrors")); } catch (Exception ignored) {}
         } catch (IOException e) {
             System.err.println("Unable to load configuration from " + this.file);
         }
@@ -30,10 +32,15 @@ public class Config
         return singleton;
     }
 
+    public static int showErrors()
+    {
+        return Config.instance().showErrors;
+    }
+
     public static String get(String key)
     {
         try {
-            return Config.instance().properties.get(key).toString();
+            return Config.instance().properties.getProperty(key);
         } catch (Exception e) {
             return null;
         }
@@ -42,9 +49,9 @@ public class Config
     public static String getDefault(String key, String def)
     {
         try {
-            return Config.instance().properties.getOrDefault(key, def).toString();
+            return Config.instance().properties.getProperty(key, def);
         } catch (Exception e) {
-            return null;
+            return def;
         }
     }
 

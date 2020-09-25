@@ -1,0 +1,160 @@
+{
+  "total": 31,
+  "data": [
+    {
+      "groupName": "explore",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/medium/156"
+    },
+    {
+      "groupName": "explore",
+      "key": "preset",
+      "value": "all"
+    },
+    {
+      "groupName": "explore",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/28"
+    },
+    {
+      "groupName": "explore",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/20"
+    },
+    {
+      "groupName": "connections",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/28"
+    },
+    {
+      "groupName": "connections",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/20"
+    },
+    {
+      "groupName": "connections",
+      "key": "preset",
+      "value": "all"
+    },
+    {
+      "groupName": "connections",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/artist/223"
+    },
+    {
+      "groupName": "connections",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/medium/156"
+    },
+    {
+      "groupName": "color",
+      "key": "colors",
+      "value": "cycle"
+    },
+    {
+      "groupName": "timeline",
+      "key": "preset",
+      "value": "all"
+    },
+    {
+      "groupName": "timeline",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/classification/18"
+    },
+    {
+      "groupName": "timeline",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/nation/67"
+    },
+    {
+      "groupName": "timeline",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/artist/223 by Tag"
+    },
+    {
+      "groupName": "timeline",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/21 by Tag"
+    },
+    {
+      "groupName": "timeline",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/20 by Artist"
+    },
+    {
+      "groupName": "timeline",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/28"
+    },
+    {
+      "groupName": "timeline",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/medium/156"
+    },
+    {
+      "groupName": "color",
+      "key": "colors",
+      "value": "#0C1289,#A86AB5;Midnight"
+    },
+    {
+      "groupName": "color",
+      "key": "colors",
+      "value": "#54A8D3,#F2606F;Orange and Blue"
+    },
+    {
+      "groupName": "color",
+      "key": "colors",
+      "value": "#F2215A,#FFB553;Sunset"
+    },
+    {
+      "groupName": "color",
+      "key": "colors",
+      "value": "#93BC85,#64489B;Lavender Fields"
+    },
+    {
+      "groupName": "color",
+      "key": "colors",
+      "value": "#E0168F,#390060;Pinks"
+    },
+    {
+      "groupName": "color",
+      "key": "colors",
+      "value": "#000000,#FFFFFF;Monochrome"
+    },
+    {
+      "groupName": "color",
+      "key": "message",
+      "value": "Welcome to the Keith and Catherine Stein World Museum"
+    },
+    {
+      "groupName": "globe",
+      "key": "folder",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/28"
+    },
+    {
+      "groupName": "globe",
+      "key": "topic",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/classification/99"
+    },
+    {
+      "groupName": "globe",
+      "key": "topic",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/medium/156"
+    },
+    {
+      "groupName": "globe",
+      "key": "topic",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/nation/10"
+    },
+    {
+      "groupName": "globe",
+      "key": "topic",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/artist/193"
+    },
+    {
+      "groupName": "explore",
+      "key": "preset",
+      "value": "http://mec402.boisestate.edu/cgi-bin/openpipe/data/artist/223"
+    }
+  ]
+}

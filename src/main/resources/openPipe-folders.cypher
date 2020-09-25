@@ -64,7 +64,13 @@ CALL apoc.periodic.iterate(
 RETURN "FOLDER:TOPIC relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-
+CALL apoc.periodic.iterate("MATCH (:Asset {hasGeo: true})-[]->(f:Folder) RETURN f","
+  SET f.hasGeo = true
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "SET Folder hasGeo from Assets - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
+;
 
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.lastFolderRun = date()

@@ -12,10 +12,8 @@ import bsuapi.behavior.Folder;
 import bsuapi.behavior.Related;
 import bsuapi.behavior.Search;
 import bsuapi.dbal.*;
-import bsuapi.dbal.query.CypherQuery;
-import bsuapi.dbal.query.FolderList;
-import bsuapi.dbal.query.TopicTop;
-import bsuapi.dbal.query.TopicTopFiltered;
+import bsuapi.dbal.query.*;
+import bsuapi.obj.OpenPipeSettings;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -41,17 +39,25 @@ public class RootResource extends BaseResource
         data.put("schema", this.buildSchema(response));
         this.attachPackageDetails(data);
 
-        try (
-            Cypher c = new Cypher(db)
-        ) {
-            data.put("topics", this.topicsList(c));
-            data.put("folders", this.folderList(c));
-        } catch (Exception e) {
-            data.put("topics", new JSONObject());
-            data.put("folders", new JSONArray());
-        }
+        Cypher c = new Cypher(db);
+
+        this.safeCypher(data, "topics", this::topicsList, c);
+        this.safeCypher(data, "folders", this::folderList, c);
+        this.safeCypher(data, "settings", this::settingsList, c);
 
         return response.plain(data);
+    }
+
+    private interface SafeCypherJSON { JSONObject apply(Cypher c) throws CypherException; }
+
+    private void safeCypher(JSONObject data, String key, SafeCypherJSON dataLoader, Cypher c)
+    {
+        try {
+            data.put(key, dataLoader.apply(c));
+        } catch (Exception e) {
+            data.put(key, new JSONObject());
+            data.put(key +"-exception", this.exceptionHandler(e));
+        }
     }
 
     private JSONObject buildMethodList()
@@ -135,14 +141,52 @@ public class RootResource extends BaseResource
         return topics;
     }
 
-    private JSONArray folderList(Cypher c)
+    private JSONObject folderList(Cypher c)
     throws CypherException
     {
         CypherQuery query = new FolderList();
         query.setPage(this.getParam(CypherQuery.pageParam));
         query.setLimit(this.getParam(CypherQuery.limitParam));
         query.setHasGeo(Boolean.parseBoolean(this.getParam(CypherQuery.hasGeoParam)));
-        return query.exec(c);
+        JSONArray folderList = query.exec(c);
+
+        JSONObject result = new JSONObject();
+        result.put("folders", folderList);
+
+        return result;
+    }
+
+    private JSONObject settingsList(Cypher c)
+    throws CypherException
+    {
+        JSONObject result = new JSONObject();
+        CypherQuery query = new SettingsList();
+        result.put("query", query.getCommand());
+
+        int i = 0;
+        for(Object entry : query.exec(c)) {
+            if (entry instanceof JSONObject) {
+                OpenPipeSettings current = new OpenPipeSettings((JSONObject) entry);
+                if (current.isValid()) {
+                    result.put(current.name(), current.data());
+                }
+            }
+        }
+
+        result.put("config", this.getConfig());
+        return result;
+    }
+
+    private JSONObject getConfig()
+    {
+        JSONObject result = new JSONObject();
+        result.put("artifactId",Config.get("artifactId"));
+        result.put("domain",Config.get("domain"));
+        result.put("baseuri",Config.get("baseuri"));
+        result.put("name",Config.get("name"));
+        result.put("homeFilter",Config.get("homeFilter"));
+        result.put("showErrors",Config.showErrors());
+        return result;
     }
 
     private JSONObject buildSchema(Response response)
@@ -160,5 +204,17 @@ public class RootResource extends BaseResource
         data.put("version", Config.getDefault("version", "0.1"));
         data.put("package", Config.getDefault("package", "bsuapi"));
         data.put("canonical", Config.buildUri("/"));
+    }
+
+    private JSONObject exceptionHandler(Exception e) {
+        JSONObject exObj = new JSONObject();
+        if (Config.showErrors() > 0) {
+            exObj.put("message", e.getMessage());
+            exObj.put("cause", e.getCause());
+            exObj.put("stack", JsonResponse.exceptionStack(e));
+        } else {
+            exObj.put("message", e.getClass().getSimpleName());
+        }
+        return exObj;
     }
 }
