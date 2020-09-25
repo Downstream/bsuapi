@@ -1,4 +1,5 @@
 # Releases
+* [`1.5.3`](bsuapi-1.5.3.jar) Added settings as executable option: `OPENPIPE_SETTINGS`.
 * [`1.5.2`](bsuapi-1.5.2.jar) Added settings, geo, and config improvements.
    * Folders and Topics containing Assets with geo-data will be marked hasGeo=true, and included in filter results.
    * Settings from openpipe are imported, and parsed results added to root `/` data.
