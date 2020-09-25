@@ -102,7 +102,7 @@ RETURN "COMPLETED IMPORT apoc.periodic.commit(apoc.load.json( "+ api.allAssets +
 
 MATCH (x:Asset {import: 0})-[r]->() DELETE r;
 
-RETURN "STARTING Asset:Topic relationships" as t LIMIT 1;
+RETURN "STARTING Asset:Topic relationships" as t;
 
 CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
   SET x.import = 1 WITH x
@@ -344,68 +344,68 @@ RETURN "BUILDING Topic MetaGraph, TAG relationships complete - committed:"+ oper
 MATCH (l:TopicList {type: "Artist"}) UNWIND KEYS(l) as guid
 MATCH (a:Artist) WHERE a.guid = guid
 SET a.name = l[guid]
-RETURN "Updated Artist names" as t LIMIT 1;
+RETURN "Updated Artist names" as t;
 
 MATCH (l:TopicList {type: "Classification"}) UNWIND KEYS(l) as guid
 MATCH (a:Classification) WHERE a.guid = guid
 SET a.name = l[guid]
-RETURN "Updated Classification names" as t LIMIT 1;
+RETURN "Updated Classification names" as t;
 
 MATCH (l:TopicList {type: "Culture"}) UNWIND KEYS(l) as guid
 MATCH (a:Culture) WHERE a.guid = guid
 SET a.name = l[guid]
-RETURN "Updated Culture names" as t LIMIT 1;
+RETURN "Updated Culture names" as t;
 
 MATCH (l:TopicList {type: "Genre"}) UNWIND KEYS(l) as guid
 MATCH (a:Genre) WHERE a.guid = guid
 SET a.name = l[guid]
-RETURN "Updated Genre names" as t LIMIT 1;
+RETURN "Updated Genre names" as t;
 
 MATCH (l:TopicList {type: "Medium"}) UNWIND KEYS(l) as guid
 MATCH (a:Medium) WHERE a.guid = guid
 SET a.name = l[guid]
-RETURN "Updated Medium names" as t LIMIT 1;
+RETURN "Updated Medium names" as t;
 
 MATCH (l:TopicList {type: "Nation"}) UNWIND KEYS(l) as guid
 MATCH (a:Nation) WHERE a.guid = guid
 SET a.name = l[guid]
-RETURN "Updated Nation names" as t LIMIT 1;
+RETURN "Updated Nation names" as t;
 
 MATCH (l:TopicList {type: "City"}) UNWIND KEYS(l) as guid
 MATCH (a:City) WHERE a.guid = guid
 SET a.name = l[guid]
-RETURN "Updated City names" as t LIMIT 1;
+RETURN "Updated City names" as t;
 
 MATCH (l:TopicList {type: "Tag"}) UNWIND KEYS(l) as guid
 MATCH (a:Tag) WHERE a.guid = guid
 SET a.name = l[guid]
-RETURN "Updated Tag names" as t LIMIT 1;
+RETURN "Updated Tag names" as t;
 
 
 MATCH (a:Artist)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for ARTIST" as t LIMIT 1;
+RETURN "SET artCount for ARTIST" as t;
 
 MATCH (a:Classification)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for CLASSIFICATION" as t LIMIT 1;
+RETURN "SET artCount for CLASSIFICATION" as t;
 
 MATCH (a:Culture)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for CULTURE" as t LIMIT 1;
+RETURN "SET artCount for CULTURE" as t;
 
 MATCH (a:Genre)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for GENRE" as t LIMIT 1;
+RETURN "SET artCount for GENRE" as t;
 
 MATCH (a:Medium)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for MEDIUM" as t LIMIT 1;
+RETURN "SET artCount for MEDIUM" as t;
 
 MATCH (a:Nation)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for NATION" as t LIMIT 1;
+RETURN "SET artCount for NATION" as t;
 
 MATCH (a:City)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for CITY" as t LIMIT 1;
+RETURN "SET artCount for CITY" as t;
 
 MATCH (a:Tag)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
-RETURN "SET artCount for TAG" as t LIMIT 1;
+RETURN "SET artCount for TAG" as t;
 
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.lastRun = api.thisRun
-RETURN "Sync COMPLETE" as t LIMIT 1;
+RETURN "Sync COMPLETE" as t;
