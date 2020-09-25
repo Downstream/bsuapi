@@ -1,4 +1,14 @@
 # Releases
+* [`1.5.2`](bsuapi-1.5.2.jar) Added settings, geo, and config improvements.
+   * Folders and Topics containing Assets with geo-data will be marked hasGeo=true, and included in filter results.
+   * Settings from openpipe are imported, and parsed results added to root `/` data.
+      * collections
+      * timeline - `"[Topic|Folder]"` OR `"[Topic|Folder] by [TopicType]"`
+      * color
+      * globe
+      * explore
+   * Better, and configurable, exception visibility.
+   * Config is now also visible in `/` settings data.
 * [`1.4.0`](bsuapi-1.4.0.jar) Added geo filter. 
    * New Parameter `hasGeo` (bool) `hasGeo=1` will only include assets and topics with geo data.
 * [`1.3.2`](bsuapi-1.3.2.jar) Bugfixes for sync and folders.
