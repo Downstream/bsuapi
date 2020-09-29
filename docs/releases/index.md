@@ -1,4 +1,11 @@
 # Releases
+* [`1.6.2`](bsuapi-1.6.2.jar) Improvements and fixes to sync, and `/settings`.
+* [`1.6.0`](bsuapi-1.6.0.jar) Added settings to `/` and a new method `/settings`.
+   * `/settings` lists all openpipeline settings, and api config.
+   * `/settings/{group}` retrieves settings for that specific mode.
+      * e.g.: `/settings/timeline` will retrieve all Topics and Folders preset as options for the timeline mode. 
+      * `timeline` mode options *may* have an additional property: `byType` with a value of a specific topic type to focus the mode on.
+      * `color` options include a message, and two colors for applying to the color-mode. 
 * [`1.5.3`](bsuapi-1.5.3.jar) Added settings as executable option: `OPENPIPE_SETTINGS`.
 * [`1.5.2`](bsuapi-1.5.2.jar) Added settings, geo, and config improvements.
    * Folders and Topics containing Assets with geo-data will be marked hasGeo=true, and included in filter results.
