@@ -2,7 +2,7 @@ package bsuapi.dbal.query;
 
 import bsuapi.obj.SettingGroup;
 
-public class SettingsList extends CypherQuery
+public class SettingsEntry extends CypherQuery
 implements QueryResultSingleColumn
 {
     /**
@@ -13,15 +13,15 @@ implements QueryResultSingleColumn
      * 4: max # of matches
      */
     protected static String query =
-        "MATCH (g:%1$s {name: \"%2$s\"})<-[rel:SETTING_OPTION]-(a) " +
-        "RETURN CASE WHEN rel.byType IS NOT NULL THEN a{.*, type: head(labels(a)), byType: rel.byType} ELSE a END AS "+ QueryResultSingleColumn.resultColumn
+        "MATCH ("+ QueryResultSingleColumn.resultColumn +":%1$s {name: \"%2$s\"}) " +
+        "RETURN "+ QueryResultSingleColumn.resultColumn +" LIMIT 1"
         ;
 
     private SettingGroup group;
 
-    public SettingsList(SettingGroup group)
+    public SettingsEntry(SettingGroup group)
     {
-        super(SettingsList.query);
+        super(SettingsEntry.query);
         this.group = group;
     }
 

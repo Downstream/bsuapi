@@ -11,4 +11,31 @@ UNWIND vals AS val
 WITH group, key, COLLECT(distinct val) as newvals
 CALL apoc.create.setProperty(group, key, newvals) YIELD node
 
-RETURN "Loaded new Settings - Settings Sync COMPLETE" as t;
+RETURN "Loaded new Settings" as t;
+
+MATCH (group:OpenPipeSetting)
+UNWIND group.preset AS entry
+WITH group, entry, split(entry, ' ') as splitEntry
+WITH group, entry, splitEntry[0] as splitGuid, splitEntry[2] as splitByType
+CALL apoc.do.case([
+  splitByType IS NOT NULL AND size(splitByType)>0 AND splitGuid CONTAINS "/folder/", "
+    	MATCH (a:Folder {guid: splitGuid})
+        MERGE (group)<-[:SETTING_OPTION {byType: splitByType}]-(a)
+    ",
+  splitByType IS NOT NULL AND size(splitByType)>0 AND splitGuid CONTAINS "/openpipe/", "
+    	MATCH (a:Topic {guid: splitGuid})
+        MERGE (group)<-[:SETTING_OPTION {byType: splitByType}]-(a)
+    ",
+  entry CONTAINS "/folder/", "
+    	MATCH (a:Folder {guid: entry})
+        MERGE (group)<-[:SETTING_OPTION]-(a)
+    ",
+  entry CONTAINS "/openpipe/", "
+    	MATCH (a:Topic {guid: entry})
+        MERGE (group)<-[:SETTING_OPTION]-(a)
+    "
+],
+"",
+{group: group, entry: entry, splitGuid: splitGuid, splitByType: splitByType}
+) YIELD value
+RETURN "Mapped setting's guids to topic/folders" as t;

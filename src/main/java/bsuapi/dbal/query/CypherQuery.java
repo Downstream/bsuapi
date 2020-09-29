@@ -1,6 +1,8 @@
 package bsuapi.dbal.query;
 
 import bsuapi.dbal.*;
+import bsuapi.resource.JsonResponse;
+import bsuapi.resource.Util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -155,12 +157,16 @@ abstract public class CypherQuery
 
     public void entryHandler(Object entry)
     {
-        if (entry instanceof org.neo4j.graphdb.Node) {
-            this.addResultEntry(new Node((org.neo4j.graphdb.Node) entry));
-        } else if (entry instanceof Map) {
-            this.addResultEntry(new VirtualNode((Map) entry));
-        } else {
-            this.addResultEntry(entry.getClass() +": "+ entry.toString());
+        try {
+            if (entry instanceof org.neo4j.graphdb.Node) {
+                this.addResultEntry(new Node((org.neo4j.graphdb.Node) entry));
+            } else if (entry instanceof Map) {
+                this.addResultEntry(new VirtualNode((Map) entry));
+            } else {
+                this.addResultEntry(entry.getClass() + ": " + entry.toString());
+            }
+        } catch (Throwable e) {
+            this.addResultEntry(JsonResponse.exceptionDetailed(e));
         }
     }
 

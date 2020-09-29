@@ -31,7 +31,7 @@ public class RootResource extends BaseResource
         Response response = this.prepareResponse(uriInfo);
 
         JSONObject data = new JSONObject();
-        data.put("title","Boise State World Museum Neo4j JSON API");
+        data.put("title",Config.get("name")+" Neo4j JSON API");
         data.put("summary","Multiple RESTful URI methods to retrieve preset JSON representations of the graph of curated assets.");
         data.put("note","Project goal: >90% test coverage, and every API method has an equivalent function registered.");
         data.put("methods", this.buildMethodList());
@@ -56,7 +56,7 @@ public class RootResource extends BaseResource
             data.put(key, dataLoader.apply(c));
         } catch (Exception e) {
             data.put(key, new JSONObject());
-            data.put(key +"-exception", this.exceptionHandler(e));
+            data.put(key +"-exception", JsonResponse.exceptionDetailed(e));
         }
     }
 
@@ -66,10 +66,13 @@ public class RootResource extends BaseResource
 
         methods.put("root", this.youarehere());
         methods.put("related", Related.describe());
-        methods.put("folder", Folder.describe());
+        methods.put("folder/{guid}", Folder.describe());
+        methods.put("folder", FolderResource.describeList());
         methods.put("topic-assets", Assets.describe());
         methods.put("search", Search.describe());
         methods.put("search/completion", Search.describeCompletion());
+        methods.put("settings", SettingsResource.describeList());
+        methods.put("settings/{group}", SettingsResource.describeSingleGroup());
         methods.put("info", InfoResource.describe());
         methods.put("execute", ExecutorResource.describe());
 
@@ -159,34 +162,7 @@ public class RootResource extends BaseResource
     private JSONObject settingsList(Cypher c)
     throws CypherException
     {
-        JSONObject result = new JSONObject();
-        CypherQuery query = new SettingsList();
-        result.put("query", query.getCommand());
-
-        int i = 0;
-        for(Object entry : query.exec(c)) {
-            if (entry instanceof JSONObject) {
-                OpenPipeSettings current = new OpenPipeSettings((JSONObject) entry);
-                if (current.isValid()) {
-                    result.put(current.name(), current.data());
-                }
-            }
-        }
-
-        result.put("config", this.getConfig());
-        return result;
-    }
-
-    private JSONObject getConfig()
-    {
-        JSONObject result = new JSONObject();
-        result.put("artifactId",Config.get("artifactId"));
-        result.put("domain",Config.get("domain"));
-        result.put("baseuri",Config.get("baseuri"));
-        result.put("name",Config.get("name"));
-        result.put("homeFilter",Config.get("homeFilter"));
-        result.put("showErrors",Config.showErrors());
-        return result;
+        return OpenPipeSettings.listAll(c);
     }
 
     private JSONObject buildSchema(Response response)
@@ -204,17 +180,5 @@ public class RootResource extends BaseResource
         data.put("version", Config.getDefault("version", "0.1"));
         data.put("package", Config.getDefault("package", "bsuapi"));
         data.put("canonical", Config.buildUri("/"));
-    }
-
-    private JSONObject exceptionHandler(Exception e) {
-        JSONObject exObj = new JSONObject();
-        if (Config.showErrors() > 0) {
-            exObj.put("message", e.getMessage());
-            exObj.put("cause", e.getCause());
-            exObj.put("stack", JsonResponse.exceptionStack(e));
-        } else {
-            exObj.put("message", e.getClass().getSimpleName());
-        }
-        return exObj;
     }
 }

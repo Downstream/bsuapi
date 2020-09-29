@@ -1,5 +1,6 @@
 package bsuapi.resource;
 
+import bsuapi.behavior.BehaviorDescribe;
 import bsuapi.behavior.BehaviorType;
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
@@ -69,5 +70,14 @@ public class FolderResource extends BaseResource
         query.setPage(this.getParam(CypherQuery.pageParam));
         query.setLimit(this.getParam(CypherQuery.limitParam));
         return query.exec(c);
+    }
+
+    public static BehaviorDescribe describeList()
+    {
+        BehaviorDescribe desc = BehaviorDescribe.resource("/folder",
+            "List all folders."
+        );
+
+        return desc;
     }
 }

@@ -13,7 +13,8 @@ public enum NodeType
     MEDIUM,
     CITY,
     TOPIC,
-    FOLDER;
+    FOLDER,
+    OPEN_PIPE_SETTING;
 
     public Label label()
     {
@@ -47,6 +48,8 @@ public enum NodeType
                 return "City";
             case FOLDER:
                 return "Folder";
+            case OPEN_PIPE_SETTING:
+                return "OpenPipeSetting";
             default:
                 throw new IllegalStateException( "Unknown Node Type enum: " + this );
         }
@@ -75,6 +78,8 @@ public enum NodeType
                 return "CITY";
             case FOLDER:
                 return "FOLDER_TOPIC";
+            case OPEN_PIPE_SETTING:
+                return "SETTING_OPTION";
             case TOPIC:
                 throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
             case ASSET:
@@ -107,6 +112,8 @@ public enum NodeType
                 return "ASSET_CITY";
             case FOLDER:
                 return "FOLDER_ASSET";
+            case OPEN_PIPE_SETTING:
+                return "SETTING_OPTION";
             case TOPIC:
                 throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
             case ASSET:
@@ -169,6 +176,7 @@ public enum NodeType
             if (lName.equals("Medium")) return MEDIUM;
             if (lName.equals("City")) return CITY;
             if (lName.equals("Folder")) return FOLDER;
+            if (lName.equals("OpenPipeSetting")) return OPEN_PIPE_SETTING;
         }
 
         return null;

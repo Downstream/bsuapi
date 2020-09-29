@@ -39,7 +39,7 @@ public class Node
 
     public String getNodeKey() { return this.keyVal; }
 
-    public String getProperty(String key){ return (String) this.properties.get(key); }
+    public String getProperty(String key){ return (String) this.properties.getOrDefault(key, "unknown"); }
 
     /* @todo refactor this and NodeType calls - can be simplified */
     public String getUri()

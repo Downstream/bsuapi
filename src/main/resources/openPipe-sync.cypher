@@ -70,7 +70,7 @@ SET x.openpipe_latitude = openpipe_latitude
 SET x.openpipe_longitude = openpipe_longitude
 SET x.hasGeo = (openpipe_latitude IS NOT NULL AND openpipe_longitude IS NOT NULL)
 SET x.latlong = CASE WHEN x.hasGeo THEN [toFloat(openpipe_latitude), toFloat(openpipe_longitude)] ELSE null END
-SET a.wgs = CASE WHEN x.hasGeo THEN point({x: x.latlong[0], y: x.latlong[1], crs: 'wgs-84'}) ELSE null END
+SET x.wgs = CASE WHEN x.hasGeo THEN point({x: x.latlong[0], y: x.latlong[1], crs: 'wgs-84'}) ELSE null END
 SET x.openpipe_date = openpipe_date
 SET x.date = date(bsuapi.obj.openPipeDateMap(x.openpipe_date))
 
@@ -104,8 +104,7 @@ MATCH (x:Asset {import: 0})-[r]->() DELETE r;
 
 RETURN "STARTING Asset:Topic relationships" as t;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
-  SET x.import = 1 WITH x
+CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
   UNWIND x.openpipe_guid_artist as guid MERGE (t:Artist {guid: guid})
   MERGE (x)-[:BY]->(t)
   WITH t,
@@ -119,8 +118,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
 RETURN "BUILDING Topics, ASSET:ARTIST relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
-  SET x.import = 2 WITH x
+CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
   UNWIND x.openpipe_guid_culture as guid MERGE (t:Culture {guid: guid})
   MERGE (x)-[:ASSET_CULTURE]->(t)
   WITH t,
@@ -134,8 +132,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
 RETURN "BUILDING Topics, ASSET:CULTURE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset {import: 2}) RETURN x","
-  SET x.import = 3 WITH x
+CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
   UNWIND x.openpipe_guid_classification as guid MERGE (t:Classification {guid: guid})
   MERGE (x)-[:ASSET_CLASS]->(t)
   WITH t,
@@ -149,8 +146,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 2}) RETURN x","
 RETURN "BUILDING Topics, ASSET:CLASS relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset {import: 3}) RETURN x","
-  SET x.import = 4 WITH x
+CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
   UNWIND x.openpipe_guid_genre as guid MERGE (t:Genre {guid: guid})
   MERGE (x)-[:ASSET_GENRE]->(t)
   WITH t,
@@ -164,8 +160,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 3}) RETURN x","
 RETURN "BUILDING Topics, ASSET:GENRE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset {import: 4}) RETURN x","
-  SET x.import = 5 WITH x
+CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
   UNWIND x.openpipe_guid_medium as guid MERGE (t:Medium {guid: guid})
   MERGE (x)-[:ASSET_MEDIUM]->(t)
   WITH t,
@@ -179,8 +174,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 4}) RETURN x","
 RETURN "BUILDING Topics, ASSET:MEDIUM relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset {import: 5}) RETURN x","
-  SET x.import = 6 WITH x
+CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
   UNWIND x.openpipe_guid_nation as guid MERGE (t:Nation {guid: guid})
   MERGE (x)-[:ASSET_NATION]->(t)
   WITH t,
@@ -194,8 +188,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 5}) RETURN x","
 RETURN "BUILDING Topics, ASSET:NATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
-  SET x.import = 7 WITH x
+CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
   UNWIND x.openpipe_guid_city as guid MERGE (t:City {guid: guid})
   MERGE (x)-[:ASSET_CITY]->(t)
   WITH t,
@@ -209,8 +202,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
 RETURN "BUILDING Topics, ASSET:CITY relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset {import: 0}) RETURN x","
-  SET x.import = null WITH x
+CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
   UNWIND x.openpipe_guid_tags as guid MERGE (t:Tag {guid: guid})
   MERGE (x)-[:ASSET_TAG]->(t)
   WITH t,

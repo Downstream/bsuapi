@@ -50,7 +50,7 @@ public class JsonResponse
         return Response.status( status ).entity( UTF8.encode(response.toString(4)) ).build();
     }
 
-    public static JSONObject exceptionStack(Exception e)
+    public static JSONObject exceptionStack(Throwable e)
     {
         JSONObject result = new JSONObject();
         JSONArray stack;
@@ -64,5 +64,17 @@ public class JsonResponse
         } while(null != (cause = e.getCause()));
 
         return result;
+    }
+
+    public static JSONObject exceptionDetailed(Throwable e) {
+        JSONObject exObj = new JSONObject();
+        if (Config.showErrors() > 0) {
+            exObj.put("message", e.getMessage());
+            exObj.put("cause", e.getCause());
+            exObj.put("stack", JsonResponse.exceptionStack(e));
+        } else {
+            exObj.put("message", e.getClass().getSimpleName());
+        }
+        return exObj;
     }
 }
