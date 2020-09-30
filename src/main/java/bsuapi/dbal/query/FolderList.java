@@ -17,6 +17,9 @@ implements QueryResultSingleColumn
         "%2$s RETURN "+ QueryResultSingleColumn.resultColumn
         ;
 
+    private boolean templateOnly = false;
+    public static final String templateOnlyParam = "hasLayout";
+
     public FolderList()
     {
         super(FolderList.query);
@@ -30,5 +33,24 @@ implements QueryResultSingleColumn
             this.target.labelName(),
             this.where()
         ) + this.getPageLimitCmd();
+    }
+
+    public void setTemplateOnly(boolean templateOnly) { this.templateOnly = templateOnly; }
+
+    public String where() {
+        StringBuilder result = new StringBuilder();
+        if (this.hasGeo) {
+            result.append(QueryResultSingleColumn.resultColumn +".hasGeo = true");
+        }
+
+        if (this.templateOnly) {
+            result.append(QueryResultSingleColumn.resultColumn +".hasLayout = true");
+        }
+
+        if (result.length() > 0) {
+            return " WHERE " + result.toString();
+        }
+
+        return "";
     }
 }

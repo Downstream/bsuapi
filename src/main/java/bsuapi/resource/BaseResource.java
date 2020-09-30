@@ -46,6 +46,8 @@ abstract public class BaseResource
     protected boolean getParamBool(String key)
     {
         String val = this.getParam(key);
+        if (val == null) return false;
+
         return (
             val.equals("1") ||
             val.toLowerCase().equals("true")

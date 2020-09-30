@@ -1,4 +1,5 @@
 # Releases
+* [`1.6.4`](bsuapi-1.6.4.jar) Adds `/template` method for returning *only* folders with `hasLayout=true`.
 * [`1.6.3`](bsuapi-1.6.3.jar) Bugfixes for sync and hasGeo.
 * [`1.6.2`](bsuapi-1.6.2.jar) Improvements and fixes to sync, and `/settings`.
 * [`1.6.0`](bsuapi-1.6.0.jar) Added settings to `/` and a new method `/settings`.

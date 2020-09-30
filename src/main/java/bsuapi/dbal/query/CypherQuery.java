@@ -70,7 +70,6 @@ abstract public class CypherQuery
         }
     }
 
-    public void setHasGeo() { this.setHasGeo(true); }
     public void setHasGeo(boolean hasGeo) { this.hasGeo = hasGeo; }
 
     public String where() {
