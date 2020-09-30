@@ -43,6 +43,15 @@ abstract public class BaseResource
         return this.response;
     }
 
+    protected boolean getParamBool(String key)
+    {
+        String val = this.getParam(key);
+        return (
+            val.equals("1") ||
+            val.toLowerCase().equals("true")
+        );
+    }
+
     protected String getParam(String key)
     {
         return this.response.getParam(key);

@@ -74,11 +74,20 @@ public abstract class Behavior
         return this.config.get(key);
     }
 
+    public boolean getConfigParamBool(String key)
+    {
+        String val = this.config.get(key);
+        return (
+            val.equals("1") ||
+            val.toLowerCase().equals("true")
+        );
+    }
+
     public void setQueryConfig(CypherQuery query)
     {
         query.setLimit(this.getConfigParam(CypherQuery.limitParam));
         query.setPage(this.getConfigParam(CypherQuery.pageParam));
-        query.setHasGeo(Boolean.parseBoolean(this.getConfigParam(CypherQuery.hasGeoParam)));
+        query.setHasGeo(this.getConfigParamBool(CypherQuery.hasGeoParam));
     }
 
     public void putBehaviorData(JSONObject json)

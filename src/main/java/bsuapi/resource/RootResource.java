@@ -136,7 +136,7 @@ public class RootResource extends BaseResource
 
                 query.setPage(this.getParam(CypherQuery.pageParam));
                 query.setLimit(this.getParam(CypherQuery.limitParam));
-                query.setHasGeo(Boolean.parseBoolean(this.getParam(CypherQuery.hasGeoParam)));
+                query.setHasGeo(this.getParamBool(CypherQuery.hasGeoParam));
                 JSONArray results = query.exec(c);
                 topics.put(n.labelName(), results);
             }
@@ -150,7 +150,7 @@ public class RootResource extends BaseResource
         CypherQuery query = new FolderList();
         query.setPage(this.getParam(CypherQuery.pageParam));
         query.setLimit(this.getParam(CypherQuery.limitParam));
-        query.setHasGeo(Boolean.parseBoolean(this.getParam(CypherQuery.hasGeoParam)));
+        query.setHasGeo(this.getParamBool(CypherQuery.hasGeoParam));
         JSONArray folderList = query.exec(c);
 
         JSONObject result = new JSONObject();

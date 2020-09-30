@@ -2,9 +2,11 @@ package bsuapi.dbal.script;
 
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.CypherException;
+import bsuapi.dbal.Node;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.QueryResultCollector;
 import bsuapi.resource.Config;
+import bsuapi.resource.JsonResponse;
 import bsuapi.resource.Util;
 import bsuapi.service.ScriptOverseer;
 import bsuapi.service.ScriptStatus;
@@ -182,13 +184,13 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
     {
         bsuapi.dbal.query.ScriptStatus status = new bsuapi.dbal.query.ScriptStatus(script);
         try {
-            Object result = Util.jsonArrayFirst(status.exec(c));
+            JSONObject result = Util.jsonArrayFirstJsonObj(status.exec(c));
             if (null == result) {
                 throw new Error("No stored record found for CypherScript: "+ script.name());
             }
-            return new JSONObject(result);
+            return result;
         } catch (Throwable e) {
-            return new JSONObject(e);
+            return JsonResponse.exceptionDetailed(e);
         }
     }
 

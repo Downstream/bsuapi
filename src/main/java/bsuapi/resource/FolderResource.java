@@ -69,6 +69,7 @@ public class FolderResource extends BaseResource
         CypherQuery query = new FolderList();
         query.setPage(this.getParam(CypherQuery.pageParam));
         query.setLimit(this.getParam(CypherQuery.limitParam));
+        query.setHasGeo(this.getParamBool(CypherQuery.hasGeoParam));
         return query.exec(c);
     }
 

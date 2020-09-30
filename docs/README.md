@@ -1,7 +1,7 @@
 # Experimental Neo4j JSON API Plugin
 Intended to be included as a Neo4j plugin, on Ubuntu 18, with Nginx control of access. 
 
-### Latest [bsuapi-1.6.2.jar](releases/bsuapi-1.6.2.jar)
+### Latest [bsuapi-1.6.3.jar](releases/bsuapi-1.6.3.jar)
 * Access the API [bsuapi/](bsuapi)
 * All Releases [releases/](releases)
 * [Simple Viewer](viewer) from [Downstream:bsu_viewer.git](https://github.com/Downstream/bsu_viewer)
@@ -90,3 +90,17 @@ server {
 sudo systemctl start neo4j
 sudo systemctl start nginx 
 ```
+
+### OpenPipeline Sync
+See api home: `methods.execute`
+
+Pulling data from openPipeline is a multi-step process, which includes 2 stages:
+
+* Reset `/execute/OPENPIPE_RESET` - clears entire database, recreates config and indices, and sets sync to pull from assets changed after 2020-01-01.
+* Info `/execute/INFO` - regenerates Info Cards. See api home: `methods.info` and `/info`.
+* Sync - pulls new assets, folders, and settings, that have changed since the last time Sync was ran. Should be ran in sequence: 
+   * `/execute/OPENPIPE_SYNC` - pulls all changed assets, and extrapolates topics and meta-data, creating most of the meta-graph.
+   * `/execute/OPENPIPE_FOLDERS` - pulls all folders and their assets, including template positioning where present.
+   * `/execute/OPENPIPE_TOPICIMG` - attempts to select a best asset to use as the image representing a topic.
+   * `/execute/OPENPIPE_SETTINGS` - pulls all mode settings from openpipe and connects them to their respectively selected folders/topics. Defines the preset options available for each mode.
+   

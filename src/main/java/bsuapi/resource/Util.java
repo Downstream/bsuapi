@@ -1,5 +1,6 @@
 package bsuapi.resource;
 
+import bsuapi.dbal.Node;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.neo4j.logging.Log;
@@ -121,6 +122,17 @@ public class Util
             return "null";
         }
         return val.toString();
+    }
+
+    public static JSONObject jsonArrayFirstJsonObj(JSONArray j)
+    {
+        for (Object entry : j) {
+            if (entry instanceof JSONObject) {
+                return (JSONObject) entry;
+            }
+        }
+
+        return null;
     }
 
     public static String durationDisplayFormat(Duration d)

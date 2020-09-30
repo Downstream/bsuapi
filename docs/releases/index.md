@@ -1,4 +1,5 @@
 # Releases
+* [`1.6.3`](bsuapi-1.6.3.jar) Bugfixes for sync and hasGeo.
 * [`1.6.2`](bsuapi-1.6.2.jar) Improvements and fixes to sync, and `/settings`.
 * [`1.6.0`](bsuapi-1.6.0.jar) Added settings to `/` and a new method `/settings`.
    * `/settings` lists all openpipeline settings, and api config.

@@ -33,9 +33,9 @@ public enum CypherScript
                 return "openPipe-folders.cypher";
             case OPENPIPE_SETTINGS:
                 return "openPipe-settings.cypher";
-            default:
-                throw new IllegalStateException( "Unknown CypherScript " + this );
         }
+
+        throw new IllegalStateException( "Unknown CypherScript " + this );
     }
 
     public int type()

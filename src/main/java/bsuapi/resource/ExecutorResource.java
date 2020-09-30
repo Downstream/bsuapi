@@ -73,11 +73,18 @@ public class ExecutorResource extends BaseResource
 
     private JSONObject scriptReport(Cypher c, CypherScript script)
     {
+        JSONObject result;
         if (ScriptOverseer.has(script.name())) {
-            return script.getRunner(c).statusReport();
+            result = script.getRunner(c).statusReport();
         } else {
-            return script.getStoredReport(c);
+            result = script.getStoredReport(c);
+            result.remove("keyField");
+            result.remove("keyRaw");
+            result.remove("keyEncoded");
+            result.put("next", "Command ready to be started.");
         }
+
+        return result;
     }
 
     public static BehaviorDescribe describe()
