@@ -77,6 +77,9 @@ public abstract class Behavior
     public boolean getConfigParamBool(String key)
     {
         String val = this.config.get(key);
+
+        if (val == null) return false;
+
         return (
             val.equals("1") ||
             val.toLowerCase().equals("true")
