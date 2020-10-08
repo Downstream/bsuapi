@@ -1,4 +1,7 @@
 # Releases
+* [`1.6.6`](bsuapi-1.6.6.jar) Bugfixes for settings globe, and double-encoded guids in URIs.
+   * GUIDs are no longer double-encoded.
+   * Settings for globe *only* include results with geo-data. `/settings/globe`
 * [`1.6.5`](bsuapi-1.6.5.jar) Fixes null pointer error for some methods, caused by new handling of hasLayout and hasGeo qs params.
 * [`1.6.4`](bsuapi-1.6.4.jar) Adds `/template` method for returning *only* folders with `hasLayout=true`.
 * [`1.6.3`](bsuapi-1.6.3.jar) Bugfixes for sync and hasGeo.
