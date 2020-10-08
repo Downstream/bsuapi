@@ -23,10 +23,18 @@ public enum SettingGroup
 
     public CypherQuery query()
     {
-        if (this.equals(COLOR)) {
-            return new SettingsEntry(this);
-        } else {
-            return new SettingsList(this);
+        switch (this) {
+            case COLOR:
+                return new SettingsEntry(this);
+            case GLOBE:
+                CypherQuery q = new SettingsEntry(this);
+                q.setHasGeo(true);
+                return q;
+            case TIMELINE:
+            case EXPLORE:
+            case CONNECTION:
+            default:
+                return new SettingsList(this);
         }
     }
 
