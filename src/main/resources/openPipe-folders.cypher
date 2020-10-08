@@ -12,19 +12,15 @@ SET f.smallImage = bsuapi.coll.singleClean(folder.image)
 SET f.layoutType = bsuapi.coll.singleClean(folder.layoutType)
 SET f.insertTime = bsuapi.coll.singleClean(folder.insertTime)
 SET f.lastModified = bsuapi.coll.singleClean(folder.lastModified)
-RETURN "Synced Folder Details" as t;
+WITH "Synced Folder Details" as t RETURN t;
 
 
-MATCH (api:OpenPipeConfig {name: 'api'}) WITH api.lastFolderRun as lastRunDate
 MATCH (f:Folder)-[r:FOLDER_ASSET]->(:Asset)
-WHERE f.lastModified > lastRunDate
 DELETE r
-RETURN "Cleared assets from updated folders" as t;
+WITH "Cleared assets from updated folders" as t RETURN t;
 
 
-MATCH (api:OpenPipeConfig {name: 'api'}) WITH api.lastFolderRun as lastRunDate
 MATCH (f:Folder)
-WHERE f.lastModified > lastRunDate
 
 CALL apoc.load.json(f.guid) YIELD value
 UNWIND value.assets as assetEntry
@@ -47,7 +43,7 @@ CALL apoc.do.when( geometry IS NOT NULL AND size(geoSplit)>6 ,
 "",
 {f: f, r: r, geometry: geometry, wall: wall, geoSplit: geoSplit}
 ) YIELD value
-RETURN "Synced folders and connected assets and positional data." as t;
+WITH "Synced folders and connected assets and positional data." as t RETURN t;
 
 
 
@@ -61,7 +57,7 @@ CALL apoc.periodic.iterate(
       ON MATCH SET r.strength = r.strength + 1
 ", {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "FOLDER:TOPIC relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t
+WITH "FOLDER:TOPIC relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t RETURN t
 ;
 
 CALL apoc.periodic.iterate("MATCH (:Asset {hasGeo: true})-[]->(f:Folder) RETURN f","
@@ -69,10 +65,10 @@ CALL apoc.periodic.iterate("MATCH (:Asset {hasGeo: true})-[]->(f:Folder) RETURN 
 ",
 {batchSize:10000, iterateList:true, parallel:false}
 ) YIELD operations
-RETURN "SET Folder hasGeo from Assets - committed:"+ operations.committed +" failed:"+ operations.failed as t
+WITH "SET Folder hasGeo from Assets - committed:"+ operations.committed +" failed:"+ operations.failed as t RETURN t
 ;
 
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.lastFolderRun = date()
-RETURN "Folder Sync COMPLETE" as t;
+WITH "Folder Sync COMPLETE" as t RETURN t;
 
