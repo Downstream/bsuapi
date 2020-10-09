@@ -27,7 +27,7 @@ public enum SettingGroup
             case COLOR:
                 return new SettingsEntry(this);
             case GLOBE:
-                CypherQuery q = new SettingsEntry(this);
+                CypherQuery q = new SettingsList(this);
                 q.setHasGeo(true);
                 return q;
             case TIMELINE:
