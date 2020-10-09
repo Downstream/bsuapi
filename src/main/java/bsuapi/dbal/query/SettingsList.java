@@ -13,8 +13,10 @@ implements QueryResultSingleColumn
      * 4: max # of matches
      */
     protected static String query =
-        "MATCH (g:%1$s {name: \"%2$s\"})<-[rel:SETTING_OPTION]-(a) " +
-        "RETURN CASE WHEN rel.byType IS NOT NULL THEN a{.*, type: head(labels(a)), byType: rel.byType} ELSE a END AS "+ QueryResultSingleColumn.resultColumn
+        "MATCH (g:%1$s {name: \"%2$s\"})<-[rel:SETTING_OPTION]-("+ QueryResultSingleColumn.resultColumn +") " +
+        "%3$s RETURN CASE WHEN rel.byType IS NOT NULL THEN "+ QueryResultSingleColumn.resultColumn +
+            "{.*, type: head(labels("+ QueryResultSingleColumn.resultColumn +")), byType: rel.byType} ELSE "+
+            QueryResultSingleColumn.resultColumn +" END AS "+ QueryResultSingleColumn.resultColumn
         ;
 
     private SettingGroup group;
@@ -30,7 +32,8 @@ implements QueryResultSingleColumn
         return this.resultQuery = String.format(
             this.initQuery,
             this.group.label(),
-            this.group.key()
+            this.group.key(),
+            this.where()
         );
     }
 }
