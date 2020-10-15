@@ -1,6 +1,7 @@
-package bsuapi.dbal.query;
+package bsuapi.settings;
 
-import bsuapi.obj.SettingGroup;
+import bsuapi.dbal.query.CypherQuery;
+import bsuapi.dbal.query.QueryResultSingleColumn;
 
 public class SettingsList extends CypherQuery
 implements QueryResultSingleColumn

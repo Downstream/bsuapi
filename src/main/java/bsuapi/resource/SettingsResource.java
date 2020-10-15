@@ -2,10 +2,9 @@ package bsuapi.resource;
 
 import bsuapi.behavior.BehaviorDescribe;
 import bsuapi.dbal.Cypher;
-import bsuapi.dbal.script.CypherScript;
-import bsuapi.obj.OpenPipeSetting;
-import bsuapi.obj.OpenPipeSettings;
-import bsuapi.obj.SettingGroup;
+import bsuapi.settings.OpenPipeSetting;
+import bsuapi.settings.OpenPipeSettings;
+import bsuapi.settings.SettingGroup;
 import org.json.JSONObject;
 
 import javax.ws.rs.GET;

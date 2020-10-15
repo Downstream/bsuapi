@@ -1,7 +1,8 @@
 package bsuapi.obj;
 
-import bsuapi.dbal.query.SettingsEntry;
-import bsuapi.dbal.query.SettingsList;
+import bsuapi.settings.SettingsEntry;
+import bsuapi.settings.SettingsList;
+import bsuapi.settings.SettingGroup;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

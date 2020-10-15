@@ -1,4 +1,4 @@
-package bsuapi.obj;
+package bsuapi.settings;
 
 import bsuapi.dbal.Cypher;
 import bsuapi.dbal.query.CypherQuery;

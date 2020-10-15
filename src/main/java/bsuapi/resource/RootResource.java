@@ -13,7 +13,7 @@ import bsuapi.behavior.Related;
 import bsuapi.behavior.Search;
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.*;
-import bsuapi.obj.OpenPipeSettings;
+import bsuapi.settings.OpenPipeSettings;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

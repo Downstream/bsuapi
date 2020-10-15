@@ -1,9 +1,7 @@
-package bsuapi.obj;
+package bsuapi.settings;
 
 import bsuapi.dbal.NodeType;
 import bsuapi.dbal.query.CypherQuery;
-import bsuapi.dbal.query.SettingsEntry;
-import bsuapi.dbal.query.SettingsList;
 import org.json.JSONObject;
 
 public enum SettingGroup
@@ -30,8 +28,9 @@ public enum SettingGroup
                 CypherQuery q = new SettingsList(this);
                 q.setHasGeo(true);
                 return q;
-            case TIMELINE:
             case EXPLORE:
+                return new SettingsTopicsOnly(this);
+            case TIMELINE:
             case CONNECTION:
             default:
                 return new SettingsList(this);
@@ -67,7 +66,7 @@ public enum SettingGroup
         switch(this) {
             case GLOBE: return "Preconfigured options (Topics and Folders) as the entry point for Globe mode.";
             case TIMELINE: return "Preconfigured options (Topics and Folders) as the entry point for the Timeline. May additionally be focused by TopicType (option.byTopic: type).";
-            case EXPLORE: return "Preconfigured options (Topics and Folders) as the entry point for Explore mode.";
+            case EXPLORE: return "Preconfigured options (Topics ONLY, folders are filtered out) as the entry point for Explore mode.";
             case COLOR: return "Preconfigured color-pairs for Color mode.";
             case CONNECTION: return "Preconfigured options (Topics and Folders) as the entry point for Connections mode.";
         }
