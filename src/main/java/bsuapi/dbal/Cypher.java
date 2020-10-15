@@ -20,11 +20,11 @@ public class Cypher implements AutoCloseable
         this.db = db;
     }
 
-    public void resolveTopic(Topic topic)
+    public void resolveNode(Element element)
     throws CypherException
     {
         // @todo pick by (curator/algo) score
-        topic.setNode(this.findOne(topic.getType(), topic.getNodeKeyField(), topic.getNodeKey()));
+        element.setNode(this.findOne(element.getType(), element.getNodeKeyField(), element.getNodeKey()));
     }
 
     public Node findOne(NodeType type, String keyName, String keyVal)
@@ -43,6 +43,10 @@ public class Cypher implements AutoCloseable
 
             tx.success();
             matches.close();
+            if (result == null) {
+                throw new CypherException("Cypher.findAll unable to retrieve matches for (:"+ type.label() +" { "+ keyName +": \""+ keyVal +"\" })");
+            }
+
             return result;
         } catch (Exception e) {
             throw new CypherException("Cypher.findAll unable to retrieve matches for (:"+ type.label() +" { "+ keyName +": \""+ keyVal +"\" })", e);
@@ -90,7 +94,7 @@ public class Cypher implements AutoCloseable
     throws Throwable
     {
         try (
-            Transaction tx = db.beginTx();
+            Transaction tx = db.beginTx()
         ) {
             db.execute(command);
             tx.success();

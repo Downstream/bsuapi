@@ -3,7 +3,6 @@ package bsuapi.behavior;
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.FolderAssets;
-import bsuapi.dbal.query.TopicAssets;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -51,7 +50,7 @@ public class Folder extends Behavior
     private void resolveTopic(Cypher cypher)
             throws CypherException
     {
-        if (!this.topic.hasMatch()) { cypher.resolveTopic(this.topic); }
+        if (!this.topic.hasMatch()) { cypher.resolveNode(this.topic); }
         this.node = topic.getNode();
     }
 

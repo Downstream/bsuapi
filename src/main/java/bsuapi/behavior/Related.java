@@ -51,7 +51,7 @@ public class Related extends Behavior
     private void resolveTopic(Cypher cypher)
     throws CypherException
     {
-        if (!this.topic.hasMatch()) { cypher.resolveTopic(this.topic); }
+        if (!this.topic.hasMatch()) { cypher.resolveNode(this.topic); }
         this.node = topic.getNode();
     }
 
