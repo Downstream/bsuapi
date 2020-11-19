@@ -1,4 +1,6 @@
 package bsuapi.dbal;
+import bsuapi.resource.Config;
+import bsuapi.resource.URLCoder;
 import org.neo4j.graphdb.Label;
 
 public enum NodeType
@@ -180,5 +182,48 @@ public enum NodeType
         }
 
         return null;
+    }
+
+    /* @todo refactor this and NodeType calls - can be simplified */
+    public String makeRelatedUri(String key)
+    {
+        switch ( this )
+        {
+            case ARTIST:
+            case CLASS:
+            case CULTURE:
+            case NATION:
+            case TAG:
+            case GENRE:
+            case MEDIUM:
+            case CITY:
+            case TOPIC:
+            case ASSET:
+                return Config.buildUri("/related/" + this.labelName().toLowerCase() + "/" + URLCoder.encode(key));
+            case FOLDER:
+                return Config.buildUri("/folder/" + URLCoder.encode(key));
+            default:
+                return null;
+        }
+    }
+
+    public String makeAssetsUri(String key)
+    {
+        switch ( this )
+        {
+            case ARTIST:
+            case CLASS:
+            case CULTURE:
+            case NATION:
+            case TAG:
+            case GENRE:
+            case MEDIUM:
+            case CITY:
+                return Config.buildUri("/topic-assets/" + this.labelName().toLowerCase() + "/" + URLCoder.encode(key));
+            case FOLDER:
+                return Config.buildUri("/folder/" + URLCoder.encode(key));
+            default:
+                return null;
+        }
     }
 }
