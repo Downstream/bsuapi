@@ -88,9 +88,11 @@ public class Node
             /* @todo refactor this and NodeType calls - can be simplified */
             if (type.isTopic()) {
                 String topicPath = this.getUri();
+                result.put("linkTimeline", Config.buildUri("/timeline" + topicPath));
                 result.put("linkRelated", Config.buildUri("/related" + topicPath));
                 result.put("linkAssets", Config.buildUri("/topic-assets" + topicPath));
             } else if (type == NodeType.FOLDER) {
+                result.put("linkTimeline", Config.buildUri("/timeline" + this.getUri()));
                 result.put("linkRelated", Config.buildUri(this.getUri()));
                 result.put("linkAssets", Config.buildUri(this.getUri()));
             }
