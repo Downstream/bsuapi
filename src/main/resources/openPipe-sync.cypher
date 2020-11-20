@@ -22,6 +22,7 @@ WITH asset, canon, assetGuidBase, value.total as pageAssetsCount,
 	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date]) AS openpipe_date,
 	bsuapi.obj.singleClean(asset.openpipe_canonical.latitude) AS openpipe_latitude,
 	bsuapi.obj.singleClean(asset.openpipe_canonical.longitude) AS openpipe_longitude,
+	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.moment,['0']) AS openpipe_moment,
 
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.artist, [canon.artist, '']) AS openpipe_artist,
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.classification, [canon.classification, '']) AS openpipe_classification,
@@ -73,6 +74,7 @@ SET x.latlong = CASE WHEN x.hasGeo THEN [toFloat(openpipe_latitude), toFloat(ope
 SET x.wgs = CASE WHEN x.hasGeo THEN point({x: x.latlong[0], y: x.latlong[1], crs: 'wgs-84'}) ELSE null END
 SET x.openpipe_date = openpipe_date
 SET x.date = date(bsuapi.obj.openPipeDateMap(x.openpipe_date))
+SET x.moment = openpipe_moment
 
 SET x.openpipe_artist = [k IN KEYS(openpipe_artist) | openpipe_artist[k]]
 SET x.openpipe_culture = [k IN KEYS(openpipe_culture) | openpipe_culture[k]]

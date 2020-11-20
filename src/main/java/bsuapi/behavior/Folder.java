@@ -26,7 +26,7 @@ public class Folder extends Behavior
             throw new BehaviorException("Missing required parameters for folder: "+ Topic.labelParam +" and "+ Topic.keyParam);
         }
 
-        this.topic = new Topic(labelName, keyName);
+        this.topic = new Topic(NodeType.match(labelName), keyName);
     }
 
     @Override

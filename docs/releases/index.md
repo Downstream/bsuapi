@@ -1,4 +1,7 @@
 # Releases
+* [`1.7.1`](bsuapi-1.7.1.jar) Adds method `/timeline/{topic}/{guid}`.
+   * Explore settings `/settings/explore` no longer includes folders.
+   * Another attempt to workaround innaccurate modify dates.
 * [`1.6.7`](bsuapi-1.6.7.jar) Bugfixes for globe, and workaround for folder sync (inaccurate folder modified date).
 * [`1.6.6`](bsuapi-1.6.6.jar) Bugfixes for settings globe, and double-encoded guids in URIs.
    * GUIDs are no longer double-encoded.

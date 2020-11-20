@@ -16,7 +16,7 @@ implements QueryResultSingleColumn
     protected static String query =
         "MATCH (%1$s)<-[r:%2$s]-("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
         "%4$s RETURN "+ QueryResultSingleColumn.resultColumn +
-            "{.*, type: head(labels("+ QueryResultSingleColumn.resultColumn +")), year: "+ QueryResultSingleColumn.resultColumn +"date.year, month: "+ QueryResultSingleColumn.resultColumn +"date.month, day: "+ QueryResultSingleColumn.resultColumn +"date.day} " +
+            "{.*, type: head(labels("+ QueryResultSingleColumn.resultColumn +"))} " +
         "ORDER BY "+ QueryResultSingleColumn.resultColumn +".date ASC"
         ;
 
@@ -34,7 +34,7 @@ implements QueryResultSingleColumn
         super(Timeline.query);
         this.target = NodeType.ASSET;
         this.topic = topic;
-        this.step = TimeStep.stepFromDates(LocalDate.parse(topic.getNodeProperty("startDate")), LocalDate.parse(topic.getNodeProperty("endDate")));
+        this.step = TimeStep.stepFromTopic(topic);
     }
 
     public JSONObject getResults()
@@ -57,7 +57,7 @@ implements QueryResultSingleColumn
     {
         try {
             VirtualNode asset = new VirtualNode((Map) entry);
-            this.addEntry(this.step.getDateKey(asset), asset);
+            this.addEntry(this.step.getDateKey(asset), asset.toJsonObject());
         } catch (Throwable e) {
             this.addResultEntry(JsonResponse.exceptionDetailed(e));
         }
@@ -95,6 +95,15 @@ enum TimeStep
 
     private static final int DEFAULT_TARGET_STEPS = 100;
 
+    public static TimeStep stepFromTopic(Topic topic)
+    {
+        String start = topic.getNodeProperty("dateStart");
+        String end = topic.getNodeProperty("dateEnd");
+        LocalDate startDate = LocalDate.parse(start);
+        LocalDate endDate = LocalDate.parse(end);
+        return TimeStep.stepFromDates(startDate, endDate);
+    }
+
     public static TimeStep stepFromDates(LocalDate start, LocalDate end)
     {
         return TimeStep.stepFromDates(start, end, DEFAULT_TARGET_STEPS);
@@ -126,7 +135,7 @@ enum TimeStep
             case DAY:  return DateTimeFormatter.ofPattern("dd MMM yyyy").format(date);
             case MONTH:  return DateTimeFormatter.ofPattern("MMM yyyy").format(date);
             case YEAR:  return DateTimeFormatter.ofPattern("yyyy").format(date);
-            default: return Integer.toString(Math.round(date.getYear()/this.roundingDivisor()));
+            default: return Integer.toString(Math.round(date.getYear()/this.roundingDivisor())*this.roundingDivisor());
         }
     }
 

@@ -1,11 +1,9 @@
 package bsuapi.resource;
 
+import bsuapi.behavior.BehaviorDescribe;
 import bsuapi.behavior.BehaviorType;
 import bsuapi.dbal.*;
-import bsuapi.dbal.query.AssetTopics;
-import bsuapi.dbal.query.CypherQuery;
-import bsuapi.dbal.query.QueryResultCollector;
-import bsuapi.dbal.query.Timeline;
+import bsuapi.dbal.query.*;
 import org.json.JSONObject;
 
 import javax.ws.rs.GET;
@@ -15,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
+import java.time.LocalDate;
 
 
 @Path("/timeline")
@@ -22,66 +21,50 @@ public class TimelineResource extends BaseResource
 {
     private static final int TIMEOUT = 1000;
 
-    @Path("/folder/{GUID}")
+    @Path("/{label: [a-z]*}/{GUID}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response apiFolderTimeline(
-            @PathParam("GUID") String guid,
-            @Context UriInfo uriInfo
+    public javax.ws.rs.core.Response apiRelated(
+        @PathParam("label") String label,
+        @PathParam("GUID") String guid,
+        @Context UriInfo uriInfo
     ){
 
         Response response = this.prepareResponse(uriInfo);
 
-        Folder folder = new Folder(URLCoder.decode(guid));
+        Topic topic = new Topic(NodeType.match(label), URLCoder.decode(guid));
         Cypher c = new Cypher(db);
 
         try {
-            c.resolveNode(folder);
+            c.resolveNode(topic);
         } catch (Exception e) {
             return response.notFound(e.getMessage());
         }
 
         JSONObject result = new JSONObject();
-        result.put("node", folder.toJson());
+        result.put("node", topic.toJson());
 
         try {
-            result.put("timeline",this.buildFolderTimeline(folder, c));
-            return response.data(result, "Found :"+ folder.name() +" {"+ folder.getNodeKeyField() +":\""+ folder.getNodeKey() +"\"}");
-        } catch (Exception e) {
-            return response.exception(e);
+            result.put("dateStart", topic.getNodeProperty("dateStart"));
+            result.put("dateEnd", topic.getNodeProperty("dateEnd"));
+            result.put("dateStartRaw", topic.getNode().getRawProperty("dateStart"));
+            result.put("dateEndRaw", topic.getNode().getRawProperty("dateEnd"));
+            result.put("localDateStart", LocalDate.parse(topic.getNodeProperty("dateStart")));
+            result.put("localDateEnd", LocalDate.parse(topic.getNodeProperty("dateEnd")));
+            result.put("timeline", this.buildTimeline(topic, c));
+            return response.data(result, "Found :" + topic.name() + " {" + topic.getNodeKeyField() + ":\"" + topic.getNodeKey() + "\"}");
+//        } catch (Exception e) {
+//            return response.exception(e);
+//        }
+        } catch (Throwable e) {
+            return response.plain(JsonResponse.exceptionDetailed(e));
         }
     }
 
-    @Path("/{topic: [a-z]*}/{GUID}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public javax.ws.rs.core.Response apiRelated(
-        @PathParam("topic") String topic,
-        @PathParam("GUID") String guid,
-        @Context UriInfo uriInfo
-    ){
-
-        if (topic.equals("folder")) return this.apiFolderTimeline(guid, uriInfo);
-
-        //Response response = Response.prepare(new Request(uriInfo));
-        Response response = this.prepareResponse(uriInfo);
-
-        if (guid == null || topic == null)
-        {
-            return response.badRequest("Required method parameters missing: topic label, topic guid");
-        }
-
-        String searchVal = URLCoder.decode(guid);
-        String searchTopic = topic.substring(0, 1).toUpperCase() + topic.substring(1); // upper first
-        response.setTopic(searchTopic, searchVal);
-
-        return this.handleBehavior(BehaviorType.RELATED);
-    }
-
-    private JSONObject buildFolderTimeline(Folder folder, Cypher c)
+    private JSONObject buildTimeline(Topic topic, Cypher c)
     throws CypherException
     {
-        Timeline query = new Timeline(folder);
+        Timeline query = new Timeline(topic);
         this.setQueryConfig(query);
         c.query(query);
         return query.getResults();
@@ -92,5 +75,22 @@ public class TimelineResource extends BaseResource
         query.setPage(this.getParam(CypherQuery.pageParam));
         query.setLimit(this.getParam(CypherQuery.limitParam));
         query.setHasGeo(this.getParamBool(CypherQuery.hasGeoParam));
+    }
+
+    public static BehaviorDescribe describe()
+    {
+        BehaviorDescribe desc = BehaviorDescribe.resource("/timeline/{topic}/{GUID}",
+            "List all assets for that (topic|folder), grouped in time." +
+            "Attempts to create ~100 time groups, from time-steps extrapolated from the (topic|folder) start and end dates (earliest and latest asset dates)."
+        );
+
+        desc.arg("topic", ".");
+        desc.arg("GUID", "URL-encoded string, defined from source. Must start with a letter, a-zA-Z.");
+
+        JSONObject examples = new JSONObject();
+        examples.put("folder", "/bsuapi/timeline/folder/http%3A%2F%2Fmec402.boisestate.edu%2Fcgi-bin%2Fopenpipe%2Fdata%2Ffolder%2F28");
+        examples.put("artist", "/bsuapi/timeline/artist/http%3A%2F%2Fmec402.boisestate.edu%2Fcgi-bin%2Fopenpipe%2Fdata%2Fartist%2F193");
+
+        return desc;
     }
 }

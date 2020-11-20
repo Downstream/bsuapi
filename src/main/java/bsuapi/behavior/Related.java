@@ -25,7 +25,7 @@ public class Related extends Behavior
             throw new BehaviorException("Missing required parameters for "+ this.toString()+ ": "+ Topic.labelParam +" and "+ Topic.keyParam);
         }
 
-        this.topic = new Topic(labelName, keyName);
+        this.topic = new Topic(NodeType.match(labelName), keyName);
     }
 
     public org.neo4j.graphdb.Node getNeoNode() throws CypherException { return this.node.getNeoNode(); }
@@ -89,7 +89,7 @@ public class Related extends Behavior
             "collection of closely related Topics, and a collection of Assets which references that Topic. "
         );
 
-        desc.arg("topic", "All lowercase, a-z. Search all topics: 'topic'");
+        desc.arg("topic", "All lowercase, a-z. May be a topic-type (artist, nation, culture, etc.) or 'folder'.");
         desc.arg("value", "URL-encoded string. Must start with a letter, a-zA-Z.");
 
         return desc;

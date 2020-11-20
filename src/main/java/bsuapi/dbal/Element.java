@@ -2,6 +2,9 @@ package bsuapi.dbal;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Element implements org.neo4j.graphdb.Label
 {
     protected NodeType type;
@@ -12,6 +15,15 @@ public class Element implements org.neo4j.graphdb.Label
     {
         this.type = type;
         this.nodeKey = nodeKey;
+    }
+
+    public static Map<String, String> plainMap(String label, String key)
+    {
+        Map<String, String> m = new HashMap<>();
+        m.put(Topic.labelParam, label);
+        m.put(Topic.keyParam, key);
+
+        return m;
     }
 
     public void setNode(Node node)

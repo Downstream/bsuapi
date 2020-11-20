@@ -3,6 +3,7 @@ package bsuapi.dbal;
 import bsuapi.resource.Config;
 import bsuapi.resource.URLCoder;
 import org.json.JSONObject;
+import org.neo4j.cypher.internal.frontend.v2_3.ast.functions.Str;
 
 import java.util.Map;
 import java.lang.String;
@@ -39,7 +40,15 @@ public class Node
 
     public String getNodeKey() { return this.keyVal; }
 
-    public String getProperty(String key){ return (String) this.properties.getOrDefault(key, "unknown"); }
+    public String getProperty(String key){
+        Object value = this.properties.getOrDefault(key, "unknown");
+        if (value instanceof String) return (String) value;
+        return value.toString();
+    }
+
+    public Object getRawProperty(String key){
+        return this.properties.get(key);
+    }
 
     /* @todo refactor this and NodeType calls - can be simplified */
     public String getUri()

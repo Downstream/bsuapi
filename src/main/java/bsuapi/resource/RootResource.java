@@ -69,6 +69,7 @@ public class RootResource extends BaseResource
         methods.put("folder/{guid}", Folder.describe());
         methods.put("folder", FolderResource.describeList());
         methods.put("template", TemplateResource.describeList());
+        methods.put("timeline", TimelineResource.describe());
         methods.put("topic-assets", Assets.describe());
         methods.put("search", Search.describe());
         methods.put("search/completion", Search.describeCompletion());
