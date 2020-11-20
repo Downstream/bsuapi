@@ -9,4 +9,9 @@ public class Topic extends Element
     {
         super(NodeType.match(labelName), nodeKey);
     }
+
+    public Topic(NodeType nodeType, String nodeKey)
+    {
+        super(nodeType, nodeKey);
+    }
 }
