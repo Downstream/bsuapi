@@ -45,19 +45,10 @@ public class TimelineResource extends BaseResource
         result.put("node", topic.toJson());
 
         try {
-            result.put("dateStart", topic.getNodeProperty("dateStart"));
-            result.put("dateEnd", topic.getNodeProperty("dateEnd"));
-            result.put("dateStartRaw", topic.getNode().getRawProperty("dateStart"));
-            result.put("dateEndRaw", topic.getNode().getRawProperty("dateEnd"));
-            result.put("localDateStart", LocalDate.parse(topic.getNodeProperty("dateStart")));
-            result.put("localDateEnd", LocalDate.parse(topic.getNodeProperty("dateEnd")));
             result.put("timeline", this.buildTimeline(topic, c));
             return response.data(result, "Found :" + topic.name() + " {" + topic.getNodeKeyField() + ":\"" + topic.getNodeKey() + "\"}");
-//        } catch (Exception e) {
-//            return response.exception(e);
-//        }
-        } catch (Throwable e) {
-            return response.plain(JsonResponse.exceptionDetailed(e));
+        } catch (Exception e) {
+            return response.exception(e);
         }
     }
 

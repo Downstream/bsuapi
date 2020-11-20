@@ -66,6 +66,7 @@ public class JsonSchemaResource extends BaseResource
         properties.put("guid", this.prop("string", "Key for all topics."));
         properties.put("linkRelated", this.prop("string", "A relative URL to this topic's 'related' dataset"));
         properties.put("linkAssets", this.prop("string", "A relative URL to an iterable collection of assets for this topic."));
+        properties.put("linkTimeline", this.prop("string", "A relative URL to a timeline of assets for the topic."));
 
         schema.put("properties", properties);
 
