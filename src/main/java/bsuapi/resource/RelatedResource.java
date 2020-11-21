@@ -63,6 +63,8 @@ public class RelatedResource extends BaseResource
         @Context UriInfo uriInfo
     ){
 
+        if (topic.equals("asset")) return this.apiAssetRelated(value, uriInfo);
+
         //Response response = Response.prepare(new Request(uriInfo));
         Response response = this.prepareResponse(uriInfo);
 
@@ -85,9 +87,18 @@ public class RelatedResource extends BaseResource
 
         for (NodeType n : NodeType.values()) {
             if (n.isTopic()) {
-                CypherQuery query = new AssetTopics(n);
+                CypherQuery query = new AssetTopics(asset,n);
                 this.setQueryConfig(query);
-                result.put(n.labelName(), query.exec(c));
+
+                try {
+                    result.put(n.labelName(), query.exec(c));
+                } catch (Throwable e) {
+                    JSONObject x = new JSONObject();
+                    x.put("query", query.getCommand());
+                    x.put("msg", JsonResponse.exceptionDetailed(e));
+                    result.put(n.labelName(), x);
+                }
+
             }
         }
 

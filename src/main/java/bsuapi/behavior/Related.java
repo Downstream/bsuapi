@@ -84,13 +84,13 @@ public class Related extends Behavior
 
     public static BehaviorDescribe describe()
     {
-        BehaviorDescribe desc = BehaviorDescribe.resource("/related/{TOPIC}/{VALUE}",
-            "Find all (TOPIC)s with an indexed value matching (VALUE), along with a" +
-            "collection of closely related Topics, and a collection of Assets which references that Topic. "
+        BehaviorDescribe desc = BehaviorDescribe.resource("/related/{type}/{GUID}",
+            "Retrieve a specific node by GUID, along with a" +
+            "collection of closely related Topics, and all directly related Assets. "
         );
 
-        desc.arg("topic", "All lowercase, a-z. May be a topic-type (artist, nation, culture, etc.) or 'folder'.");
-        desc.arg("value", "URL-encoded string. Must start with a letter, a-zA-Z.");
+        desc.arg("type", "All lowercase, a-z. May be a topic-type (artist, nation, culture, etc.), 'folder', or 'asset'.");
+        desc.arg("GUID", "URL-encoded string. Must start with a letter, a-zA-Z.");
 
         return desc;
     }

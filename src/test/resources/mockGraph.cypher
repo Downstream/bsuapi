@@ -16,25 +16,26 @@ CREATE (art:Asset {
   artistDisplayBio: "French, Paris 1834–1917 Paris",
   objectName: "Drawing",
   id: 334323,
+  guid: "ASSET",
   primaryImageSmall: "https://images.metmuseum.org/CRDImages/dp/web-large/DP805823.jpg",
   objectID: 334323,
   dimensions: "Sheet: 9 1/16 x 4 3/16 in. (23 x 10.6cm)"
 })
 
-CREATE (degas:Artist:Topic {name: "Edgar Degas", artCount: 203})
-CREATE (draw:Classification:Topic {name: "Drawings",artCount: 6260})
-CREATE (french:Nation:Topic {name: "French",artCount: 13575})
-CREATE (tMen:Tag:Topic {name: "Men",artCount: 32172})
-CREATE (tProfiles:Tag:Topic {name: "Profiles",artCount: 4101})
-CREATE (tSaints:Tag:Topic {name: "Saints",artCount: 896})
+CREATE (degas:Artist:Topic {name: "Edgar Degas", artCount: 203, guid: "DEGAS"})
+CREATE (draw:Classification:Topic {name: "Drawings",artCount: 6260, guid: "DRAW"})
+CREATE (french:Nation:Topic {name: "French",artCount: 13575, guid: "FRENCH"})
+CREATE (tMen:Tag:Topic {name: "Men",artCount: 32172, guid: "MEN"})
+CREATE (tProfiles:Tag:Topic {name: "Profiles",artCount: 4101, guid: "PROFILE"})
+CREATE (tSaints:Tag:Topic {name: "Saints",artCount: 896, guid: "SAINTS"})
 
 // SEARCH TEST LIMIT and PAGE
-CREATE (searchDegas1:Artist {name: "Degas One"})
-CREATE (searchDegas2:Artist {name: "degas two"})
-CREATE (searchDegas3:Artist {name: "DEGAS THREE"})
-CREATE (searchDegas4:Artist {name: "degas four"})
-CREATE (searchDegas5:Artist {name: "Some other Bob Degasa"}) // no match
-CREATE (searchDegas6:Artist {name: "dega"}) // no match
+CREATE (searchDegas1:Artist {name: "Degas One", guid: "DEGAS1"})
+CREATE (searchDegas2:Artist {name: "degas two", guid: "DEGAS2"})
+CREATE (searchDegas3:Artist {name: "DEGAS THREE", guid: "DEGAS3"})
+CREATE (searchDegas4:Artist {name: "degas four", guid: "DEGAS4"})
+CREATE (searchDegas5:Artist {name: "Some other Bob Degasa", guid: "DEGAS5"}) // no match
+CREATE (searchDegas6:Artist {name: "dega", guid: "DEGASNONE"}) // no match
 
 CREATE (degas)<-[:BY]-(art)
 CREATE (draw)<-[:ART_CLASS]-(art)
