@@ -226,4 +226,23 @@ public enum NodeType
                 return null;
         }
     }
+
+    public String makeTimelineUri(String key)
+    {
+        switch ( this )
+        {
+            case ARTIST:
+            case CLASS:
+            case CULTURE:
+            case NATION:
+            case TAG:
+            case GENRE:
+            case MEDIUM:
+            case CITY:
+            case FOLDER:
+                return Config.buildUri("/timeline/" + this.labelName().toLowerCase() + "/" + URLCoder.encode(key));
+            default:
+                return null;
+        }
+    }
 }

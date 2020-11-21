@@ -1,6 +1,5 @@
 package bsuapi.dbal;
 
-import bsuapi.resource.Config;
 import bsuapi.resource.URLCoder;
 import org.json.JSONObject;
 
@@ -63,6 +62,7 @@ public class Node
     public JSONObject toJsonObject()
     {
         JSONObject result = new JSONObject();
+
         for (Map.Entry<String, Object> entry : this.properties.entrySet())
         {
             result.put(entry.getKey(), entry.getValue());
@@ -76,17 +76,6 @@ public class Node
         if (null != type) {
             result.put("type", type.labelName());
 
-            /* @todo refactor this and NodeType calls - can be simplified */
-            if (type.isTopic()) {
-                String topicPath = this.getUri();
-                result.put("linkTimeline", Config.buildUri("/timeline" + topicPath));
-                result.put("linkRelated", Config.buildUri("/related" + topicPath));
-                result.put("linkAssets", Config.buildUri("/topic-assets" + topicPath));
-            } else if (type == NodeType.FOLDER) {
-                result.put("linkTimeline", Config.buildUri("/timeline" + this.getUri()));
-                result.put("linkRelated", Config.buildUri(this.getUri()));
-                result.put("linkAssets", Config.buildUri(this.getUri()));
-
             String relatedUri = type.makeRelatedUri(this.getNodeKey());
             if (relatedUri != null) {
                 result.put("linkRelated", relatedUri);
@@ -95,6 +84,11 @@ public class Node
             String assetsUri = type.makeAssetsUri(this.getNodeKey());
             if (assetsUri != null) {
                 result.put("linkAssets", assetsUri);
+            }
+
+            String timelineUri = type.makeTimelineUri(this.getNodeKey());
+            if (timelineUri != null) {
+                result.put("linkTimeline", timelineUri);
             }
 
         } else {

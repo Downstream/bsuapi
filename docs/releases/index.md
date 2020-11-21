@@ -1,4 +1,5 @@
 # Releases
+* [`1.7.3`](bsuapi-1.7.3.jar) Adds method `/related/asset/{guid}` for retrieving topics for a specific Asset.
 * [`1.7.2`](bsuapi-1.7.2.jar) Adds `linkTimeline` property to topics and folders.
 * [`1.7.1`](bsuapi-1.7.1.jar) Adds method `/timeline/{topic}/{guid}`.
    * Explore settings `/settings/explore` no longer includes folders.
