@@ -4,6 +4,7 @@ import bsuapi.behavior.BehaviorDescribe;
 import bsuapi.behavior.BehaviorType;
 import bsuapi.dbal.*;
 import bsuapi.dbal.query.*;
+import org.apache.commons.lang3.ObjectUtils;
 import org.json.JSONObject;
 
 import javax.ws.rs.GET;
@@ -45,15 +46,20 @@ public class TimelineResource extends BaseResource
         result.put("node", topic.toJson());
 
         try {
-            result.put("timeline", this.buildTimeline(topic, c));
+            result.put("test","here");
+            JSONObject timeline = this.buildTimeline(topic, c);
+            result.put("timeline", timeline);
+            result.put("isnull", (timeline == null));
             return response.data(result, "Found :" + topic.name() + " {" + topic.getNodeKeyField() + ":\"" + topic.getNodeKey() + "\"}");
+        } catch (NullPointerException e) {
+            return response.data(result, "Could not build timeline: "+ e.getMessage());
         } catch (Exception e) {
             return response.exception(e);
         }
     }
 
     private JSONObject buildTimeline(Topic topic, Cypher c)
-    throws CypherException
+    throws CypherException, NullPointerException
     {
         Timeline query = new Timeline(topic);
         this.setQueryConfig(query);

@@ -11,7 +11,7 @@ MATCH (fields:OpenPipeConfig {name: 'topicFields'})
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.assetPage = (api.assetPage + 1)
 SET script.page = api.assetPage
-WITH canon, fields, api.singleAsset as assetGuidBase, api.allAssets + '?changeStart=' + api.lastRun + '&ps=20&p=' + api.assetPage as url
+WITH canon, fields, api.singleAsset as assetGuidBase, api.allAssets + '?changeStart=' + api.lastRun + '&ps=100&p=' + api.assetPage as url
 CALL apoc.load.json(url) YIELD value
 UNWIND value.data AS asset
 
@@ -20,8 +20,8 @@ WITH asset, canon, assetGuidBase, value.total as pageAssetsCount,
   bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS openpipe_id,
 	assetGuidBase + bsuapi.obj.singleClean(asset.openpipe_canonical.id) AS guid,
 	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date]) AS openpipe_date,
-	bsuapi.obj.singleClean(asset.openpipe_canonical.latitude) AS openpipe_latitude,
-	bsuapi.obj.singleClean(asset.openpipe_canonical.longitude) AS openpipe_longitude,
+	toFloat(bsuapi.obj.singleClean(asset.openpipe_canonical.latitude)) AS openpipe_latitude,
+	toFloat(bsuapi.obj.singleClean(asset.openpipe_canonical.longitude)) AS openpipe_longitude,
 	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.moment,['0']) AS openpipe_moment,
 
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.artist, [canon.artist, '']) AS openpipe_artist,
@@ -33,7 +33,7 @@ WITH asset, canon, assetGuidBase, value.total as pageAssetsCount,
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.city, [canon.city, '']) AS openpipe_city,
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.tags, [canon.tags, '']) AS openpipe_tags
     LIMIT {limit}
-WHERE (asset.name <> '' AND openpipe_id IS NOT NULL)
+WHERE (asset.name <> '' AND openpipe_id IS NOT NULL AND NOT openpipe_date CONTAINS 'YYYY')
 
 MERGE (x:Asset {id: openpipe_id})
 MERGE (artists:TopicList {type: 'Artist'})
@@ -55,6 +55,7 @@ SET cities += openpipe_city
 SET tags += openpipe_tags
 
 SET x.import = 0
+SET x.type = 'Asset'
 SET x.score_generated = 0
 SET x.name = name
 SET x.openpipe_id = openpipe_id
@@ -70,8 +71,8 @@ SET x.primaryImageFullDimensions = bsuapi.obj.singleClean(asset.openpipe_canonic
 SET x.openpipe_latitude = openpipe_latitude
 SET x.openpipe_longitude = openpipe_longitude
 SET x.hasGeo = (openpipe_latitude IS NOT NULL AND openpipe_longitude IS NOT NULL)
-SET x.latlong = CASE WHEN x.hasGeo THEN [toFloat(openpipe_latitude), toFloat(openpipe_longitude)] ELSE null END
-SET x.wgs = CASE WHEN x.hasGeo THEN point({x: x.latlong[0], y: x.latlong[1], crs: 'wgs-84'}) ELSE null END
+SET x.latlong = CASE WHEN x.hasGeo THEN [openpipe_latitude, openpipe_longitude] ELSE null END
+SET x.wgs = CASE WHEN x.hasGeo THEN point({x: openpipe_latitude, y: openpipe_longitude, crs: 'wgs-84'}) ELSE null END
 SET x.openpipe_date = openpipe_date
 SET x.date = date(bsuapi.obj.openPipeDateMap(x.openpipe_date))
 SET x.moment = openpipe_moment

@@ -52,6 +52,14 @@ CREATE INDEX ON :Tag(name);
 CREATE INDEX ON :Tag(guid);
 CREATE INDEX ON :Folder(guid);
 
+CALL db.indexes() YIELD indexName
+WITH COLLECT(indexName) AS indexList
+WITH [i IN indexList WHERE i IN ['assetNameIndex', 'topicNameIndex'] | i] AS dropList
+UNWIND dropList AS index
+CALL db.index.fulltext.drop(index)
+WITH count(index) as dropCount
+RETURN "DROPPED " + dropCount + " fulltext indices" as t LIMIT 1;
+
 CALL db.index.fulltext.createNodeIndex("topicNameIndex",["Artist","Culture","Classification","Genre","Medium","Nation","City","Tag"],["name"])
 RETURN "CREATED full-text-index topicNameIndex" as t LIMIT 1;
 CALL db.index.fulltext.createNodeIndex("assetNameIndex",["Asset"],["name"])

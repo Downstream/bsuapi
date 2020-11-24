@@ -15,8 +15,7 @@ implements QueryResultSingleColumn
 {
     protected static String query =
         "MATCH (%1$s)<-[r:%2$s]-("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
-        "%4$s RETURN "+ QueryResultSingleColumn.resultColumn +
-            "{.*, type: head(labels("+ QueryResultSingleColumn.resultColumn +"))} " +
+        "%4$s RETURN "+ QueryResultSingleColumn.resultColumn + " " +
         "ORDER BY "+ QueryResultSingleColumn.resultColumn +".date ASC"
         ;
 
@@ -30,6 +29,7 @@ implements QueryResultSingleColumn
     protected TimeStep step;
 
     public Timeline(Topic topic)
+    throws NullPointerException
     {
         super(Timeline.query);
         this.target = NodeType.ASSET;
@@ -39,6 +39,7 @@ implements QueryResultSingleColumn
 
     public JSONObject getResults()
     {
+        this.results.put("step",this.step);
         return this.results;
     }
 
@@ -56,10 +57,20 @@ implements QueryResultSingleColumn
     public void entryHandler(Object entry)
     {
         try {
-            VirtualNode asset = new VirtualNode((Map) entry);
+            Node asset;
+            if (entry instanceof org.neo4j.graphdb.Node) {
+                asset = new Node((org.neo4j.graphdb.Node) entry);
+            } else if (entry instanceof Map) {
+                asset = new VirtualNode((Map) entry);
+            } else {
+                this.addEntry("error", entry.getClass() + ": " + entry.toString());
+                return;
+            }
+
             this.addEntry(this.step.getDateKey(asset), asset.toJsonObject());
+
         } catch (Throwable e) {
-            this.addResultEntry(JsonResponse.exceptionDetailed(e));
+            this.results.put("exeption", JsonResponse.exceptionDetailed(e));
         }
     }
 
@@ -96,12 +107,44 @@ enum TimeStep
     private static final int DEFAULT_TARGET_STEPS = 100;
 
     public static TimeStep stepFromTopic(Topic topic)
+    throws NullPointerException
     {
-        String start = topic.getNodeProperty("dateStart");
-        String end = topic.getNodeProperty("dateEnd");
-        LocalDate startDate = LocalDate.parse(start);
-        LocalDate endDate = LocalDate.parse(end);
+        LocalDate startDate = TimeStep.parseLocalDate(topic,"dateStart");
+        LocalDate endDate = TimeStep.parseLocalDate(topic,"dateEnd");
+
+        if (startDate == null || endDate == null) {
+            throw new NullPointerException("Topic or Folder missing dates, likely has no assets.");
+        }
+
         return TimeStep.stepFromDates(startDate, endDate);
+    }
+
+    public static LocalDate parseLocalDate(Topic topic, String property)
+    {
+        Object date = topic.getRawProperty(property);
+        if (date instanceof LocalDate) {
+            return (LocalDate) date;
+        }
+
+        if (date != null) {
+            return LocalDate.parse((String) date);
+        }
+
+        return null;
+    }
+
+    public static LocalDate parseLocalDate(Node node, String property)
+    {
+        Object date = node.getRawProperty(property);
+        if (date instanceof LocalDate) {
+            return (LocalDate) date;
+        }
+
+        if (date != null) {
+            return LocalDate.parse((String) date);
+        }
+
+        return null;
     }
 
     public static TimeStep stepFromDates(LocalDate start, LocalDate end)
@@ -126,9 +169,9 @@ enum TimeStep
         return TimeStep.YEAR100;
     }
 
-    public String getDateKey(VirtualNode node)
+    public String getDateKey(Node node)
     {
-        LocalDate date = LocalDate.parse(node.getProperty("date"));
+        LocalDate date = TimeStep.parseLocalDate(node, "date");
 
         switch (this)
         {

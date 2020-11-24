@@ -68,6 +68,18 @@ CALL apoc.periodic.iterate("MATCH (:Asset {hasGeo: true})-[]->(f:Folder) RETURN 
 WITH "SET Folder hasGeo from Assets - committed:"+ operations.committed +" failed:"+ operations.failed as t RETURN t
 ;
 
+CALL apoc.periodic.iterate("MATCH (f:Folder)<-[:FOLDER_ASSET]-(x:Asset) RETURN f, x","
+  WITH f, x,
+  CASE WHEN f.dateStart IS NULL OR f.dateStart > x.date THEN x.date ELSE f.dateStart END AS dateStart,
+  CASE WHEN f.dateEnd IS NULL OR f.dateEnd < x.date THEN x.date ELSE f.dateEnd END AS dateEnd
+  SET f.dateStart = dateStart, f.dateEnd = dateEnd
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "SET Folder dates from Assets - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
+;
+
+
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.lastFolderRun = date()
 WITH "Folder Sync COMPLETE" as t RETURN t;

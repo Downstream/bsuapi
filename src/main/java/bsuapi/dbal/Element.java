@@ -56,6 +56,16 @@ public class Element implements org.neo4j.graphdb.Label
         return "";
     }
 
+    public Object getRawProperty(String field)
+    {
+        if (this.hasMatch())
+        {
+            return this.getNode().getRawProperty(field);
+        }
+
+        return null;
+    }
+
     public JSONObject toJson()
     {
         Node node = this.getNode();

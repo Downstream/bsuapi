@@ -40,6 +40,8 @@ public class Node
 
     public String getProperty(String key){ return (String) this.properties.getOrDefault(key, "unknown"); }
 
+    public Object getRawProperty(String key){ return this.properties.get(key); }
+
     /* @todo refactor this and NodeType calls - can be simplified */
     public String getUri()
     {
