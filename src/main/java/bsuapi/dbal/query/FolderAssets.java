@@ -21,6 +21,7 @@ implements QueryResultSingleColumn
         ;
 
     protected Topic topic;
+    private boolean templateOnly = false;
 
     public FolderAssets(Topic topic)
     {
@@ -38,5 +39,25 @@ implements QueryResultSingleColumn
             this.target.labelName(),
             this.where()
         ) + this.getPageLimitCmd();
+    }
+
+    public void setTemplateOnly(boolean templateOnly) { this.templateOnly = templateOnly; }
+
+    public String where() {
+        StringBuilder result = new StringBuilder();
+
+        if (this.hasGeo) {
+            result.append(QueryResultSingleColumn.resultColumn +".hasGeo = true");
+        }
+
+        if (this.templateOnly) {
+            result.append("EXISTS(r.geometry)");
+        }
+
+        if (result.length() > 0) {
+            return " WHERE " + result.toString();
+        }
+
+        return "";
     }
 }

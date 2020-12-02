@@ -93,6 +93,15 @@ public class Node
                 result.put("linkTimeline", timelineUri);
             }
 
+            result.put("layout",false);
+            if (this.getRawProperty("hasLayout") != null) {
+                result.put("layout",true);
+                String templateUri = type.makeTemplateUri(this.getNodeKey());
+                if (templateUri != null) {
+                    result.put("linkTemplate", templateUri);
+                }
+            }
+
         } else {
             result.put("type", "unknown");
         }

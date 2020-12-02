@@ -245,4 +245,12 @@ public enum NodeType
                 return null;
         }
     }
+
+    public String makeTemplateUri(String key)
+    {
+        if (this == NodeType.FOLDER) {
+            return Config.buildUri("/template/" + URLCoder.encode(key));
+        }
+        return null;
+    }
 }

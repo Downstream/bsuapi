@@ -46,10 +46,8 @@ public class TimelineResource extends BaseResource
         result.put("node", topic.toJson());
 
         try {
-            result.put("test","here");
             JSONObject timeline = this.buildTimeline(topic, c);
             result.put("timeline", timeline);
-            result.put("isnull", (timeline == null));
             return response.data(result, "Found :" + topic.name() + " {" + topic.getNodeKeyField() + ":\"" + topic.getNodeKey() + "\"}");
         } catch (NullPointerException e) {
             return response.data(result, "Could not build timeline: "+ e.getMessage());

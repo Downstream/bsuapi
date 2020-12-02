@@ -1,4 +1,5 @@
 # Releases
+* [`1.7.5`](bsuapi-1.7.5s.jar) Adjustments to `/template` method, adds `/template/{guid}` which retrieves only assets with positioning.
 * [`1.7.4`](bsuapi-1.7.4.jar) Bugfixes for sync and timeline
 * [`1.7.3`](bsuapi-1.7.3.jar) Adds method `/related/asset/{guid}` for retrieving topics for a specific Asset.
 * [`1.7.2`](bsuapi-1.7.2.jar) Adds `linkTimeline` property to topics and folders.
