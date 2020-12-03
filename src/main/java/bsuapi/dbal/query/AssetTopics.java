@@ -2,7 +2,6 @@ package bsuapi.dbal.query;
 
 import bsuapi.dbal.Asset;
 import bsuapi.dbal.NodeType;
-import bsuapi.dbal.Topic;
 
 public class AssetTopics extends CypherQuery
 implements QueryResultSingleColumn

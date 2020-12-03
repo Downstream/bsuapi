@@ -1,6 +1,18 @@
 # Experimental Neo4j JSON API Plugin
 Intended to be included as a Neo4j plugin, on Ubuntu 18, with Nginx control of access. 
 
+## API Documentation
+The API itself is meant to be self-documenting. By visiting the root of the API (`/bsuapi/`), all methods and parameters are listed in properties there:
+* schema - json schema for the three main types of result data
+* methods - all api methods available
+* parameters - queryString parameters available to _almost_ every request method.
+* folders - list of folders available
+* topics - sample set of topics for every topic-type, ordered by most-connected topics first.
+* settings - all settings and configuration data for this API, and exhibit modes powered by this API.
+
+Example URIs, with at least one example for each available method, is available here:
+[Example API URLs](pages/example-uri.md) 
+
 ### Latest [bsuapi-1.7.4.jar](releases/bsuapi-1.7.4.jar)
 * Access the API [bsuapi/](bsuapi)
 * All Releases [releases/](releases)
