@@ -10,6 +10,7 @@ import org.neo4j.helpers.collection.Iterators;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 public class Cypher implements AutoCloseable
 {
@@ -88,6 +89,26 @@ public class Cypher implements AutoCloseable
         } catch (Throwable e) {
             throw new CypherException("Cypher.query failed: "+query, e);
         }
+    }
+
+    public Node querySingleNode (String command, String resultKey)
+    throws Throwable
+    {
+        Transaction tx = db.beginTx();
+        Result result = db.execute(command);
+
+        Map<String, Object> line = result.next();
+        if (line.containsKey(resultKey)) {
+            Object neoNode = line.get(resultKey);
+            if (neoNode instanceof org.neo4j.graphdb.Node) {
+                return new Node((org.neo4j.graphdb.Node) neoNode);
+            }
+        }
+
+        tx.success();
+        tx.close();
+
+        return null;
     }
 
     public void execute (String command)

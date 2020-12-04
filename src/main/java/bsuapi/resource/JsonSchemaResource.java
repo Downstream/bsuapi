@@ -132,7 +132,8 @@ public class JsonSchemaResource extends BaseResource
         properties.put("primaryImageFullDimensions", this.prop("string", "Pixels dimensions of the image in pixels: width,height. eg: \"100,200\" for a 200px tall image"));
         properties.put("primaryImageThumbDimensions", this.prop("string", "[NOT YET IMPLEMENTED] Pixels dimensions of the image in pixels: width,height. eg: \"100,200\" for a 200px tall image"));
 
-        properties.put("physicalDimensions", this.prop("string", "Size of original object, in centimeters: width,height,depth. e.g.: \"111.8,87.9,1.0\""));
+        properties.put("openpipe_dimensions", this.array("string", "Size of original object, in centimeters, as entered in OpenPipe: width,height,depth. e.g.: \"111.8,87.9,1.0\""));
+        properties.put("dimensions", this.array("float", "Size of original object, in centimeters: width,height,depth. e.g.: [111.8, 87.9, 1.0]"));
         properties.put("biography", this.prop("string", "Long text describing the asset."));
         properties.put("moment", this.prop("string", "If present, this asset will be a 'key moment' on a timeline, and given more focus or size."));
 

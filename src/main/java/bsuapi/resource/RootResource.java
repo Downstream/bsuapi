@@ -78,6 +78,7 @@ public class RootResource extends BaseResource
         methods.put("settings/{group}", SettingsResource.describeSingleGroup());
         methods.put("info", InfoResource.describe());
         methods.put("execute", ExecutorResource.describe());
+        methods.put("sync_status", SyncStatusResource.describe());
 
         return methods;
     }

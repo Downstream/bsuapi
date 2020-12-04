@@ -1,4 +1,9 @@
 # Releases
+* [`1.7.6`](bsuapi-1.7.6s.jar) Adds `/sync_status` and all-in-one sync script `/execute/FULLSYNC`, with improvements to sync, and script handling.
+   * execution of scripts will more accurately report results.
+   * updates to documentation and `/` method explainations.
+   * improvements to executor operation and recording.
+   * adds a simplified method of retrieving a single node (see SyncStatusResource).
 * [`1.7.5`](bsuapi-1.7.5s.jar) Adjustments to `/template` method, adds `/template/{guid}` which retrieves only assets with positioning.
 * [`1.7.4`](bsuapi-1.7.4.jar) Bugfixes for sync and timeline
 * [`1.7.3`](bsuapi-1.7.3.jar) Adds method `/related/asset/{guid}` for retrieving topics for a specific Asset.

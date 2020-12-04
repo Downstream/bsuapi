@@ -16,7 +16,8 @@ public enum NodeType
     CITY,
     TOPIC,
     FOLDER,
-    OPEN_PIPE_SETTING;
+    OPEN_PIPE_SETTING,
+    SYNC_CONFIG;
 
     public Label label()
     {
@@ -51,7 +52,9 @@ public enum NodeType
             case FOLDER:
                 return "Folder";
             case OPEN_PIPE_SETTING:
-                return "OpenPipeSetting";
+                return "OpenPipeSetting"; // mode settings entered into OpenPipe
+            case SYNC_CONFIG:
+                return "OpenPipeConfig"; // uris and configuration for sync with OpenPipe
             default:
                 throw new IllegalStateException( "Unknown Node Type enum: " + this );
         }
@@ -86,6 +89,8 @@ public enum NodeType
                 throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
             case ASSET:
                 throw new IllegalArgumentException( "Assets do not have relationships from Topics. e.g.: (:Topic)-[X]->(:Asset) X does not exist.");
+            case SYNC_CONFIG:
+                throw new IllegalArgumentException( "Configuration nodes do not have relationships from Topics.");
             default:
                 throw new IllegalStateException( "Unknown Node Type enum: " + this );
         }
@@ -120,6 +125,8 @@ public enum NodeType
                 throw new IllegalArgumentException( "The generic 'Topic' label matches all Topics, thus has no specific named relationship.");
             case ASSET:
                 throw new IllegalArgumentException( "Assets do not have direct relationships with eachother. e.g.: (:Asset)<-[X]->(:Asset) X does not exist.");
+            case SYNC_CONFIG:
+                throw new IllegalArgumentException( "Configuration nodes do not have relationships from Assets.");
             default:
                 throw new IllegalStateException( "Unknown Node Type enum: " + this );
         }
@@ -179,6 +186,7 @@ public enum NodeType
             if (lName.equals("City")) return CITY;
             if (lName.equals("Folder")) return FOLDER;
             if (lName.equals("OpenPipeSetting")) return OPEN_PIPE_SETTING;
+            if (lName.equals("OpenPipeConfig")) return SYNC_CONFIG;
         }
 
         return null;

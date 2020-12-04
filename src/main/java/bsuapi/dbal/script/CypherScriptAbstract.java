@@ -206,6 +206,13 @@ abstract public class CypherScriptAbstract implements ScriptStatus, Runnable
         status.put("running", this.isRunning());
         status.put("complete", this.isComplete());
 
+        if (this.getScript() == CypherScript.FULLSYNC || this.getScript() == CypherScript.OPENPIPE_SYNC) {
+            try {
+                Node api = c.querySingleNode("MATCH (api:OpenPipeConfig {name: 'api'}) RETURN api", "api");
+                status.put("lastRun",api.getProperty("lastRun"));
+            } catch (Throwable ignored) {}
+        }
+
         if (null != this.startTime) {
             status.put("startTime", TIME_FORMATTER.format(this.startTime));
         }

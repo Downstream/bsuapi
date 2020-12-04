@@ -29,5 +29,6 @@ becomes `https://bsu-openpipe.downstreamlabs.com/bsuapi/settings/globe`, to make
 * `/search-completion/rome` - best matches (by guid or title) topics and assets, but only returns the matched string (much faster, but no data, for search-completion).
 * `/execute/someScriptName` - retrieve details about last, or current, execution.
 * `/execute/someScriptName/start` - starts execution of that script.
+* `/sync_status` - details of the configuration and last run of the OpenPipe sync.
  
 

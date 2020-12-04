@@ -10,7 +10,8 @@ public enum CypherScript
     OPENPIPE_TOPICIMG,
     OPENPIPE_SYNC,
     OPENPIPE_FOLDERS,
-    OPENPIPE_SETTINGS;
+    OPENPIPE_SETTINGS,
+    FULLSYNC;  // sync, folder, settings, topicimg
 
     static final int TYPE_FILE_INCLUDED = 1;  // included in the jar
     static final int TYPE_FILESYSTEM = 2;     // accessible in the filesystem
@@ -33,6 +34,8 @@ public enum CypherScript
                 return "openPipe-folders.cypher";
             case OPENPIPE_SETTINGS:
                 return "openPipe-settings.cypher";
+            case FULLSYNC:
+                return "openPipe-fullsync.cypher";
         }
 
         throw new IllegalStateException( "Unknown CypherScript " + this );
@@ -48,6 +51,7 @@ public enum CypherScript
             case OPENPIPE_TOPICIMG:
             case OPENPIPE_FOLDERS:
             case OPENPIPE_SETTINGS:
+            case FULLSYNC:
                 return TYPE_FILE_INCLUDED;
             default:
                 return 0;
@@ -89,6 +93,8 @@ public enum CypherScript
                 return "Retrieve Folders and Templates, and updating those Folders' list of Assets.";
             case OPENPIPE_SETTINGS:
                 return "Retrieve Settings from OpenPipe, and add to :OpenPipeSettings in db.";
+            case FULLSYNC:
+                return "Run the whole sync at once: SYNC (assets and topics), FOLDERS, SETTINGS, TOPICIMG. Untested in parallel with other scripts.";
             default:
                 throw new IllegalStateException( "Unknown CypherScript " + this );
         }

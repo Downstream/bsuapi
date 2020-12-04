@@ -32,7 +32,7 @@ public class ExecutorResource extends BaseResource
                 Cypher c = new Cypher(db)
         ) {
             CypherScript script = CypherScript.valueOf(scriptName.toUpperCase());
-            JSONObject data = this.scriptReport(c, script);
+            JSONObject data = ScriptOverseer.report(c, script);
 
             return response.data(data, "Report of last run of CypherScript: "+ script.name());
         }
@@ -69,22 +69,6 @@ public class ExecutorResource extends BaseResource
     private JSONObject scriptStart(Cypher c, CypherScript script)
     {
         return ScriptExecutor.exec(c, script).statusReport();
-    }
-
-    private JSONObject scriptReport(Cypher c, CypherScript script)
-    {
-        JSONObject result;
-        if (ScriptOverseer.has(script.name())) {
-            result = script.getRunner(c).statusReport();
-        } else {
-            result = script.getStoredReport(c);
-            result.remove("keyField");
-            result.remove("keyRaw");
-            result.remove("keyEncoded");
-            result.put("next", "Command ready to be started.");
-        }
-
-        return result;
     }
 
     public static BehaviorDescribe describe()

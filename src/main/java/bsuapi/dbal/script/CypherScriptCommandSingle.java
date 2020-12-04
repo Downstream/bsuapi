@@ -2,6 +2,7 @@ package bsuapi.dbal.script;
 
 import bsuapi.dbal.query.CypherQuery;
 import bsuapi.dbal.query.QueryResultSingleColumn;
+import org.json.JSONObject;
 import org.neo4j.graphdb.Result;
 import org.neo4j.helpers.collection.Iterators;
 
@@ -23,7 +24,11 @@ implements QueryResultSingleColumn
     {
         Iterator<Object> resultIterator = result.columnAs(QueryResultSingleColumn.resultColumn);
         for (Object entry : Iterators.asIterable(resultIterator)) {
-            this.entryHandler(entry);
+            if (entry instanceof String) {
+                this.addResultEntry((String) entry);
+            } else {
+                this.entryHandler(entry);
+            }
         }
     }
 }

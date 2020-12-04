@@ -8,6 +8,7 @@ SET x.singleFolder='http://mec402.boisestate.edu/cgi-bin/openpipe/data/folder/'
 SET x.settings='http://mec402.boisestate.edu/cgi-bin/dataAccess/settings/getWallAppSettings.py'
 SET x.lastRun = '2020-01-01'
 SET x.lastFolderRun = '2020-01-01'
+SET x.assetPerPage = '100'
 RETURN "RESET OpenPipeConfig api settings" as t LIMIT 1
 ;
 

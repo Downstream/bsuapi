@@ -1,5 +1,9 @@
 package bsuapi.service;
 
+import bsuapi.dbal.Cypher;
+import bsuapi.dbal.script.CypherScript;
+import org.json.JSONObject;
+
 import java.time.Duration;
 import java.util.HashMap;
 
@@ -75,6 +79,22 @@ public class ScriptOverseer
     public static boolean has(String key)
     {
         return ScriptOverseer.singleton().hasCommand(key);
+    }
+
+    public static JSONObject report(Cypher c, CypherScript script)
+    {
+        JSONObject result;
+        if (ScriptOverseer.has(script.name())) {
+            result = script.getRunner(c).statusReport();
+        } else {
+            result = script.getStoredReport(c);
+            result.remove("keyField");
+            result.remove("keyRaw");
+            result.remove("keyEncoded");
+            result.put("next", "Command ready to be started.");
+        }
+
+        return result;
     }
 
     public static void ready(String key, ScriptStatus command)

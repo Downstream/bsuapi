@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CypherScriptFile extends CypherScriptAbstract
@@ -34,10 +35,12 @@ public class CypherScriptFile extends CypherScriptAbstract
     {
         ArrayList<CypherQuery> commands = new ArrayList<>();
         String sourceFileData = Util.readResourceFile(this.script.filename());
+        Pattern patternReturn = Pattern.compile("\\s?RETURN\\s");
+
         for (String cmd : sourceFileData.trim().split(";")) {
             cmd = cmd.trim();
             if (cmd.length() < 5) {continue;}
-            if (Pattern.matches(".*\\sRETURN\\s.*",cmd)) {
+            if (patternReturn.matcher(cmd).find()) {
                 commands.add(new CypherScriptCommandSingle(cmd));
             } else {
                 commands.add(new CypherScriptCommandEmpty(cmd));

@@ -108,11 +108,14 @@ MATCH (api:OpenPipeConfig {name: 'api'})
 RETURN "COMPLETED IMPORT apoc.periodic.commit(apoc.load.json( "+ api.allAssets +" )) updates:" + updates + " batches:" + batches + " failedBatches:" + failedBatches as t LIMIT 1
 ;
 
-MATCH (x:Asset {import: 0})-[r]->() DELETE r;
+OPTIONAL MATCH (x:Asset {import: 0})-[r]->()
+SET x.import = 1
+DELETE r
+RETURN "Wiped old asset relations for imported assets" as t;
 
 RETURN "STARTING Asset:Topic relationships" as t;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
   UNWIND x.openpipe_guid_artist as guid MERGE (t:Artist {guid: guid})
   MERGE (x)-[:BY]->(t)
   WITH t,
@@ -126,7 +129,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
 RETURN "BUILDING Topics, ASSET:ARTIST relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
   UNWIND x.openpipe_guid_culture as guid MERGE (t:Culture {guid: guid})
   MERGE (x)-[:ASSET_CULTURE]->(t)
   WITH t,
@@ -140,7 +143,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
 RETURN "BUILDING Topics, ASSET:CULTURE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
   UNWIND x.openpipe_guid_classification as guid MERGE (t:Classification {guid: guid})
   MERGE (x)-[:ASSET_CLASS]->(t)
   WITH t,
@@ -154,7 +157,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
 RETURN "BUILDING Topics, ASSET:CLASS relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
   UNWIND x.openpipe_guid_genre as guid MERGE (t:Genre {guid: guid})
   MERGE (x)-[:ASSET_GENRE]->(t)
   WITH t,
@@ -168,7 +171,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
 RETURN "BUILDING Topics, ASSET:GENRE relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
   UNWIND x.openpipe_guid_medium as guid MERGE (t:Medium {guid: guid})
   MERGE (x)-[:ASSET_MEDIUM]->(t)
   WITH t,
@@ -182,7 +185,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
 RETURN "BUILDING Topics, ASSET:MEDIUM relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
   UNWIND x.openpipe_guid_nation as guid MERGE (t:Nation {guid: guid})
   MERGE (x)-[:ASSET_NATION]->(t)
   WITH t,
@@ -196,7 +199,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
 RETURN "BUILDING Topics, ASSET:NATION relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
   UNWIND x.openpipe_guid_city as guid MERGE (t:City {guid: guid})
   MERGE (x)-[:ASSET_CITY]->(t)
   WITH t,
@@ -210,7 +213,7 @@ CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
 RETURN "BUILDING Topics, ASSET:CITY relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-CALL apoc.periodic.iterate("MATCH (x:Asset) RETURN x","
+CALL apoc.periodic.iterate("MATCH (x:Asset {import: 1}) RETURN x","
   UNWIND x.openpipe_guid_tags as guid MERGE (t:Tag {guid: guid})
   MERGE (x)-[:ASSET_TAG]->(t)
   WITH t,
@@ -409,3 +412,296 @@ RETURN "SET artCount for TAG" as t;
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.lastRun = api.thisRun
 RETURN "Sync COMPLETE" as t;
+
+MATCH (api:OpenPipeConfig {name: 'api'})
+
+WITH api.folders + '?collectionId=all' as url, api.singleFolder as singleFolderUrl
+CALL apoc.load.json(url) YIELD value
+UNWIND value.data AS folder
+
+MERGE (f:Folder {openpipe_id:bsuapi.coll.singleClean(folder.id)})
+SET f.guid = singleFolderUrl + f.openpipe_id
+SET f.title = bsuapi.coll.singleClean(folder.name)
+SET f.name = bsuapi.coll.singleClean(folder.name)
+SET f.smallImage = bsuapi.coll.singleClean(folder.image)
+SET f.layoutType = bsuapi.coll.singleClean(folder.layoutType)
+SET f.insertTime = bsuapi.coll.singleClean(folder.insertTime)
+SET f.lastModified = bsuapi.coll.singleClean(folder.lastModified)
+WITH "Synced Folder Details" as t RETURN t;
+
+
+OPTIONAL MATCH (f:Folder)-[r:FOLDER_ASSET]->(:Asset)
+DELETE r
+WITH "Cleared assets from updated folders" as t RETURN t;
+
+
+MATCH (f:Folder)
+
+CALL apoc.load.json(f.guid) YIELD value
+UNWIND value.assets as assetEntry
+MATCH (a:Asset {guid: assetEntry.guid})
+WITH f, a, assetEntry,
+     CASE WHEN f.dateStart IS NULL OR f.dateStart > a.date THEN a.date ELSE f.dateStart END AS dateStart,
+     CASE WHEN f.dateEnd IS NULL OR f.dateEnd < a.date THEN a.date ELSE f.dateEnd END AS dateEnd
+SET f.dateStart = dateStart, f.dateEnd = dateEnd
+WITH f, a, assetEntry.geometry as geometry, assetEntry.wall as wall, split(assetEntry.geometry, ' ') as geoSplit
+MERGE (f)<-[r:FOLDER_ASSET]-(a)
+WITH f, r, geometry, wall, geoSplit
+CALL apoc.do.when( geometry IS NOT NULL AND size(geoSplit)>6 ,
+"
+  SET r.geometry = geometry
+  SET r.wall = wall
+  SET r.size = [geoSplit[0],geoSplit[2]]
+  SET r.position = [geoSplit[3] + geoSplit[4], geoSplit[5] + geoSplit[6]]
+  SET f.hasLayout = true
+",
+"",
+{f: f, r: r, geometry: geometry, wall: wall, geoSplit: geoSplit}
+) YIELD value
+WITH "Synced folders and connected assets and positional data." as t RETURN t;
+
+
+
+CALL apoc.periodic.iterate(
+"
+      MATCH (f:Folder)<--(:Asset)-->(b:Topic)
+      RETURN f, b
+","
+      MERGE (f)-[r:FOLDER_TOPIC]->(b)
+      ON CREATE SET r.strength = 1
+      ON MATCH SET r.strength = r.strength + 1
+", {batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+WITH "FOLDER:TOPIC relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t RETURN t
+;
+
+CALL apoc.periodic.iterate("MATCH (:Asset {hasGeo: true})-[]->(f:Folder) RETURN f","
+  SET f.hasGeo = true
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+WITH "SET Folder hasGeo from Assets - committed:"+ operations.committed +" failed:"+ operations.failed as t RETURN t
+;
+
+CALL apoc.periodic.iterate("MATCH (f:Folder)<-[:FOLDER_ASSET]-(x:Asset) RETURN f, x","
+  WITH f, x,
+  CASE WHEN f.dateStart IS NULL OR f.dateStart > x.date THEN x.date ELSE f.dateStart END AS dateStart,
+  CASE WHEN f.dateEnd IS NULL OR f.dateEnd < x.date THEN x.date ELSE f.dateEnd END AS dateEnd
+  SET f.dateStart = dateStart, f.dateEnd = dateEnd
+",
+{batchSize:10000, iterateList:true, parallel:false}
+) YIELD operations
+RETURN "SET Folder dates from Assets - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
+;
+
+
+MATCH (api:OpenPipeConfig {name: 'api'})
+SET api.lastFolderRun = date()
+WITH "Folder Sync COMPLETE" as t RETURN t;
+
+
+
+OPTIONAL MATCH (group:OpenPipeSetting) DETACH DELETE group
+RETURN "Cleared all old settings" as t;
+
+MATCH (api:OpenPipeConfig {name: 'api'})
+CALL apoc.load.json(api.settings) YIELD value
+UNWIND value.data AS setting
+
+MERGE (group:OpenPipeSetting {name: setting.groupName})
+WITH group, setting.key as key, coalesce(group[setting.key], []) + setting.value as vals
+UNWIND vals AS val
+WITH group, key, COLLECT(distinct val) as newvals
+CALL apoc.create.setProperty(group, key, newvals) YIELD node
+
+RETURN "Loaded new Settings" as t;
+
+OPTIONAL MATCH (group:OpenPipeSetting)
+UNWIND group.preset AS entry
+WITH group, entry, split(entry, ' ') as splitEntry
+WITH group, entry, splitEntry[0] as splitGuid, splitEntry[2] as splitByType
+CALL apoc.do.case([
+  splitByType IS NOT NULL AND size(splitByType)>0 AND splitGuid CONTAINS "/folder/", "
+    	MATCH (a:Folder {guid: splitGuid})
+        MERGE (group)<-[:SETTING_OPTION {byType: splitByType}]-(a)
+    ",
+  splitByType IS NOT NULL AND size(splitByType)>0 AND splitGuid CONTAINS "/openpipe/", "
+    	MATCH (a:Topic {guid: splitGuid})
+        MERGE (group)<-[:SETTING_OPTION {byType: splitByType}]-(a)
+    ",
+  entry CONTAINS "/folder/", "
+    	MATCH (a:Folder {guid: entry})
+        MERGE (group)<-[:SETTING_OPTION]-(a)
+    ",
+  entry CONTAINS "/openpipe/", "
+    	MATCH (a:Topic {guid: entry})
+        MERGE (group)<-[:SETTING_OPTION]-(a)
+    "
+],
+"",
+{group: group, entry: entry, splitGuid: splitGuid, splitByType: splitByType}
+) YIELD value
+WITH value AS t RETURN t
+UNION WITH "Mapped setting's guids to topic/folders" as t
+RETURN t;
+
+
+
+
+MATCH (a:Artist)<-[r:BY]-(x:Asset)
+WITH a, r, x
+SET r.representative =
+(CASE WHEN x.name CONTAINS a.name THEN 10 ELSE 0 END)
++ (CASE WHEN x.name =~ '(?i)^.*self.*' THEN 6 ELSE 0 END)
++ (CASE WHEN x.name =~ '(?i)^.*portrait.*' THEN 4 ELSE 0 END)
++ (size([tag IN x.openpipe_tags WHERE (tag='Self-portraits')]) * 10)
++ size([tag IN x.openpipe_tags WHERE (tag='Artists' OR tag='Portraits')])
++ (CASE WHEN size(x.openpipe_medium) >0 THEN 1 ELSE 0 END)
++ (CASE WHEN size(x.openpipe_classification) >0 THEN 1 ELSE 0 END)
++ (CASE WHEN size(x.openpipe_culture) >0 THEN 1 ELSE 0 END)
+RETURN "Indentifying Artist representative images" AS t
+;
+
+OPTIONAL MATCH (a:Artist)<-[r:BY]-(:Asset)
+  WHERE r.representative > 0
+WITH a, r ORDER BY r.representative DESC
+WITH a, head(collect(r)) as prime
+SET prime.prime = true
+RETURN "SET Artist representative image" AS t
+;
+
+MATCH (a:Culture)<-[r:ASSET_CULTURE]-(x:Asset)
+WITH a, r, x
+SET r.representative =
+(CASE WHEN x.name CONTAINS a.name THEN 10 ELSE 0 END)
++ (CASE WHEN x.name =~ '(?i)^.*culture.*' THEN 6 ELSE 0 END)
++ (CASE WHEN x.name =~ '(?i)^.*nation.*' THEN 4 ELSE 0 END)
++ (CASE WHEN x.name =~ '(?i)^.*country.*' THEN 2 ELSE 0 END)
++ (size([tag IN x.openpipe_tags WHERE (tag='Cities' OR tag='Towns')]) * 3)
++ (size([tag IN x.openpipe_tags WHERE (tag='People' OR tag='Utilitarian Objects' OR tag='Bridges')]) * 2)
++ size([tag IN x.openpipe_tags WHERE (tag='Landscapes' OR tag='Architecture' OR tag='Churches' OR tag='Battles' OR tag='Masks' OR tag='Games')])
+RETURN "Indentifying Culture representative images" AS t
+;
+
+OPTIONAL MATCH (a:Culture)<-[r:ASSET_CULTURE]-(:Asset)
+  WHERE r.representative > 0
+WITH a, r ORDER BY r.representative DESC
+WITH a, head(collect(r)) as prime
+SET prime.prime = true
+RETURN "SET Culture representative image" AS t
+;
+
+MATCH (a:Classification)<-[r:ASSET_CLASS]-(x:Asset)
+WITH a, r, x
+SET r.representative =
+(CASE WHEN x.name = a.name THEN 10 ELSE 0 END)
++ (CASE WHEN x.name CONTAINS a.name THEN 6 ELSE 0 END)
+RETURN "Indentifying Classification representative images" AS t
+;
+
+OPTIONAL MATCH (a:Classification)<-[r:ASSET_CLASS]-(:Asset)
+  WHERE r.representative > 0
+WITH a, r ORDER BY r.representative DESC
+WITH a, head(collect(r)) as prime
+SET prime.prime = true
+RETURN "SET Classification representative image" AS t
+;
+
+MATCH (a:Genre)<-[r:ASSET_GENRE]-(x:Asset)
+WITH a, r, x
+SET r.representative =
+(CASE WHEN x.name = a.name THEN 10 ELSE 0 END)
++ (CASE WHEN x.name CONTAINS a.name THEN 6 ELSE 0 END)
+RETURN "Indentifying Genre representative images" AS t
+;
+
+OPTIONAL MATCH (a:Genre)<-[r:ASSET_GENRE]-(:Asset)
+  WHERE r.representative > 0
+WITH a, r ORDER BY r.representative DESC
+WITH a, head(collect(r)) as prime
+SET prime.prime = true
+RETURN "SET Genre representative image" AS t
+;
+
+MATCH (a:Medium)<-[r:ASSET_MEDIUM]-(x:Asset)
+WITH a, r, x
+SET r.representative =
+(CASE WHEN x.name = a.name THEN 10 ELSE 0 END)
++ (CASE WHEN x.name CONTAINS a.name THEN 6 ELSE 0 END)
+RETURN "Indentifying Medium representative images" AS t
+;
+
+OPTIONAL MATCH (a:Medium)<-[r:ASSET_MEDIUM]-(:Asset)
+  WHERE r.representative > 0
+WITH a, r ORDER BY r.representative DESC
+WITH a, head(collect(r)) as prime
+SET prime.prime = true
+RETURN "SET Medium representative image" AS t
+;
+
+MATCH (a:Nation)<-[r:ASSET_NATION]-(x:Asset)
+WITH a, r, x
+SET r.representative =
+(CASE WHEN x.name CONTAINS a.name THEN 10 ELSE 0 END)
++ (CASE WHEN x.name =~ '(?i)^.*country.*' THEN 6 ELSE 0 END)
++ (CASE WHEN x.name =~ '(?i)^.*nation.*' THEN 4 ELSE 0 END)
++ (size([tag IN x.openpipe_tags WHERE (tag='Flags' OR tag='Landscapes' OR tag='Capitals')]) * 2)
++ size([tag IN x.openpipe_tags WHERE (tag='Cities' OR tag='Towns' OR tag="Streets" OR tag="Buildings")])
+RETURN "Indentifying Nation representative images" AS t
+;
+
+OPTIONAL MATCH (a:Nation)<-[r:ASSET_NATION]-(:Asset)
+  WHERE r.representative > 0
+WITH a, r ORDER BY r.representative DESC
+WITH a, head(collect(r)) as prime
+SET prime.prime = true
+RETURN "SET Nation representative image" AS t
+;
+
+MATCH (a:City)<-[r:ASSET_CITY]-(x:Asset)
+WITH a, r, x
+SET r.representative =
+(CASE WHEN x.name CONTAINS a.name THEN 10 ELSE 0 END)
++ (CASE WHEN x.name =~ '(?i)^.*city.*' THEN 6 ELSE 0 END)
++ (CASE WHEN x.name =~ '(?i)^.*town.*' THEN 4 ELSE 0 END)
++ (size([tag IN x.openpipe_tags WHERE (tag='Flags' OR tag='Landscapes' OR tag='Capitals')]) * 2)
++ size([tag IN x.openpipe_tags WHERE (tag='Cities' OR tag='Towns' OR tag="Streets" OR tag="Buildings")])
+RETURN "Indentifying City representative images" AS t
+;
+
+OPTIONAL MATCH (a:City)<-[r:ASSET_CITY]-(:Asset)
+  WHERE r.representative > 0
+WITH a, r ORDER BY r.representative DESC
+WITH a, head(collect(r)) as prime
+SET prime.prime = true
+RETURN "SET City representative image" AS t
+;
+
+MATCH (a:Tag)<-[r:ASSET_TAG]-(x:Asset)
+WITH a, r, x
+SET r.representative =
+(CASE WHEN x.name CONTAINS a.name THEN 10 ELSE 0 END)
++ (CASE WHEN size(x.openpipe_tags) = 1 THEN 4 ELSE 0 END)
+RETURN "Indentifying Tag representative images" AS t
+;
+
+OPTIONAL MATCH (a:Tag)<-[r:ASSET_TAG]-(:Asset)
+  WHERE r.representative > 0
+WITH a, r ORDER BY r.representative DESC
+WITH a, head(collect(r)) as prime
+SET prime.prime = true
+RETURN "SET Tag representative image" AS t
+;
+
+OPTIONAL MATCH (a:Topic)<-[r]-(x:Asset)
+  WHERE r.prime=true AND exists(x.primaryImageSmall)
+SET a.smallImage = x.primaryImageSmall
+RETURN "SET representative image to topic.smallImage property" AS t
+;
+
+OPTIONAL MATCH (a:Topic)
+  WHERE NOT EXISTS(a.smallImage)
+OPTIONAL MATCH (a)<-[]-(x:Asset)
+WITH a, head(collect(x)) as asset
+SET a.smallImage = asset.primaryImageSmall
+RETURN "SET a random image to topic.smallImage property where no representative image was found." AS t
