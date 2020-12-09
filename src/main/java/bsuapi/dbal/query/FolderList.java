@@ -14,7 +14,8 @@ implements QueryResultSingleColumn
      */
     protected static String query =
         "MATCH ("+ QueryResultSingleColumn.resultColumn +":%1$s) " +
-        "%2$s RETURN "+ QueryResultSingleColumn.resultColumn
+        "OPTIONAL MATCH ("+ QueryResultSingleColumn.resultColumn +")<-[:%2$s]-(x:Asset)" +
+        "%3$s RETURN "+ QueryResultSingleColumn.resultColumn
         ;
 
     private boolean templateOnly = false;
@@ -31,6 +32,7 @@ implements QueryResultSingleColumn
         return this.resultQuery = String.format(
             this.initQuery,
             this.target.labelName(),
+            this.target.relFromAsset(),
             this.where()
         ) + this.getPageLimitCmd();
     }
@@ -46,6 +48,8 @@ implements QueryResultSingleColumn
         if (this.templateOnly) {
             result.append(QueryResultSingleColumn.resultColumn +".hasLayout = true");
         }
+
+        result.append("count(x) > 0");
 
         if (result.length() > 0) {
             return " WHERE " + result.toString();
