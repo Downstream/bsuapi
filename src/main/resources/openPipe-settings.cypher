@@ -20,22 +20,26 @@ WITH group, entry, splitEntry[0] as splitGuid, splitEntry[2] as splitByType
 CALL apoc.do.case([
   splitByType IS NOT NULL AND size(splitByType)>0 AND splitGuid CONTAINS "/folder/", "
     	MATCH (a:Folder {guid: splitGuid})
-        MERGE (group)<-[:SETTING_OPTION {byType: splitByType}]-(a)
+      MERGE (group)<-[:SETTING_OPTION {byType: splitByType}]-(a)
+      RETURN 1 as cnt
     ",
   splitByType IS NOT NULL AND size(splitByType)>0 AND splitGuid CONTAINS "/openpipe/", "
     	MATCH (a:Topic {guid: splitGuid})
-        MERGE (group)<-[:SETTING_OPTION {byType: splitByType}]-(a)
+      MERGE (group)<-[:SETTING_OPTION {byType: splitByType}]-(a)
+      RETURN 1 as cnt
     ",
   entry CONTAINS "/folder/", "
     	MATCH (a:Folder {guid: entry})
-        MERGE (group)<-[:SETTING_OPTION]-(a)
+      MERGE (group)<-[:SETTING_OPTION]-(a)
+      RETURN 1 as cnt
     ",
   entry CONTAINS "/openpipe/", "
     	MATCH (a:Topic {guid: entry})
-        MERGE (group)<-[:SETTING_OPTION]-(a)
+      MERGE (group)<-[:SETTING_OPTION]-(a)
+      RETURN 1 as cnt
     "
 ],
-"",
+"RETURN count(c) AS message",
 {group: group, entry: entry, splitGuid: splitGuid, splitByType: splitByType}
 ) YIELD value
-RETURN "Mapped setting's guids to topic/folders" as t;
+RETURN "Mapped topic/folders " + sum(value.c) + " options from openpipe settings" as t;

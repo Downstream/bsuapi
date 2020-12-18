@@ -69,7 +69,7 @@ RETURN a,b,c,x,r
 // TopicAssets Query
 MATCH (a:Artist {name: 'Edgar Degas'})<-[:BY]-(x:Asset)
 RETURN x.name
-ORDER BY x.score_generated DESC, x.openpipe_id ASC
+ORDER BY x.score_generated DESC, x.guid ASC
 
 
 MATCH p=(:Nation {name:"France"})<-[]-(t:Asset)

@@ -15,7 +15,7 @@ implements QueryResultSingleColumn
     protected static String query =
         "MATCH (%1$s)<-[:%2$s]-("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
         "%4$s RETURN "+ QueryResultSingleColumn.resultColumn +" " +
-        "ORDER BY "+ QueryResultSingleColumn.resultColumn +".score_generated DESC ,"+ QueryResultSingleColumn.resultColumn +".openpipe_id ASC "
+        "ORDER BY "+ QueryResultSingleColumn.resultColumn +".score_generated DESC ,"+ QueryResultSingleColumn.resultColumn +".guid ASC "
         ;
 
     protected Topic topic;

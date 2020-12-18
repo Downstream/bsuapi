@@ -17,7 +17,7 @@ implements QueryResultSingleColumn
         "MATCH (%1$s)<-[r:%2$s]-("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
         "%4$s RETURN "+ QueryResultSingleColumn.resultColumn +
             "{.*, type: head(labels("+ QueryResultSingleColumn.resultColumn +")), hasLayout: r.hasLayout, geometry: r.geometry, wall: r.wall, size: r.size, position: r.position} " +
-        "ORDER BY "+ QueryResultSingleColumn.resultColumn +".score_generated DESC ,"+ QueryResultSingleColumn.resultColumn +".openpipe_id ASC "
+        "ORDER BY "+ QueryResultSingleColumn.resultColumn +".score_generated DESC ,"+ QueryResultSingleColumn.resultColumn +".guid ASC "
         ;
 
     protected Topic topic;

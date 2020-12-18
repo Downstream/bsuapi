@@ -15,13 +15,13 @@ SET f.lastModified = bsuapi.coll.singleClean(folder.lastModified)
 WITH "Synced Folder Details" as t RETURN t;
 
 
-MATCH (f:Folder)-[r:FOLDER_ASSET]->(:Asset)
+OPTIONAL MATCH (f:Folder)<-[r:FOLDER_ASSET]-(:Asset)
 DELETE r
 WITH "Cleared assets from updated folders" as t RETURN t;
 
 
 MATCH (f:Folder)
-
+WITH f
 CALL apoc.load.json(f.guid) YIELD value
 UNWIND value.assets as assetEntry
 MATCH (a:Asset {guid: assetEntry.guid})
@@ -32,18 +32,22 @@ SET f.dateStart = dateStart, f.dateEnd = dateEnd
 WITH f, a, assetEntry.geometry as geometry, assetEntry.wall as wall, split(assetEntry.geometry, ' ') as geoSplit
 MERGE (f)<-[r:FOLDER_ASSET]-(a)
 WITH f, r, geometry, wall, geoSplit
-CALL apoc.do.when( geometry IS NOT NULL AND size(geoSplit)>6 ,
-"
-  SET r.geometry = geometry
-  SET r.wall = wall
-  SET r.size = [geoSplit[0],geoSplit[2]]
-  SET r.position = [geoSplit[3] + geoSplit[4], geoSplit[5] + geoSplit[6]]
-  SET f.hasLayout = true
-",
-"",
+
+CALL apoc.do.case([
+  geometry IS NOT NULL AND size(geoSplit)>6, "
+      SET r.geometry = geometry
+  	  SET r.wall = wall
+      SET r.size = [geoSplit[0],geoSplit[2]]
+      SET r.position = [geoSplit[3] + geoSplit[4], geoSplit[5] + geoSplit[6]]
+      SET f.hasLayout = true
+      RETURN 1 as c
+    "
+],
+"RETURN 1 AS c",
 {f: f, r: r, geometry: geometry, wall: wall, geoSplit: geoSplit}
 ) YIELD value
-WITH "Synced folders and connected assets and positional data." as t RETURN t;
+WITH sum(value.c) AS assetCount LIMIT 1
+WITH "Synced all folders and connected "+ assetCount +" assets and positional data." as t RETURN t;
 
 
 

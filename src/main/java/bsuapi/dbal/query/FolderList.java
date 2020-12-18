@@ -13,8 +13,9 @@ implements QueryResultSingleColumn
      * 4: max # of matches
      */
     protected static String query =
-        "MATCH ("+ QueryResultSingleColumn.resultColumn +":%1$s) " +
-        "OPTIONAL MATCH ("+ QueryResultSingleColumn.resultColumn +")<-[:%2$s]-(x:Asset)" +
+        "MATCH (f:%1$s) " +
+        "OPTIONAL MATCH (f)<-[:%2$s]-(x:Asset) " +
+        "WITH count(x) AS cnt, f AS " + QueryResultSingleColumn.resultColumn + " " +
         "%3$s RETURN "+ QueryResultSingleColumn.resultColumn
         ;
 
@@ -49,7 +50,7 @@ implements QueryResultSingleColumn
             result.append(QueryResultSingleColumn.resultColumn +".hasLayout = true");
         }
 
-        result.append("count(x) > 0");
+        result.append("cnt > 0");
 
         if (result.length() > 0) {
             return " WHERE " + result.toString();

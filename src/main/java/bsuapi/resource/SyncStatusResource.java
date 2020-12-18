@@ -53,14 +53,14 @@ public class SyncStatusResource extends BaseResource
                 perPage = 100;
             }
 
-            int lastPage = Integer.parseInt(report.getString("page"));
+            int lastPage = Integer.parseInt(report.optString("page","0"));
             int pageNumberBy10 = ((perPage*(lastPage-1))/10)+1;
 
-            String lastRun = report.optString("lastRun",api.getProperty("lastRun"));
+            String lastRun = this.bestLastRunDate(api, report);
 
-            status.put("lastPageOfSync", api.getProperty("allAssets") + "?changeStart=" + lastRun + "&ps=" + api.getProperty("assetsPerPage") + "&p=" + (lastPage -1));
-            status.put("nextPageOfSync", api.getProperty("allAssets") + "?changeStart=" + lastRun + "&ps=" + api.getProperty("assetsPerPage") + "&p=" + lastPage);
-            status.put("nearCauseIfIssue",api.getProperty("allAssets") + "?changeStart=" + lastRun + "&ps=10&p=" + pageNumberBy10);
+            status.put("lastPageOfSync", api.getRawProperty("allAssets") + "?changeStart=" + lastRun + "&ps=" + api.getRawProperty("assetsPerPage") + "&p=" + (lastPage -1));
+            status.put("nextPageOfSync", api.getRawProperty("allAssets") + "?changeStart=" + lastRun + "&ps=" + api.getRawProperty("assetsPerPage") + "&p=" + lastPage);
+            status.put("nearCauseIfIssue",api.getRawProperty("allAssets") + "?changeStart=" + lastRun + "&ps=10&p=" + pageNumberBy10);
             status.put("config", api.toJsonObject());
             status.put("report", report);
 
@@ -70,6 +70,21 @@ public class SyncStatusResource extends BaseResource
         {
             return response.exception(e);
         }
+    }
+
+    private String bestLastRunDate(Node api, JSONObject report)
+    {
+        String reportRun = report.optString("lastRun");
+        if (reportRun != null) {
+            return reportRun;
+        }
+
+        Object apiRun = api.getRawProperty("lastRun");
+        if (apiRun instanceof String) {
+            return (String) apiRun;
+        }
+
+        return "2020-01-01";
     }
 
     private Node getConfigApi(Cypher c)
