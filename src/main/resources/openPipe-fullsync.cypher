@@ -711,6 +711,6 @@ OPTIONAL MATCH (a:Topic)
 OPTIONAL MATCH (a)<-[]-(x:Asset)
 WITH a, head(collect(x)) as asset
 SET a.smallImage = asset.primaryImageSmall
-RETURN "SET a random image to topic.smallImage property where no representative image was found." AS t
+RETURN "SET a random image to topic.smallImage property where no representative image was found." AS t;
 
 WITH "FULLSYNC COMPLETE" as t RETURN t;

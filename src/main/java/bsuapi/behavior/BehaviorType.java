@@ -11,7 +11,8 @@ public enum BehaviorType
     FOLDER,
     SEARCH,
     SEARCH_ASSETS,
-    SEARCH_TOPICS;
+    SEARCH_TOPICS,
+    SEARCH_FOLDERS;
 
     private Behavior prepare(Map<String, String> config)
     throws BehaviorException
@@ -37,6 +38,7 @@ public enum BehaviorType
                 b = new Search(config);
                 b.appendBehavior(BehaviorType.SEARCH_ASSETS.prepare(config));
                 b.appendBehavior(BehaviorType.SEARCH_TOPICS.prepare(config));
+                b.appendBehavior(BehaviorType.SEARCH_FOLDERS.prepare(config));
                 return b;
 
             case SEARCH_ASSETS:
@@ -45,6 +47,9 @@ public enum BehaviorType
 
             case SEARCH_TOPICS:
                 b = new TopicIndex(config);
+                return b;
+            case SEARCH_FOLDERS:
+                b = new FolderIndex(config);
                 return b;
         }
 

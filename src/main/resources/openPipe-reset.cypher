@@ -55,7 +55,7 @@ CREATE INDEX ON :Folder(guid);
 
 CALL db.indexes() YIELD indexName
 WITH COLLECT(indexName) AS indexList
-WITH [i IN indexList WHERE i IN ['assetNameIndex', 'topicNameIndex'] | i] AS dropList
+WITH [i IN indexList WHERE i IN ['assetNameIndex', 'topicNameIndex', 'folderNameIndex'] | i] AS dropList
 UNWIND dropList AS index
 CALL db.index.fulltext.drop(index)
 WITH count(index) as dropCount
@@ -65,6 +65,8 @@ CALL db.index.fulltext.createNodeIndex("topicNameIndex",["Artist","Culture","Cla
 RETURN "CREATED full-text-index topicNameIndex" as t LIMIT 1;
 CALL db.index.fulltext.createNodeIndex("assetNameIndex",["Asset"],["name"])
 RETURN "CREATED full-text-index assetNameIndex" as t LIMIT 1;
+CALL db.index.fulltext.createNodeIndex("folderNameIndex",["Folder"],["name"])
+RETURN "CREATED full-text-index folderNameIndex" as t LIMIT 1;
 
 MATCH (a:Topic) DETACH DELETE a;
 MATCH (a:Asset) DETACH DELETE a;
