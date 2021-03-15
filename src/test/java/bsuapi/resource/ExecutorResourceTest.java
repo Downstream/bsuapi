@@ -44,4 +44,19 @@ public class ExecutorResourceTest
         assertTrue((Boolean) responseData.query("/success"));
         assertEquals("Starting or checking CypherScript: INFO", responseData.query("/message").toString());
     }
+
+    @Test
+    public void reset() {
+        UriInfo uriInfo = j.mockUriInfo("empty");
+        ExecutorResource resource = new ExecutorResource();
+        db.baseResourceInjection(resource);
+        javax.ws.rs.core.Response result = resource.start(CypherScript.OPENPIPE_RESET.name(), uriInfo);
+
+        assertEquals(result.getStatus(), 200);
+
+        JSONObject responseData = new JSONObject(UTF8.decode((byte[]) result.getEntity()));
+
+        assertTrue((Boolean) responseData.query("/success"));
+        assertEquals("Starting or checking CypherScript: OPENPIPE_RESET", responseData.query("/message").toString());
+    }
 }

@@ -1,18 +1,54 @@
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.assetPage = 0
+SET api.topicPage = 0
+SET api.topicRun = apoc.temporal.format( date(), 'YYYY-MM-dd')
 SET api.thisRun = apoc.temporal.format( date(), 'YYYY-MM-dd')
 RETURN "RESET api counts to prepare for new sync." as t LIMIT 1
 ;
 
 CALL apoc.periodic.commit("
+MERGE (script:Script {name: 'OPENPIPE_TOPICS'})
+WITH script
+MATCH (api:OpenPipeConfig {name: 'api'})
+SET api.topicPage = (api.topicPage + 1)
+SET script.page = api.topicPage
+SET api.lastTopicUrl = api.allTopics + '?ps=' + api.assetsPerPage + '&p=' + api.topicPage
+WITH api.lastTopicUrl as url
+CALL apoc.load.json(url) YIELD value
+
+UNWIND value.availableTopics AS topicType
+
+UNWIND value[topicType].data AS topic
+
+WITH url, apoc.text.capitalizeAll(topicType) AS topicType, topic, SPLIT(topic.guid,'/') as guidLong
+WITH url, topicType, topic, COALESCE(guidLong[size(guidLong)-2], '0') + '/' + COALESCE(guidLong[size(guidLong)-1], '0') as guid
+
+MERGE (t:Topic {guid:guid})
+SET
+  t.name = topic.value,
+  t.biography=topic.biography
+
+WITH url, t, topicType
+CALL apoc.create.addLabels(t, [topicType]) YIELD node
+
+RETURN COUNT(node) AS t LIMIT {limit}
+"
+,{limit: 1000}
+) YIELD updates, batches, failedBatches
+MATCH (api:OpenPipeConfig {name: 'api'})
+RETURN "COMPLETED TOPIC IMPORT apoc.periodic.commit(apoc.load.json( "+ api.allTopics +" )) updates:" + updates + " batches:" + batches + " failedBatches:" + failedBatches as t LIMIT 1
+;
+
+
+
+CALL apoc.periodic.commit("
 MATCH (script:Script {name: 'OPENPIPE_SYNC'})
 MATCH (canon:OpenPipeConfig {name: 'canonical'})
-MATCH (fields:OpenPipeConfig {name: 'topicFields'})
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.assetPage = (api.assetPage + 1)
 SET script.page = api.assetPage
 SET api.lastUrl = api.allAssets + '?changeStart=' + api.lastRun + '&ps=' + api.assetsPerPage + '&p=' + api.assetPage
-WITH canon, fields, api.lastUrl as url
+WITH canon, api.lastUrl as url
 CALL apoc.load.json(url) YIELD value
 UNWIND value.data AS asset
 
@@ -24,7 +60,16 @@ WITH asset, canon, value.total as pageAssetsCount,
 	toFloat(bsuapi.obj.singleClean(asset.openpipe_canonical.longitude)) AS openpipe_longitude,
 	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.moment,['0']) AS openpipe_moment,
 	bsuapi.obj.singleClean(asset.openpipe_canonical.biography) AS openpipe_bio,
-	bsuapi.obj.singleClean(asset.openpipe_canonical.physicalDimensions) AS openpipe_dimensions,
+	bsuapi.obj.singleClean(asset.openpipe_canonical.physicalDimensions) AS openpipe_dimensions
+
+WITH asset, pageAssetsCount, name, guid,
+  openpipe_date,
+  openpipe_latitude,
+  openpipe_longitude,
+  openpipe_moment,
+  openpipe_bio,
+  openpipe_dimensions,
+  CASE WHEN openpipe_dimensions CONTAINS ',' THEN [n IN split(openpipe_dimensions, ',') | toFloat(n)] ELSE null END AS dimensions,
 
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.artist, [canon.artist, '']) AS openpipe_artist,
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.classification, [canon.classification, '']) AS openpipe_classification,
@@ -38,23 +83,6 @@ WITH asset, canon, value.total as pageAssetsCount,
 WHERE (asset.name <> '' AND guid IS NOT NULL AND NOT openpipe_date CONTAINS 'YYYY')
 
 MERGE (x:Asset {guid: guid})
-MERGE (artists:TopicList {type: 'Artist'})
-MERGE (classifications:TopicList {type: 'Classification'})
-MERGE (cultures:TopicList {type: 'Culture'})
-MERGE (genres:TopicList {type: 'Genre'})
-MERGE (mediums:TopicList {type: 'Medium'})
-MERGE (nations:TopicList {type: 'Nation'})
-MERGE (cities:TopicList {type: 'City'})
-MERGE (tags:TopicList {type: 'Tag'})
-
-SET artists += openpipe_artist
-SET classifications += openpipe_classification
-SET cultures += openpipe_culture
-SET genres += openpipe_genre
-SET mediums += openpipe_medium
-SET nations += openpipe_nation
-SET cities += openpipe_city
-SET tags += openpipe_tags
 
 SET x.import = 0
 SET x.type = 'Asset'
@@ -79,7 +107,7 @@ SET x.date = date(bsuapi.obj.openPipeDateMap(x.openpipe_date))
 SET x.moment = openpipe_moment
 SET x.biography = openpipe_bio
 SET x.openpipe_dimensions = openpipe_dimensions
-SET x.dimensions = CASE WHEN openpipe_dimensions CONTAINS ',' THEN [n IN split(openpipe_dimensions, ',') | toFloat(n)] ELSE null END
+SET x.dimensions = CASE WHEN dimensions CONTAINS ',' THEN [n IN split(dimensions, ',') | toFloat(n)] ELSE null END
 
 SET x.openpipe_artist = [k IN KEYS(openpipe_artist) | openpipe_artist[k]]
 SET x.openpipe_culture = [k IN KEYS(openpipe_culture) | openpipe_culture[k]]
@@ -112,7 +140,7 @@ SET x.import = 1
 WITH x
 OPTIONAL MATCH (x)-[r]->()
 DELETE r
-RETURN "Wiped old asset relations for imported assets" as t;
+RETURN "Wiped old asset relations for imported assets" as t LIMIT 1;
 
 RETURN "STARTING Asset:Topic relationships" as t;
 
@@ -345,46 +373,6 @@ CALL apoc.periodic.iterate(
 RETURN "BUILDING Topic MetaGraph, TAG relationships complete - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
 ;
 
-MATCH (l:TopicList {type: "Artist"}) UNWIND KEYS(l) as guid
-MATCH (a:Artist) WHERE a.guid = guid
-SET a.name = l[guid]
-RETURN "Updated Artist names" as t;
-
-MATCH (l:TopicList {type: "Classification"}) UNWIND KEYS(l) as guid
-MATCH (a:Classification) WHERE a.guid = guid
-SET a.name = l[guid]
-RETURN "Updated Classification names" as t;
-
-MATCH (l:TopicList {type: "Culture"}) UNWIND KEYS(l) as guid
-MATCH (a:Culture) WHERE a.guid = guid
-SET a.name = l[guid]
-RETURN "Updated Culture names" as t;
-
-MATCH (l:TopicList {type: "Genre"}) UNWIND KEYS(l) as guid
-MATCH (a:Genre) WHERE a.guid = guid
-SET a.name = l[guid]
-RETURN "Updated Genre names" as t;
-
-MATCH (l:TopicList {type: "Medium"}) UNWIND KEYS(l) as guid
-MATCH (a:Medium) WHERE a.guid = guid
-SET a.name = l[guid]
-RETURN "Updated Medium names" as t;
-
-MATCH (l:TopicList {type: "Nation"}) UNWIND KEYS(l) as guid
-MATCH (a:Nation) WHERE a.guid = guid
-SET a.name = l[guid]
-RETURN "Updated Nation names" as t;
-
-MATCH (l:TopicList {type: "City"}) UNWIND KEYS(l) as guid
-MATCH (a:City) WHERE a.guid = guid
-SET a.name = l[guid]
-RETURN "Updated City names" as t;
-
-MATCH (l:TopicList {type: "Tag"}) UNWIND KEYS(l) as guid
-MATCH (a:Tag) WHERE a.guid = guid
-SET a.name = l[guid]
-RETURN "Updated Tag names" as t;
-
 
 MATCH (a:Artist)<-[r]-(:Asset) WITH a, count(r) as c SET a.artCount = c
 RETURN "SET artCount for ARTIST" as t;
@@ -416,12 +404,12 @@ RETURN "Sync COMPLETE" as t;
 
 MATCH (api:OpenPipeConfig {name: 'api'})
 
-WITH api.folders + '?collectionId=all' as url, api.singleFolder as singleFolderUrl
+WITH api.folders + '?collectionId=all' as url, api.guidUri as guidUri
 CALL apoc.load.json(url) YIELD value
 UNWIND value.data AS folder
-
-MERGE (f:Folder {openpipe_id:bsuapi.coll.singleClean(folder.id)})
-SET f.guid = singleFolderUrl + f.openpipe_id
+WITH folder, "200/" + bsuapi.coll.singleClean(folder.id) AS guid, bsuapi.coll.singleClean(folder.id) as openpipe_id
+MERGE (f:Folder {guid:guid})
+SET f.openpipe_id = openpipe_id
 SET f.title = bsuapi.coll.singleClean(folder.name)
 SET f.name = bsuapi.coll.singleClean(folder.name)
 SET f.smallImage = bsuapi.coll.singleClean(folder.image)
@@ -437,15 +425,24 @@ WITH "Cleared assets from updated folders" as t RETURN t;
 
 
 MATCH (f:Folder)
-WITH f
-CALL apoc.load.json(f.guid) YIELD value
+MATCH (api:OpenPipeConfig {name: 'api'})
+WITH f, api.guidUri + f.guid as uri
+CALL apoc.load.json(uri) YIELD value
 UNWIND value.assets as assetEntry
-MATCH (a:Asset {guid: assetEntry.guid})
-WITH f, a, assetEntry,
-     CASE WHEN f.dateStart IS NULL OR f.dateStart > a.date THEN a.date ELSE f.dateStart END AS dateStart,
-     CASE WHEN f.dateEnd IS NULL OR f.dateEnd < a.date THEN a.date ELSE f.dateEnd END AS dateEnd
+WITH f,
+     assetEntry.geometry as geometry,
+     assetEntry.wall as wall,
+     split(assetEntry.geometry, ' ') as geoSplit,
+     split(assetEntry.guid,'/') as guidLong
+WITH f, geometry, wall, geoSplit, guidLong,
+     COALESCE(guidLong[size(guidLong)-2], '0') + '/' + COALESCE(guidLong[size(guidLong)-1], '0') as guid
+
+MATCH (a:Asset {guid: guid})
+WITH f, a, geometry, wall, geoSplit,
+    CASE WHEN f.dateStart IS NULL OR f.dateStart > a.date THEN a.date ELSE f.dateStart END AS dateStart,
+    CASE WHEN f.dateEnd IS NULL OR f.dateEnd < a.date THEN a.date ELSE f.dateEnd END AS dateEnd
 SET f.dateStart = dateStart, f.dateEnd = dateEnd
-WITH f, a, assetEntry.geometry as geometry, assetEntry.wall as wall, split(assetEntry.geometry, ' ') as geoSplit
+WITH f, a, geometry, wall, geoSplit
 MERGE (f)<-[r:FOLDER_ASSET]-(a)
 WITH f, r, geometry, wall, geoSplit
 
@@ -488,17 +485,6 @@ CALL apoc.periodic.iterate("MATCH (:Asset {hasGeo: true})-[]->(f:Folder) RETURN 
 WITH "SET Folder hasGeo from Assets - committed:"+ operations.committed +" failed:"+ operations.failed as t RETURN t
 ;
 
-CALL apoc.periodic.iterate("MATCH (f:Folder)<-[:FOLDER_ASSET]-(x:Asset) RETURN f, x","
-  WITH f, x,
-  CASE WHEN f.dateStart IS NULL OR f.dateStart > x.date THEN x.date ELSE f.dateStart END AS dateStart,
-  CASE WHEN f.dateEnd IS NULL OR f.dateEnd < x.date THEN x.date ELSE f.dateEnd END AS dateEnd
-  SET f.dateStart = dateStart, f.dateEnd = dateEnd
-",
-{batchSize:10000, iterateList:true, parallel:false}
-) YIELD operations
-RETURN "SET Folder dates from Assets - committed:"+ operations.committed +" failed:"+ operations.failed as t LIMIT 1
-;
-
 
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.lastFolderRun = date()
@@ -523,32 +509,35 @@ RETURN "Loaded new Settings" as t;
 
 MATCH (group:OpenPipeSetting)
 UNWIND group.preset AS entry
-WITH group, entry, split(entry, ' ') as splitEntry
-WITH group, entry, splitEntry[0] as splitGuid, splitEntry[2] as splitByType
-CALL apoc.do.case([
-  splitByType IS NOT NULL AND size(splitByType)>0 AND splitGuid CONTAINS "/folder/", "
-    	MATCH (a:Folder {guid: splitGuid})
-      MERGE (group)<-[:SETTING_OPTION {byType: splitByType}]-(a)
-      RETURN 1 as cnt
+WITH group, entry, split(entry, ' ') as byType
+WITH group, byType[2] as type,
+  CASE WHEN byType[2] IS NOT NULL AND size(byType[2])>0 THEN split(byType[0],'/') ELSE split(entry,'/') END AS guidLong
+WITH group, type,
+  COALESCE(guidLong[size(guidLong)-2], '0') + '/' + COALESCE(guidLong[size(guidLong)-1], '0') as guid
+CALL apoc.do.case(
+  [
+  type IS NOT NULL AND size(type)>0 AND guid STARTS WITH "200/", "
+    	MATCH (a:Folder {guid: guid})
+      MERGE (group)<-[:SETTING_OPTION {byType: type}]-(a)
+      RETURN 1 as c
     ",
-  splitByType IS NOT NULL AND size(splitByType)>0 AND splitGuid CONTAINS "/openpipe/", "
-    	MATCH (a:Topic {guid: splitGuid})
-      MERGE (group)<-[:SETTING_OPTION {byType: splitByType}]-(a)
-      RETURN 1 as cnt
+  type IS NOT NULL AND size(type)>0, "
+    	MATCH (a:Topic {guid: guid})
+      MERGE (group)<-[:SETTING_OPTION {byType: type}]-(a)
+      RETURN 1 as c
     ",
-  entry CONTAINS "/folder/", "
-    	MATCH (a:Folder {guid: entry})
+  guid STARTS WITH "200/", "
+    	MATCH (a:Folder {guid: guid})
       MERGE (group)<-[:SETTING_OPTION]-(a)
-      RETURN 1 as cnt
-    ",
-  entry CONTAINS "/openpipe/", "
-    	MATCH (a:Topic {guid: entry})
-      MERGE (group)<-[:SETTING_OPTION]-(a)
-      RETURN 1 as cnt
+      RETURN 1 as c
     "
-],
-"RETURN count(c) AS message",
-{group: group, entry: entry, splitGuid: splitGuid, splitByType: splitByType}
+  ],
+    "
+    	MATCH (a:Topic {guid: guid})
+      MERGE (group)<-[:SETTING_OPTION]-(a)
+      RETURN 1 as c
+    ",
+{group: group, guid: guid, type:type}
 ) YIELD value
 RETURN "Mapped topic/folders " + sum(value.c) + " options from openpipe settings" as t;
 

@@ -62,6 +62,7 @@ public class Config
             base = "bsu.downstreamlabs.com/bsuapi";
         }
 
-        return "https://" + base + path;
+        String protocol = Config.getDefault("protocol", "https");
+        return protocol + "://" + base + path;
     }
 }
