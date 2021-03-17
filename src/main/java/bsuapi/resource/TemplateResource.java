@@ -73,6 +73,9 @@ public class TemplateResource extends BaseResource
         } catch (Exception e) {
             data.put("templates", new JSONArray());
             data.put("warning", "No Templates Found");
+            if (Config.showErrors() > 0) {
+                data.put("exception", JsonResponse.exceptionStack(e));
+            }
         }
 
         return response.plain(data);
