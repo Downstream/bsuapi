@@ -55,13 +55,14 @@ public class JsonResponse
         JSONObject result = new JSONObject();
         JSONArray stack;
         Throwable cause = e;
+        int i = 50;
         do {
             stack = new JSONArray();
             for(StackTraceElement trace : cause.getStackTrace()) {
                 stack.put(trace.getFileName() +"["+ trace.getLineNumber() +"] "+ trace.getClassName() +"."+ trace.getMethodName() +"()");
             }
             result.put(cause.getClass().getSimpleName(), stack);
-        } while(null != (cause = e.getCause()));
+        } while(null != (cause = e.getCause()) && --i > 0);
 
         return result;
     }

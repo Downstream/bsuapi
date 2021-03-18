@@ -1,6 +1,7 @@
 package bsuapi.dbal.query;
 
 import bsuapi.dbal.NodeType;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class FolderList extends CypherQuery
 implements QueryResultSingleColumn
@@ -41,21 +42,12 @@ implements QueryResultSingleColumn
     public void setTemplateOnly(boolean templateOnly) { this.templateOnly = templateOnly; }
 
     public String where() {
-        StringBuilder result = new StringBuilder();
-        if (this.hasGeo) {
-            result.append(QueryResultSingleColumn.resultColumn +".hasGeo = true");
-        }
+        String[] clauses = new String[]{" cnt > 0 "};
 
         if (this.templateOnly) {
-            result.append(QueryResultSingleColumn.resultColumn +".hasLayout = true");
+            ArrayUtils.add(clauses, QueryResultSingleColumn.resultColumn +".hasLayout = true ");
         }
 
-        result.append("cnt > 0");
-
-        if (result.length() > 0) {
-            return " WHERE " + result.toString();
-        }
-
-        return "";
+        return this.where(clauses);
     }
 }

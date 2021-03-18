@@ -56,11 +56,15 @@ abstract public class BaseResource
 
     protected String getParam(String key)
     {
+        if (null == this.response) return "";
+
         return this.response.getParam(key);
     }
 
     protected String getParam(String key, String fallback)
     {
+        if (null == this.response) return fallback;
+
         String val = this.response.getParam(key);
         if (val == null) {
             return fallback;

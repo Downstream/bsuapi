@@ -79,3 +79,9 @@ CREATE (french)-[:TAG]->(tSaints)
 CREATE (draw)-[:TAG]->(tSaints)
 CREATE (tProfiles)-[:TAG]->(tSaints)
 CREATE (tMen)-[:TAG]->(tSaints)
+
+CREATE (fa:Folder {guid: "A", name: "Folder A"})
+CREATE (fb:Folder {guid: "B", name: "Folder B"})
+
+CREATE (fa)<-[:FOLDER_ASSET]-(art)
+CREATE (fb)<-[:FOLDER_ASSET]-(art)

@@ -108,6 +108,7 @@ SET x.moment = openpipe_moment
 SET x.biography = openpipe_bio
 SET x.openpipe_dimensions = openpipe_dimensions
 SET x.dimensions = CASE WHEN dimensions CONTAINS ',' THEN [n IN split(dimensions, ',') | toFloat(n)] ELSE null END
+SET x.source = bsuapi.obj.singleClean(asset.openpipe_canonical.source)
 
 SET x.openpipe_artist = [k IN KEYS(openpipe_artist) | openpipe_artist[k]]
 SET x.openpipe_culture = [k IN KEYS(openpipe_culture) | openpipe_culture[k]]

@@ -1,4 +1,9 @@
 # Releases
+* [`1.8.3`](bsuapi-1.8.3s.jar) Asset sources and template bugfix.
+   * Adds `source` property to Assets via sync from openpipe.
+   * Bugfix for `/template` no-templates found (also perodically caused hang in API)
+   * Minor improvements to Exception handling. 
+* `1.8.2` temporary debug patch
 * [`1.8.1`](bsuapi-1.8.1s.jar) Minor bugfixes for sync and `/execute`.
 * `1.8.0` Major adjustments to sync for new openpipe patterns.
    * Adds `getAllTopics` endpoint
