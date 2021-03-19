@@ -452,7 +452,10 @@ CALL apoc.do.case([
       SET r.geometry = geometry
   	  SET r.wall = wall
       SET r.size = [geoSplit[0],geoSplit[2]]
-      SET r.position = [geoSplit[3] + geoSplit[4], geoSplit[5] + geoSplit[6]]
+      SET r.position = [
+        (CASE WHEN geoSplit[3] = '-' THEN '-' ELSE '' END) + geoSplit[4],
+        (CASE WHEN geoSplit[5] = '-' THEN '-' ELSE '' END) + geoSplit[6]
+      ]
       SET f.hasLayout = true
       RETURN 1 as c
     "
@@ -696,11 +699,30 @@ SET a.smallImage = x.primaryImageSmall
 RETURN "SET representative image to topic.smallImage property" AS t
 ;
 
-OPTIONAL MATCH (a:Topic)
+OPTIONAL MATCH (a:Topic)<-[r]-(x:Asset)
+  WHERE r.prime=true AND exists(x.primaryImageLarge)
+SET a.largeImage = x.primaryImageLarge
+RETURN "SET representative image to topic.largeImage property" AS t
+;
+
+MATCH (a:Topic)
   WHERE NOT EXISTS(a.smallImage)
-OPTIONAL MATCH (a)<-[]-(x:Asset)
+MATCH (a)<-[]-(x:Asset)
+  WHERE exists(x.primaryImageSmall)
+WITH a, x ORDER BY x.metaDataId DESC, x.id DESC
 WITH a, head(collect(x)) as asset
+  WHERE a IS NOT NULL AND asset IS NOT NULL
 SET a.smallImage = asset.primaryImageSmall
-RETURN "SET a random image to topic.smallImage property where no representative image was found." AS t;
+RETURN "SET a random asset to topic.smallImage property where no representative image was found." AS t;
+
+MATCH (a:Topic)
+  WHERE NOT EXISTS(a.largeImage)
+MATCH (a)<-[]-(x:Asset)
+  WHERE exists(x.primaryImageSmall)
+WITH a, x ORDER BY x.metaDataId DESC, x.id DESC
+WITH a, head(collect(x)) as asset
+  WHERE a IS NOT NULL AND asset IS NOT NULL
+SET a.largeImage = asset.primaryImageSmall
+RETURN "SET a random asset to topic.largeImage property where no representative image was found." AS t;
 
 WITH "FULLSYNC COMPLETE" as t RETURN t;
