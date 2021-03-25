@@ -1,4 +1,5 @@
 # Releases
+* [`1.8.4`](bsuapi-1.8.4s.jar) Altered API Labels for Topic groups ("Artist" to "Related Artists").
 * [`1.8.3`](bsuapi-1.8.3s.jar) Asset sources and template bugfix.
    * Adds `source` property to Assets via sync from openpipe.
    * Bugfix for `/template` no-templates found (also perodically caused hang in API)

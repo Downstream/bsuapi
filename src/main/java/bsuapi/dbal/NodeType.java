@@ -60,6 +60,29 @@ public enum NodeType
         }
     }
 
+    public String friendlyName()
+    {
+        switch ( this )
+        {
+            case ARTIST:
+                return "Related Artists";
+            case CLASS:
+                return "Types of Art";
+            case CULTURE:
+                return "Cultures";
+            case NATION:
+                return "Nations";
+            case TAG:
+                return "Visual Themes";
+            default:
+                try {
+                    return this.labelName();
+                } catch (IllegalStateException ignored) {}
+
+                return "Unknown Type";
+        }
+    }
+
     public String relFromTopic()
     throws IllegalArgumentException, IllegalStateException
     {

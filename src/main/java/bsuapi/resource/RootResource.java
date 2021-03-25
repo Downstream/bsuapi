@@ -142,7 +142,7 @@ public class RootResource extends BaseResource
                 query.setLimit(this.getParam(CypherQuery.limitParam));
                 query.setHasGeo(this.getParamBool(CypherQuery.hasGeoParam));
                 JSONArray results = query.exec(c);
-                topics.put(n.labelName(), results);
+                topics.put(n.friendlyName(), results);
             }
         }
         return topics;

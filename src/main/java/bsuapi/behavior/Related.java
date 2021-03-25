@@ -66,7 +66,7 @@ public class Related extends Behavior
             if (n.isTopic()) {
                 CypherQuery query = new TopicSharedRelations(this.topic, n);
                 this.setQueryConfig(query);
-                this.related.put(n.labelName(), query.exec(cypher));
+                this.related.put(n.friendlyName(), query.exec(cypher));
             }
         }
 

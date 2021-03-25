@@ -91,7 +91,7 @@ public class RelatedResource extends BaseResource
                 this.setQueryConfig(query);
 
                 try {
-                    result.put(n.labelName(), query.exec(c));
+                    result.put(n.friendlyName(), query.exec(c));
                 } catch (Throwable e) {
                     JSONObject x = new JSONObject();
                     x.put("query", query.getCommand());
