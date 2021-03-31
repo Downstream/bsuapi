@@ -696,12 +696,14 @@ RETURN "SET Tag representative image" AS t
 OPTIONAL MATCH (a:Topic)<-[r]-(x:Asset)
   WHERE r.prime=true AND exists(x.primaryImageSmall)
 SET a.smallImage = x.primaryImageSmall
+SET a.smallImageDimensions = x.primaryImageSmallDimensions
 RETURN "SET representative image to topic.smallImage property" AS t
 ;
 
 OPTIONAL MATCH (a:Topic)<-[r]-(x:Asset)
   WHERE r.prime=true AND exists(x.primaryImageLarge)
 SET a.largeImage = x.primaryImageLarge
+SET a.largeImageDimensions = x.primaryImageLargeDimensions
 RETURN "SET representative image to topic.largeImage property" AS t
 ;
 
@@ -713,16 +715,18 @@ WITH a, x ORDER BY x.metaDataId DESC, x.id DESC
 WITH a, head(collect(x)) as asset
   WHERE a IS NOT NULL AND asset IS NOT NULL
 SET a.smallImage = asset.primaryImageSmall
+SET a.smallImageDimensions = asset.primaryImageSmallDimensions
 RETURN "SET a random asset to topic.smallImage property where no representative image was found." AS t;
 
 MATCH (a:Topic)
   WHERE NOT EXISTS(a.largeImage)
 MATCH (a)<-[]-(x:Asset)
-  WHERE exists(x.primaryImageSmall)
+  WHERE exists(x.primaryImageLarge)
 WITH a, x ORDER BY x.metaDataId DESC, x.id DESC
 WITH a, head(collect(x)) as asset
   WHERE a IS NOT NULL AND asset IS NOT NULL
-SET a.largeImage = asset.primaryImageSmall
+SET a.largeImage = asset.primaryImageLarge
+SET a.largeImageDimensions = asset.primaryImageLargeDimensions
 RETURN "SET a random asset to topic.largeImage property where no representative image was found." AS t;
 
 WITH "FULLSYNC COMPLETE" as t RETURN t;
