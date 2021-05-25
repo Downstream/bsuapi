@@ -1,5 +1,5 @@
 # Experimental Neo4j JSON API Plugin
-Intended to be included as a Neo4j plugin, on Ubuntu 18, with Nginx control of access. 
+Intended to be included as a Neo4j plugin, on Ubuntu 18, with Nginx control of access.
 
 ## API Documentation
 The API itself is meant to be self-documenting. By visiting the root of the API (`/bsuapi/`), all methods and parameters are listed in properties there:
@@ -11,9 +11,9 @@ The API itself is meant to be self-documenting. By visiting the root of the API 
 * settings - all settings and configuration data for this API, and exhibit modes powered by this API.
 
 Example URIs, with at least one example for each available method, is available here:
-[Example API URLs](pages/example-uri.md) 
+[Example API URLs](pages/example-uri.md)
 
-### Latest [bsuapi-1.8.4.jar](releases/bsuapi-1.8.4s.jar)
+### Latest [bsuapi-1.8.5.jar](releases/bsuapi-1.8.5s.jar)
 * Access the API [bsuapi/](bsuapi)
 * All Releases [releases/](releases)
 * [Simple Viewer](viewer) from [Downstream:bsu_viewer.git](https://github.com/Downstream/bsu_viewer)
@@ -43,7 +43,7 @@ T
 * Adjust neo4j.conf
     * `dbms.unmanaged_extension_classes=bsuapi.resource=/bsuapi`
 * Start the db
-* http://localhost:7474/bsuapi 
+* http://localhost:7474/bsuapi
 
 
 # Ubuntu Server Provisioning
@@ -81,10 +81,10 @@ dbms.connectors.default_advertised_address=yourdomain.com
 ### Configure nginx
 `/etc/nginx/conf.d/yourdomain.conf`
 ```nginx
-server { 
-    
+server {
+
     server_name yourdomain.com
-    
+
     # magic
 
     location /bsuapi {
@@ -100,7 +100,7 @@ server {
 ### Start neo4j and nginx
 ```
 sudo systemctl start neo4j
-sudo systemctl start nginx 
+sudo systemctl start nginx
 ```
 
 ### OpenPipeline Sync
@@ -110,9 +110,9 @@ Pulling data from openPipeline is a multi-step process, which includes 2 stages:
 
 * Reset `/execute/OPENPIPE_RESET` - clears entire database, recreates config and indices, and sets sync to pull from assets changed after 2020-01-01.
 * Info `/execute/INFO` - regenerates Info Cards. See api home: `methods.info` and `/info`.
-* Sync - pulls new assets, folders, and settings, that have changed since the last time Sync was ran. Should be ran in sequence: 
+* Sync - pulls new assets, folders, and settings, that have changed since the last time Sync was ran. Should be ran in sequence:
    * `/execute/OPENPIPE_SYNC` - pulls all changed assets, and extrapolates topics and meta-data, creating most of the meta-graph.
    * `/execute/OPENPIPE_FOLDERS` - pulls all folders and their assets, including template positioning where present.
    * `/execute/OPENPIPE_TOPICIMG` - attempts to select a best asset to use as the image representing a topic.
    * `/execute/OPENPIPE_SETTINGS` - pulls all mode settings from openpipe and connects them to their respectively selected folders/topics. Defines the preset options available for each mode.
-   
+
