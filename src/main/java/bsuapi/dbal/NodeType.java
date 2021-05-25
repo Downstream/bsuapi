@@ -67,13 +67,13 @@ public enum NodeType
             case ARTIST:
                 return "Related Artists";
             case CLASS:
-                return "Types of Art";
+                return "Techniques";
             case CULTURE:
                 return "Cultures";
             case NATION:
                 return "Nations";
             case TAG:
-                return "Visual Themes";
+                return "Subject Matter";
             default:
                 try {
                     return this.labelName();

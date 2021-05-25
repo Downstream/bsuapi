@@ -31,7 +31,7 @@ SET
 WITH url, t, topicType
 CALL apoc.create.addLabels(t, [topicType]) YIELD node
 
-RETURN COUNT(node) AS t LIMIT {limit}
+RETURN COUNT(*) LIMIT {limit}
 "
 ,{limit: 1000}
 ) YIELD updates, batches, failedBatches
@@ -375,29 +375,42 @@ RETURN 'BUILDING Topic MetaGraph, TAG relationships complete - committed:'+ oper
 ;
 
 
-MATCH (a:Artist)<-[r]-(:Asset) WITH a, count(r) AS c SET a.artCount = c
-RETURN 'SET artCount for ARTIST' AS t;
+MATCH (t:Topic) SET t.artCount = 0
+WITH 'RESET artCounts for Topics' AS t
+RETURN t LIMIT 1;
+
+MATCH (a:Artist)<-[r]-(:Asset)
+WITH a, count(r) AS c SET a.artCount = c
+WITH 'SET artCount for ARTIST' AS t
+RETURN t LIMIT 1;
 
 MATCH (a:Classification)<-[r]-(:Asset) WITH a, count(r) AS c SET a.artCount = c
-RETURN 'SET artCount for CLASSIFICATION' AS t;
+WITH 'SET artCount for CLASSIFICATION' AS t
+RETURN t LIMIT 1;
 
 MATCH (a:Culture)<-[r]-(:Asset) WITH a, count(r) AS c SET a.artCount = c
-RETURN 'SET artCount for CULTURE' AS t;
+WITH 'SET artCount for CULTURE' AS t
+RETURN t LIMIT 1;
 
 MATCH (a:Genre)<-[r]-(:Asset) WITH a, count(r) AS c SET a.artCount = c
-RETURN 'SET artCount for GENRE' AS t;
+WITH 'SET artCount for GENRE' AS t
+RETURN t LIMIT 1;
 
 MATCH (a:Medium)<-[r]-(:Asset) WITH a, count(r) AS c SET a.artCount = c
-RETURN 'SET artCount for MEDIUM' AS t;
+WITH 'SET artCount for MEDIUM' AS t
+RETURN t LIMIT 1;
 
 MATCH (a:Nation)<-[r]-(:Asset) WITH a, count(r) AS c SET a.artCount = c
-RETURN 'SET artCount for NATION' AS t;
+WITH 'SET artCount for NATION' AS t
+RETURN t LIMIT 1;
 
 MATCH (a:City)<-[r]-(:Asset) WITH a, count(r) AS c SET a.artCount = c
-RETURN 'SET artCount for CITY' AS t;
+WITH 'SET artCount for CITY' AS t
+RETURN t LIMIT 1;
 
 MATCH (a:Tag)<-[r]-(:Asset) WITH a, count(r) AS c SET a.artCount = c
-RETURN 'SET artCount for TAG' AS t;
+WITH 'SET artCount for TAG' AS t
+RETURN t LIMIT 1;
 
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.lastRun = api.thisRun
