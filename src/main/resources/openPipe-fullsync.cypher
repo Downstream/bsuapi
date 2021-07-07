@@ -55,7 +55,7 @@ UNWIND value.data AS asset
 WITH asset, canon, value.total as pageAssetsCount,
   bsuapi.obj.singleClean(asset.openpipe_canonical.title) AS name,
 	asset.openpipe_canonical.id AS guid,
-	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.date,[canon.date]) AS openpipe_date,
+	bsuapi.obj.singleClean(asset.openpipe_canonical.date) AS openpipe_date,
 	toFloat(bsuapi.obj.singleClean(asset.openpipe_canonical.latitude)) AS openpipe_latitude,
 	toFloat(bsuapi.obj.singleClean(asset.openpipe_canonical.longitude)) AS openpipe_longitude,
 	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.moment,['0']) AS openpipe_moment,
