@@ -27,7 +27,7 @@ implements QueryResultSingleColumn
             this.initQuery,
             this.target.labelName(),
             NodeType.TOPIC.labelName(),
-            this.where()
+            this.where(new String[]{QueryResultSingleColumn.resultColumn +".artCount > 1"})
         ) + this.getPageLimitCmd();
     }
 }

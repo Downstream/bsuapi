@@ -29,7 +29,7 @@ implements QueryResultSingleColumn
             this.asset.toCypherMatch(),
             this.target.relFromAsset(),
             this.target.labelName(),
-            this.where()
+            this.where(new String[]{ QueryResultSingleColumn.resultColumn +".artCount > 1" })
         ) + this.getPageLimitCmd();
     }
 }

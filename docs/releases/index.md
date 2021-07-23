@@ -1,4 +1,5 @@
 # Releases
+* [`1.8.7`](bsuapi-1.8.7s.jar) Topic improvements: title-cased, and hide islands (1 asset topics).
 * [`1.8.6`](bsuapi-1.8.6s.jar) Bugfix for syncing videos, undefined creation date.
 * [`1.8.5`](bsuapi-1.8.5s.jar) Improvements to full-sync and topic representative assets.
 * [`1.8.4`](bsuapi-1.8.4s.jar) Altered API Labels for Topic groups ("Artist" to "Related Artists").

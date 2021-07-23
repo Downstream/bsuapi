@@ -61,7 +61,10 @@ implements QueryResultSingleColumn
     public String getWhere()
     {
         if (this.sameTopic) {
-            return this.where(new String[]{QueryResultSingleColumn.resultColumn +" <> a "});
+            return this.where(new String[]{
+                QueryResultSingleColumn.resultColumn +" <> a ",
+                QueryResultSingleColumn.resultColumn +".artCount > 1"
+            });
         }
 
         return this.where();

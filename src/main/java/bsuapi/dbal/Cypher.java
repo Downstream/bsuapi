@@ -87,7 +87,7 @@ public class Cypher implements AutoCloseable
             query.collectResult(result);
             tx.success();
         } catch (Throwable e) {
-            throw new CypherException("Cypher.query failed: "+query, e);
+            throw new CypherException("Cypher.query failed: "+command, e);
         }
     }
 

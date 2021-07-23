@@ -11,13 +11,14 @@ public class Timeline extends CypherQuery
 implements QueryResultSingleColumn
 {
     protected static String query =
-        "MATCH (%1$s)<-[r:%2$s]-("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
+        "MATCH (a%1$s)<-[r:%2$s]-("+ QueryResultSingleColumn.resultColumn +":%3$s) " +
         "%4$s RETURN "+ QueryResultSingleColumn.resultColumn + " " +
         "ORDER BY "+ QueryResultSingleColumn.resultColumn +".date ASC"
         ;
 
     protected static String[] clauses = new String[]{
-        "EXISTS(" + QueryResultSingleColumn.resultColumn +".date)"
+        "EXISTS(" + QueryResultSingleColumn.resultColumn +".date)",
+        "a.artCount > 1"
     };
 
     protected JSONObject results;

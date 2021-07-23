@@ -23,10 +23,13 @@ UNWIND value[topicType].data AS topic
 WITH url, apoc.text.capitalizeAll(topicType) AS topicType, topic, SPLIT(topic.guid,'/') as guidLong
 WITH url, topicType, topic, COALESCE(guidLong[size(guidLong)-2], '0') + '/' + COALESCE(guidLong[size(guidLong)-1], '0') as guid
 
+WHERE SIZE(guid) > 2 AND SIZE(topic.value) > 2
+
 MERGE (t:Topic {guid:guid})
 SET
-  t.name = topic.value,
-  t.biography=topic.biography
+  t.name = apoc.text.capitalizeAll(topic.value),
+  t.biography = topic.biography
+  t.representativeAssetGuid = topic.representativeAssetId
 
 WITH url, t, topicType
 CALL apoc.create.addLabels(t, [topicType]) YIELD node
