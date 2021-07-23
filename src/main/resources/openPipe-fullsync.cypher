@@ -28,7 +28,7 @@ WHERE SIZE(guid) > 2 AND SIZE(topic.value) > 2
 MERGE (t:Topic {guid:guid})
 SET
   t.name = apoc.text.capitalizeAll(topic.value),
-  t.biography = topic.biography
+  t.biography = topic.biography,
   t.representativeAssetGuid = topic.representativeAssetId
 
 WITH url, t, topicType
