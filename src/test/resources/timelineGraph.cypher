@@ -25,6 +25,7 @@ CREATE (f:Folder {
   name: "Folder Name",
   title: "Folder Title",
   guid: "F",
+  artCount: 3,
   dateStart: "0000-01-01",
   dateEnd: "2020-01-01"
 })

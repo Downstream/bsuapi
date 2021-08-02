@@ -37,7 +37,7 @@ implements QueryResultSingleColumn
 
     public JSONObject getResults()
     {
-        this.results.put("step",this.step);
+        this.addEntry("step",this.step);
         return this.results;
     }
 
