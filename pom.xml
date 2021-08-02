@@ -11,7 +11,7 @@
 
   <groupId>edu.boisestate.bsuapi</groupId>
   <artifactId>bsuapi</artifactId>
-  <version>1.8.8</version>
+  <version>1.8.9</version>
 
   <packaging>jar</packaging>
   <name>Neo4j JSON API Resolver</name>

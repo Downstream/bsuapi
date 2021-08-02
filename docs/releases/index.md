@@ -1,4 +1,5 @@
 # Releases
+* [`1.8.9`](bsuapi-1.8.9s.jar) Improvements to sync + fix Folders missing artCount.
 * [`1.8.8`](bsuapi-1.8.8s.jar) Bugfix for `/timeline`.
 * [`1.8.7`](bsuapi-1.8.7s.jar) Topic improvements: title-cased, and hide islands (1 asset topics).
 * [`1.8.6`](bsuapi-1.8.6s.jar) Bugfix for syncing videos, undefined creation date.

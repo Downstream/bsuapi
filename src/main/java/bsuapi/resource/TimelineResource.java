@@ -48,7 +48,7 @@ public class TimelineResource extends BaseResource
         try {
             JSONObject timeline = this.buildTimeline(topic, c);
             result.put("timeline", timeline);
-            return response.data(result, "Found :" + topic.name() + " {" + topic.getNodeKeyField() + ":\"" + topic.getNodeKey() + "\"}");
+            return response.data(result, "Found :" + topic.name() + " {" + topic.getNodeKeyField() + ":'" + topic.getNodeKey() + "'}");
         } catch (NullPointerException e) {
             return response.data(result, "Could not build timeline: "+ e.getMessage());
         } catch (Exception e) {
@@ -83,8 +83,8 @@ public class TimelineResource extends BaseResource
         desc.arg("GUID", "URL-encoded string, defined from source. Must start with a letter, a-zA-Z.");
 
         JSONObject examples = new JSONObject();
-        examples.put("folder", "/bsuapi/timeline/folder/http%3A%2F%2Fmec402.boisestate.edu%2Fcgi-bin%2Fopenpipe%2Fdata%2Ffolder%2F28");
-        examples.put("artist", "/bsuapi/timeline/artist/http%3A%2F%2Fmec402.boisestate.edu%2Fcgi-bin%2Fopenpipe%2Fdata%2Fartist%2F193");
+        examples.put("folder", "/bsuapi/timeline/folder/200%2F99");
+        examples.put("artist", "/bsuapi/timeline/artist/b00%2F414129");
 
         return desc;
     }

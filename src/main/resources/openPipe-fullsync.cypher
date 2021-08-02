@@ -478,6 +478,15 @@ CALL apoc.periodic.iterate('MATCH (:Asset {hasGeo: true})-[]->(f:Folder) RETURN 
 WITH 'SET Folder hasGeo from Assets - committed:'+ operations.committed +' failed:'+ operations.failed AS t RETURN t
 ;
 
+MATCH (f:Folder) SET f.artCount = 0
+WITH 'RESET artCounts for Folders' AS t
+RETURN t LIMIT 1;
+
+MATCH (f:Folder)<-[r]-(:Asset)
+WITH f, count(r) AS c, 1 AS n
+SET f.artCount = c
+WITH 'SET artCount for ' + sum(n) + ' Folders' AS t
+RETURN t LIMIT 1;
 
 MATCH (api:OpenPipeConfig {name: 'api'})
 SET api.lastFolderRun = date()

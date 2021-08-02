@@ -42,7 +42,7 @@ public class Related extends Behavior
         if (this.topic == null) {
             return "No Match Found";
         } else if (this.topic.hasMatch()) {
-            return "Found :"+ this.topic.name() +" {"+ this.topic.getNodeKeyField() +":\""+ this.topic.getNodeKey() +"\"}";
+            return "Found :"+ this.topic.name() +" {"+ this.topic.getNodeKeyField() +":'"+ this.topic.getNodeKey() +"'}";
         } else {
             return "No Match Found For :"+ this.topic.name();
         }

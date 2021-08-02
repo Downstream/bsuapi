@@ -37,7 +37,6 @@ implements QueryResultSingleColumn
 
     public JSONObject getResults()
     {
-        this.addEntry("step",this.step);
         return this.results;
     }
 
@@ -68,7 +67,7 @@ implements QueryResultSingleColumn
             this.addEntry(this.step.getDateKey(asset), asset.toJsonObject());
 
         } catch (Throwable e) {
-            this.results.put("exeption", JsonResponse.exceptionDetailed(e));
+            this.addEntry("exeption", JsonResponse.exceptionDetailed(e));
         }
     }
 
@@ -87,5 +86,10 @@ implements QueryResultSingleColumn
         groupResults.put(entry);
 
         this.results.put(dateGroup, groupResults);
+    }
+
+    protected void addEntry(Object entry)
+    {
+        this.addEntry("unexpected",entry);
     }
 }

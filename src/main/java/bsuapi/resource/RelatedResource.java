@@ -48,7 +48,7 @@ public class RelatedResource extends BaseResource
 
         try {
             result.put("related",this.buildAssetRelated(asset, c));
-            return response.data(result, "Found :"+ asset.name() +" {"+ asset.getNodeKeyField() +":\""+ asset.getNodeKey() +"\"}");
+            return response.data(result, "Found :"+ asset.name() +" {"+ asset.getNodeKeyField() +":'"+ asset.getNodeKey() +"'}");
         } catch (Exception e) {
             return response.exception(e);
         }

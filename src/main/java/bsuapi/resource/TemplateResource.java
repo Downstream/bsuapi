@@ -50,7 +50,7 @@ public class TemplateResource extends BaseResource
 
         try {
             result.put("template", this.buildTemplateAssets(topic, c));
-            return response.data(result, "Found :" + topic.name() + " {" + topic.getNodeKeyField() + ":\"" + topic.getNodeKey() + "\"}");
+            return response.data(result, "Found :" + topic.name() + " {" + topic.getNodeKeyField() + ":'" + topic.getNodeKey() + "'}");
         } catch (NullPointerException e) {
             return response.data(result, "Could not build template: "+ e.getMessage());
         } catch (Exception e) {
