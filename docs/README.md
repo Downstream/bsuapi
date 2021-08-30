@@ -13,7 +13,7 @@ The API itself is meant to be self-documenting. By visiting the root of the API 
 Example URIs, with at least one example for each available method, is available here:
 [Example API URLs](pages/example-uri.md)
 
-### Latest [bsuapi-1.8.9.jar](releases/bsuapi-1.8.9s.jar)
+### Latest [bsuapi-1.8.10.jar](releases/bsuapi-1.8.10s.jar)
 * Access the API [bsuapi/](bsuapi)
 * All Releases [releases/](releases)
 * [Simple Viewer](viewer) from [Downstream:bsu_viewer.git](https://github.com/Downstream/bsu_viewer)
@@ -36,7 +36,7 @@ Example URIs, with at least one example for each available method, is available 
   * Nginx Reverse proxy ONLY to the methods intended to be public
 
 Plugin provides a JSON API at http://localhost:7474/bsuapi
-T
+
 # Installation
 * Stop the db
 * Drop [a jar](releases) into `$NEO4j_HOME/plugins`

@@ -17,6 +17,9 @@ WITH api.lastTopicUrl as url
 CALL apoc.load.json(url) YIELD value
 
 UNWIND value.availableTopics AS topicType
+WITH topicType, value, url
+WHERE topicType IN ['artist', 'genre', 'city', 'classification', 'culture', 'medium', 'nation']
+WITH topicType, value, url
 
 UNWIND value[topicType].data AS topic
 
@@ -63,7 +66,8 @@ WITH asset, canon, value.total as pageAssetsCount,
 	toFloat(bsuapi.obj.singleClean(asset.openpipe_canonical.longitude)) AS openpipe_longitude,
 	bsuapi.obj.singleCleanObj(asset.openpipe_canonical.moment,['0']) AS openpipe_moment,
 	bsuapi.obj.singleClean(asset.openpipe_canonical.biography) AS openpipe_bio,
-	bsuapi.obj.singleClean(asset.openpipe_canonical.physicalDimensions) AS openpipe_dimensions
+	bsuapi.obj.singleClean(asset.openpipe_canonical.physicalDimensions) AS openpipe_dimensions,
+	bsuapi.obj.singleClean(asset.openpipe_canonical.displayDate) AS openpipe_displaydate
 
 WITH asset, pageAssetsCount, name, guid,
   openpipe_date,
@@ -72,6 +76,7 @@ WITH asset, pageAssetsCount, name, guid,
   openpipe_moment,
   openpipe_bio,
   openpipe_dimensions,
+  openpipe_displaydate,
   CASE WHEN openpipe_dimensions CONTAINS ',' THEN [n IN split(openpipe_dimensions, ',') | toFloat(n)] ELSE null END AS dimensions,
 
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.artist, [canon.artist, '']) AS openpipe_artist,
@@ -110,6 +115,7 @@ SET x.date = date(bsuapi.obj.openPipeDateMap(x.openpipe_date))
 SET x.moment = openpipe_moment
 SET x.biography = openpipe_bio
 SET x.openpipe_dimensions = openpipe_dimensions
+SET x.display_date = openpipe_displaydate
 SET x.dimensions = CASE WHEN dimensions CONTAINS ',' THEN [n IN split(dimensions, ',') | toFloat(n)] ELSE null END
 SET x.source = bsuapi.obj.singleClean(asset.openpipe_canonical.source)
 
