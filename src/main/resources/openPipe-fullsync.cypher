@@ -76,7 +76,7 @@ WITH asset, pageAssetsCount, name, guid,
   openpipe_moment,
   openpipe_bio,
   openpipe_dimensions,
-  openpipe_displaydate,
+  CASE WHEN openpipe_displaydate = 'null' THEN null ELSE openpipe_displaydate END AS displaydate,
   CASE WHEN openpipe_dimensions CONTAINS ',' THEN [n IN split(openpipe_dimensions, ',') | toFloat(n)] ELSE null END AS dimensions,
 
 	bsuapi.obj.openPipeCleanObj(asset.openpipe_canonical.artist, [canon.artist, '']) AS openpipe_artist,
@@ -115,7 +115,7 @@ SET x.date = date(bsuapi.obj.openPipeDateMap(x.openpipe_date))
 SET x.moment = openpipe_moment
 SET x.biography = openpipe_bio
 SET x.openpipe_dimensions = openpipe_dimensions
-SET x.display_date = openpipe_displaydate
+SET x.display_date = displaydate
 SET x.dimensions = CASE WHEN dimensions CONTAINS ',' THEN [n IN split(dimensions, ',') | toFloat(n)] ELSE null END
 SET x.source = bsuapi.obj.singleClean(asset.openpipe_canonical.source)
 
